@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>知识 on 黯梦萦辰</title>
+    <link>https://blog.tinyume.com/categories/%E7%9F%A5%E8%AF%86/</link>
+    <description>Recent content in 知识 on 黯梦萦辰</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Tue, 08 Dec 2020 15:52:00 +0000</lastBuildDate><atom:link href="https://blog.tinyume.com/categories/%E7%9F%A5%E8%AF%86/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>BOM、UTF-8 和浏览器编码问题</title>
+      <link>https://blog.tinyume.com/2020/bom-introduction/</link>
+      <pubDate>Tue, 08 Dec 2020 15:52:00 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2020/bom-introduction/</guid>
+      <description>原本只是无意间发现 https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh 这个项目，想拷到本地查看（毕竟 Gitbook 的速度也是挺不理想） 之前虽然有过类似的操作，当时是用 gitbook serve 实现在本地浏览器查看，不过这样的</description>
+    </item>
+    
+    <item>
+      <title>JS 操作 Json DOM</title>
+      <link>https://blog.tinyume.com/2019/modify-json-dom-in-html/</link>
+      <pubDate>Thu, 31 Oct 2019 00:27:08 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2019/modify-json-dom-in-html/</guid>
+      <description>起因 在修复结构化数据时，尝试使用原生 JS 去操作含在 html 标签内的 Json 简易实现方法 Json Example &amp;lt;script id=&amp;#34;myjsonid&amp;#34; type=&amp;#34;application/ld+json&amp;#34;&amp;gt; { &amp;#34;headline&amp;#34;: &amp;#34;&amp;#34;, &amp;#34;datePublished&amp;#34;: &amp;#34;&amp;#34;, &amp;#34;dateModified&amp;#34;: &amp;#34;&amp;#34;, &amp;#34;image&amp;#34;: &amp;#34;&amp;#34; // 不能添逗号否则 parse 报错 } &amp;lt;/script&amp;gt; 第一种方法 const script</description>
+    </item>
+    
+  </channel>
+</rss>

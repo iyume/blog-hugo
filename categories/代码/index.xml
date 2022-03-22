@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>代码 on 黯梦萦辰</title>
+    <link>https://blog.tinyume.com/categories/%E4%BB%A3%E7%A0%81/</link>
+    <description>Recent content in 代码 on 黯梦萦辰</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 21 Nov 2021 09:31:13 +0000</lastBuildDate><atom:link href="https://blog.tinyume.com/categories/%E4%BB%A3%E7%A0%81/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>TZMCM 2021 比赛代码</title>
+      <link>https://blog.tinyume.com/2021/tzmcm-2021/</link>
+      <pubDate>Sun, 21 Nov 2021 09:31:13 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2021/tzmcm-2021/</guid>
+      <description>比赛时间 第一阶段: 北京时间 2021 年 4 月 8 日下午 20:00 时 —— 4 月 11 日下午 20:00 时 第二阶段: 北京时间 2021 年 5 月 13 日下午 20:00 时 —— 5 月 16 日下午 20:00 时 成绩 第一阶段 分数</description>
+    </item>
+    
+    <item>
+      <title>Hackergame 2021 Writeup</title>
+      <link>https://blog.tinyume.com/2021/hackergame2021-writeup/</link>
+      <pubDate>Fri, 29 Oct 2021 12:54:22 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2021/hackergame2021-writeup/</guid>
+      <description>Overlook 比赛时间：北京时间 2021 年 10 月 23 日 中午 12:00 ～ 10 月 30 日 中午 12:00（共七天） 赛制：个人线上赛，解题模式，约 25 道题目，有实时排行榜。 比赛题目分为 4</description>
+    </item>
+    
+    <item>
+      <title>简易的个性化终端指南</title>
+      <link>https://blog.tinyume.com/2021/terminal-prettify-guideline/</link>
+      <pubDate>Sun, 04 Apr 2021 15:01:00 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2021/terminal-prettify-guideline/</guid>
+      <description>前言 默认 bash 难配置，zsh 功能强大但尺寸大易卡顿，fish 虽算是一个优良的 shell，但它并不遵循 POSIX。 并且由于 oh-my-posh 伴随了我两年多，所以最</description>
+    </item>
+    
+    <item>
+      <title>博客自动化部署-2020</title>
+      <link>https://blog.tinyume.com/2021/2020-blog-actions-docker-deploy/</link>
+      <pubDate>Fri, 26 Mar 2021 18:49:00 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2021/2020-blog-actions-docker-deploy/</guid>
+      <description>由于时间间隔较长，并且实际上使用这个方案部署了两天后我就放弃了，所以本人无法保证本文的代码可以正常使用 Preface 去年年底想着高考完了优化一下博客的访</description>
+    </item>
+    
+    <item>
+      <title>flask-bootstrap 优雅配置国内加速源</title>
+      <link>https://blog.tinyume.com/2020/flask-configure-bootstrap-mirror/</link>
+      <pubDate>Fri, 11 Dec 2020 16:21:00 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2020/flask-configure-bootstrap-mirror/</guid>
+      <description>@@ 2020-12-14 @@ Preface flask-bootstrap 是用于 flask 框架中一个 pip 包，通过 jinja2 模板继承特性可以快速开发 bootstrap。 但这个包默认采用的是 cloudflare 源，默认会包含 bootstrap.</description>
+    </item>
+    
+    <item>
+      <title>祥云杯 校赛 Write-up</title>
+      <link>https://blog.tinyume.com/2020/xiangyun-school-ctf-writeup/</link>
+      <pubDate>Sun, 22 Nov 2020 21:17:00 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2020/xiangyun-school-ctf-writeup/</guid>
+      <description>祥云杯 比赛时间：2020.11.21 9:00 - 2020.11.22 21:00 比赛形式：CTF 签到题 ZmxhZ3txcV9ncm91cF84MjY1NjYwNDB9 目测base64加密，解密得到flag 还是原来的 Ping ？ 网上稍微查查可以发现</description>
+    </item>
+    
+    <item>
+      <title>Hackergame-2020 Write-up</title>
+      <link>https://blog.tinyume.com/2020/2020-hackergame-writeup/</link>
+      <pubDate>Thu, 05 Nov 2020 21:17:00 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2020/2020-hackergame-writeup/</guid>
+      <description>Preface 此前从来没参加过 CTF、信安赛之类的，真要说类似的就是解一些过年时我所关注的各位大佬发的红包谜题了。 反正就一直对 CTF 抱有很大的念想。虽说 USTC 这</description>
+    </item>
+    
+    <item>
+      <title>Gulp 的神奇 BUG</title>
+      <link>https://blog.tinyume.com/2020/hexo-gulp-bug-report/</link>
+      <pubDate>Fri, 14 Feb 2020 20:02:14 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2020/hexo-gulp-bug-report/</guid>
+      <description>大概在年初 1 月多时被友人提醒了我的博客访问可能出了问题，后半信半疑地在隐私模式打开博客确实发现了一些问题，再拿去 Google insight 也出现了一样的问题，这才</description>
+    </item>
+    
+    <item>
+      <title>让 Material 文章更加人性化</title>
+      <link>https://blog.tinyume.com/2019/hexo-material-more-readable/</link>
+      <pubDate>Tue, 01 Oct 2019 23:10:21 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2019/hexo-material-more-readable/</guid>
+      <description>适用于 Hexo-Material Introduction 看见 Material 的文章页太简陋了，去网上查了查好像没人搞这个，于是自己动手，添加字数统计插件后完美加上了字数统计和阅读时长预计，在添加分类标</description>
+    </item>
+    
+    <item>
+      <title>TZMCM 比赛过程 &amp; 结果</title>
+      <link>https://blog.tinyume.com/2019/2019-tzmcm-go-throught/</link>
+      <pubDate>Fri, 13 Sep 2019 19:35:40 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2019/2019-tzmcm-go-throught/</guid>
+      <description>比赛时间 第一阶段：北京时间2019年4月19日下午20:00时——4月22日下午20:00时 第二阶段：北京时间2019年5月17日下午20:</description>
+    </item>
+    
+    <item>
+      <title>整理部署 Gitalk 出现的坑</title>
+      <link>https://blog.tinyume.com/2019/gitalk-problems-handbook/</link>
+      <pubDate>Fri, 13 Sep 2019 10:44:47 +0000</pubDate>
+      
+      <guid>https://blog.tinyume.com/2019/gitalk-problems-handbook/</guid>
+      <description>适用于 Hexo-Material 坑 登录报错返回 URL：/?error=redirect_uri_mismatch&amp;amp;... 初始化留言板的时候 Validation Failed(422) 原因 Github OAuth App</description>
+    </item>
+    
+  </channel>
+</rss>

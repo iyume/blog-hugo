@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='基于 oh-my-posh3 的终端个性化简易指南'><title>简易的个性化终端指南</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2021/terminal-prettify-guideline/'>
+
+<link rel="stylesheet" href="/scss/style.min.css"><meta property='og:title' content='简易的个性化终端指南'>
+<meta property='og:description' content='基于 oh-my-posh3 的终端个性化简易指南'>
+<meta property='og:url' content='https://blog.tinyume.com/2021/terminal-prettify-guideline/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2021-04-04T15:01:00&#43;00:00'/><meta property='article:modified_time' content='2021-04-04T15:01:00&#43;00:00'/>
+<meta name="twitter:title" content="简易的个性化终端指南">
+<meta name="twitter:description" content="基于 oh-my-posh3 的终端个性化简易指南">
+    <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/iyume/static/hexo-blog/img/favicon.png" />
+
+    </head>
+    <body class="
+    article-page 
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    
+        on-phone--column extended
+    
+">
+    
+        <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                
+                    <img src="https://cdn.jsdelivr.net/gh/iyume/static/hexo-blog/img/avatar.png" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        <h1 class="site-name"><a href="https://blog.tinyume.com">黯梦萦辰</a></h1>
+        <h2 class="site-description">在校大二生💕</h2>
+    </header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/about/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/archives/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+    </ol>
+</aside>
+
+    
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E4%BB%A3%E7%A0%81/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/2021/terminal-prettify-guideline/">简易的个性化终端指南</a>
+    </h2>
+
+    
+    <h3 class="article-subtitle">
+        基于 oh-my-posh3 的终端个性化简易指南
+    </h3>
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2021-04-04 15:01</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    <h1 id="前言">前言</h1>
+<p>默认 bash 难配置，zsh 功能强大但尺寸大易卡顿，fish 虽算是一个优良的 shell，但它并不遵循 POSIX。</p>
+<p>并且由于 oh-my-posh 伴随了我两年多，所以最终选择了 oh-my-posh 来写个性化终端。实际上参照官方文档和示例来写一个配置并不难，我写完下面的示例文件也只用了一个多钟，所以最终能用上一个称手的终端还是挺舒服的。</p>
+<h1 id="适用于">适用于</h1>
+<ul>
+<li>oh-my-posh (bash)</li>
+<li>windows powershell, linux most distro, macos</li>
+</ul>
+<h1 id="从示例开始">从示例开始</h1>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;$schema&#34;</span><span class="p">:</span> <span class="s2">&#34;https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;blocks&#34;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;newline&#34;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;rprompt&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;alignment&#34;</span><span class="p">:</span> <span class="s2">&#34;right&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;segments&#34;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;time&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#007ACC&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;postfix&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;prompt&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;alignment&#34;</span><span class="p">:</span> <span class="s2">&#34;left&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;segments&#34;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;session&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#FFFFFF&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;user_info_separator&#34;</span><span class="p">:</span> <span class="s2">&#34; &lt;#b0bec5&gt;on&lt;/&gt; &#34;</span><span class="p">,</span>
+            <span class="nt">&#34;prefix&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;postfix&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;user_color&#34;</span><span class="p">:</span> <span class="s2">&#34;#00e676&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;host_color&#34;</span><span class="p">:</span> <span class="s2">&#34;#7c4dff&#34;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;os&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#26C6DA&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;macos&#34;</span><span class="p">:</span> <span class="s2">&#34;\ue711&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;linux&#34;</span><span class="p">:</span> <span class="s2">&#34;\ue712&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;wsl&#34;</span><span class="p">:</span> <span class="s2">&#34;wsl&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;wsl_separator&#34;</span><span class="p">:</span> <span class="s2">&#34; &#34;</span><span class="p">,</span>
+            <span class="nt">&#34;windows&#34;</span><span class="p">:</span> <span class="s2">&#34;\ue70f&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;display_distro_name&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+            <span class="nt">&#34;alpine&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf300&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;arch&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf303&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;centos&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf304&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;debian&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf306&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;elementary&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf309&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;fedora&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf30a&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;gentoo&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf30d&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;manjaro&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf312&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;mint&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf30f&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;opensuse&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf314&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;raspbian&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf315&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;ubuntu&#34;</span><span class="p">:</span> <span class="s2">&#34;\uf31c&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;postfix&#34;</span><span class="p">:</span> <span class="s2">&#34; &#34;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;path&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;powerline&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#b0bec5&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;background&#34;</span><span class="p">:</span> <span class="s2">&#34;#2f2f2f&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;prefix&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;mixed&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;home_icon&#34;</span><span class="p">:</span> <span class="s2">&#34; \uf015 &#34;</span><span class="p">,</span>
+            <span class="nt">&#34;folder_separator_icon&#34;</span><span class="p">:</span> <span class="s2">&#34;/&#34;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;git&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;powerline&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;powerline_symbol&#34;</span><span class="p">:</span> <span class="s2">&#34;\uE0B0&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#193549&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;background&#34;</span><span class="p">:</span> <span class="s2">&#34;#95ffa4&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;display_stash_count&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="nt">&#34;display_upstream_icon&#34;</span><span class="p">:</span> <span class="kc">true</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;command&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#b0bec5&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;shell&#34;</span><span class="p">:</span> <span class="s2">&#34;bash&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;command&#34;</span><span class="p">:</span> <span class="s2">&#34;git log --pretty=format:%cr -1 || date +%H:%m:%S&#34;</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;newline&#34;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;prompt&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;alignment&#34;</span><span class="p">:</span> <span class="s2">&#34;left&#34;</span><span class="p">,</span>
+      <span class="nt">&#34;segments&#34;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#FF0266&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;prefix&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;python&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#F7CB3F&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;prefix&#34;</span><span class="p">:</span> <span class="s2">&#34;py &#34;</span><span class="p">,</span>
+            <span class="nt">&#34;postfix&#34;</span><span class="p">:</span> <span class="s2">&#34; &#34;</span><span class="p">,</span>
+            <span class="nt">&#34;display_mode&#34;</span><span class="p">:</span> <span class="s2">&#34;text&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;display_version&#34;</span><span class="p">:</span> <span class="kc">true</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;exit&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#CB4B16&#34;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;text&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;style&#34;</span><span class="p">:</span> <span class="s2">&#34;plain&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;foreground&#34;</span><span class="p">:</span> <span class="s2">&#34;#FF0266&#34;</span><span class="p">,</span>
+          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&#34;prefix&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+            <span class="nt">&#34;text&#34;</span><span class="p">:</span> <span class="s2">&#34;\u09F8&#34;</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="nt">&#34;final_space&#34;</span><span class="p">:</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="字体">字体</h2>
+<p>本人使用的是 JetBrainsMono Nerd Font Mono Regular</p>
+<p>四位数的 unicode emoji 基本支持，五位数的没测过全部</p>
+<p>如果需要使用五位数 unicode，可以去 <a class="link" href="http://www.russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm"  target="_blank" rel="noopener"
+    >Surrogate Pair Calculator etc.</a> 转码</p>
+<h2 id="选择提示符">选择提示符</h2>
+<p>示例采用了 unicode <code>\u09F8</code></p>
+<p>可以去 <a class="link" href="https://unicode-table.com/en/"  target="_blank" rel="noopener"
+    >Basic Latin — ✔️ ❤️ ★ Unicode Character Table</a> 寻找自己喜欢的提示符</p>
+<p>分享一些我第一眼比较喜欢的</p>
+<pre tabindex="0"><code>\u29F3 形状
+\uA538
+\u09F8
+\u09FB
+\u2B9E 右箭头
+\u27A5
+\u25C6 菱形
+\u261B right hand
+\u2605 星星
+\u2600 太阳
+\u2BFD male
+\u2C96 lambda
+\u03BB
+</code></pre><h2 id="换行效果">换行效果</h2>
+<p>示例在每行 prompt / 命令 之间加上了自动换行，这样可以使命令看起来不是那么密集</p>
+<p>如果需要移除，请删除第一个 newline block</p>
+<h2 id="command">Command</h2>
+<p>这个 type 是用来执行 shell command，将输出追加到 segment 内</p>
+<p>使用这个功能可以实现很多 DIY 效果</p>
+<h1 id="效果">效果</h1>
+<p><figure 
+	>
+	<a href="https://i.loli.net/2021/04/04/sMJnXau1bS3TqWI.png" >
+		<img src="https://i.loli.net/2021/04/04/sMJnXau1bS3TqWI.png"
+			
+			
+			
+			loading="lazy"
+			alt="图">
+	</a>
+	
+	<figcaption>图</figcaption>
+	
+</figure></p>
+<blockquote>
+<p>忘了把 root 的提示符截图进去了，懒得加了</p>
+</blockquote>
+<h1 id="referer">Referer</h1>
+<p>Docs: <a class="link" href="https://ohmyposh.dev/docs/configure"  target="_blank" rel="noopener"
+    >https://ohmyposh.dev/docs/configure</a></p>
+<p>Schema: <a class="link" href="https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/schema.json"  target="_blank" rel="noopener"
+    >https://github.com/JanDeDobbeleer/oh-my-posh/blob/main/themes/schema.json</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">相关文章</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/2021/tzmcm-2021/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">
+                TZMCM 2021 比赛代码</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2021/hackergame2021-writeup/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">
+                Hackergame 2021 Writeup</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2021/2020-blog-actions-docker-deploy/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">
+                博客自动化部署-2020</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2020/flask-configure-bootstrap-mirror/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">
+                flask-bootstrap 优雅配置国内加速源</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="has-image">
+    <a href="/2020/xiangyun-school-ctf-writeup/">
+        
+            <div class="article-image">
+                
+                    <img src="https://i.loli.net/2020/11/23/ASHrxb2RhTsZtGy.jpg" loading="lazy" data-key="" data-hash="https://i.loli.net/2020/11/23/ASHrxb2RhTsZtGy.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">
+                祥云杯 校赛 Write-up</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2022 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.2.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                defer="false"
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
