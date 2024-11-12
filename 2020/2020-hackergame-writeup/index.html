@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='这应该是我第一次参加 CTF，写下一些自己的做题思路吧'>
+<title>Hackergame-2020 Write-up</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2020/2020-hackergame-writeup/'>
+
+<link rel="stylesheet" href="/scss/style.min.8191399262444ab68b72a18c97392f5349be20a1615d77445be51e974c144cff.css"><meta property='og:title' content='Hackergame-2020 Write-up'>
+<meta property='og:description' content='这应该是我第一次参加 CTF，写下一些自己的做题思路吧'>
+<meta property='og:url' content='https://blog.tinyume.com/2020/2020-hackergame-writeup/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-11-05T21:17:00&#43;08:00'/><meta property='article:modified_time' content='2020-11-05T21:17:00&#43;08:00'/><meta property='og:image' content='https://i.loli.net/2020/11/07/M8jvAhqg76UBNea.jpg' />
+<meta name="twitter:title" content="Hackergame-2020 Write-up">
+<meta name="twitter:description" content="这应该是我第一次参加 CTF，写下一些自己的做题思路吧"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://i.loli.net/2020/11/07/M8jvAhqg76UBNea.jpg' />
+    <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/iyume/static/hexo-blog/img/favicon.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://cdn.jsdelivr.net/gh/iyume/static/hexo-blog/img/avatar.png" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="social-menu">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>暗色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#preface">Preface</a></li>
+    <li><a href="#q-list">Q List</a>
+      <ol>
+        <li><a href="#签到">签到</a></li>
+        <li><a href="#猫咪问答">猫咪问答++</a></li>
+        <li><a href="#2048">2048</a></li>
+        <li><a href="#一闪而过的-flag">一闪而过的 Flag</a></li>
+        <li><a href="#从零开始的记账工具人">从零开始的记账工具人</a></li>
+        <li><a href="#自复读的复读机">自复读的复读机</a>
+          <ol>
+            <li><a href="#以上不详细讲了进入解题吧">以上不详细讲了，进入解题吧</a></li>
+            <li><a href="#小小的题外话">小小的题外话</a></li>
+          </ol>
+        </li>
+        <li><a href="#233-同学的-docker">233 同学的 Docker</a></li>
+        <li><a href="#其它的">其它的</a></li>
+        <li><a href="#狗狗银行">狗狗银行</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/2020/2020-hackergame-writeup/">
+                
+                    <img src="https://i.loli.net/2020/11/07/M8jvAhqg76UBNea.jpg" loading="lazy" alt="Featured image of post Hackergame-2020 Write-up" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%97%A5%E5%B8%B8/" style="background-color: #2a9d8f; color: #fff;">
+                日常
+            </a>
+        
+            <a href="/categories/%E4%BB%A3%E7%A0%81/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2020/2020-hackergame-writeup/">Hackergame-2020 Write-up</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            这应该是我第一次参加 CTF，写下一些自己的做题思路吧
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2020-11-05 21:17</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 12 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="preface">Preface</h2>
+<p>此前从来没参加过 CTF、信安赛之类的，真要说类似的就是解一些过年时我所关注的各位大佬发的红包谜题了。</p>
+<p>反正就一直对 CTF 抱有很大的念想。虽说 USTC 这个只有个人赛，不过早就听说其难度老少皆宜了，大学后可支配时间也多了，作为我的第一次比赛正好。</p>
+<p>大佬们就没必要看了（</p>
+<h2 id="q-list">Q List</h2>
+<ul>
+<li>签到</li>
+<li>猫咪问答++</li>
+<li>2048</li>
+<li>一闪而过的 Flag</li>
+<li>从零开始的记账工具人</li>
+<li>超简单的世界模拟器(2)</li>
+<li>从零开始的火星文生活</li>
+<li>自复读的复读机(2)</li>
+<li>233 同学的字符串工具</li>
+<li>233 同学的 Docker</li>
+<li>从零开始的 HTTP 链接</li>
+<li>来自一教的图片</li>
+<li>超简陋的 OpenGL 小程序</li>
+<li>生活在博弈树上(2)</li>
+<li>来自未来的信笺</li>
+<li>狗狗银行</li>
+<li>超基础的数理计算器</li>
+<li>永不溢出的计算器</li>
+<li>普通的身份认证器</li>
+<li>超精巧的数字论证器</li>
+<li>超自动的开箱模拟器</li>
+<li>室友的加密硬盘</li>
+<li>超简易的网盘服务器</li>
+<li>超安全的代理服务器(2)</li>
+<li>证验码</li>
+<li>动态链接库检查器</li>
+<li>超精准的宇宙射线模拟器</li>
+<li>超迷你的挖矿模拟器</li>
+<li>Flag 计算机</li>
+<li>中间人(2)</li>
+<li>不经意传输(2)</li>
+</ul>
+<h3 id="签到">签到</h3>
+<blockquote>
+<p>选手要多少个 flag，我就给多少个 flag，绿色背景，红色加粗，显眼的位置，标准的格式，这都不叫送，那还有什么叫做送。</p>
+<p>点击 「打开/下载题目」 按钮，打开 flag 提取器，获取第一个 flag 吧！</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/11/05/pzZdqPi69kGKu8y.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>直接滑动是滑不到<code>1</code>的</p>
+<p>让我们打开控制台看看</p>
+<p><img src="https://i.loli.net/2020/11/05/52XQa8pzIlBW9mn.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>定位到滑动块的元素，可以发现这个<code>step</code>属性值很奇怪，把它给改成<code>1</code>、<code>0.5</code>、<code>0.1</code>之类的值再滑动一下，就发现可以定位到 <code>1</code> 了，再点提取</p>
+<p>第一个 Flag 就得到了</p>
+<h3 id="猫咪问答">猫咪问答++</h3>
+<blockquote>
+<p>这题其实我是留到第二天才做的</p>
+</blockquote>
+<p><a class="link" href="https://i.loli.net/2020/11/05/pfAlS3bKj7hHmoa.png"  target="_blank" rel="noopener"
+    >点此查看题目截图</a></p>
+<p>此题考察搜索引擎的使用能力。</p>
+<p>先说说答案吧，从第一问到第五问分别是<code>12</code>、<code>256</code>、<code>9</code>、<code>9</code>、<code>17098</code>。</p>
+<p>我当时没能查到第一题和第二题，第四题一开始用错成了谷歌全景，后来被朋友指点才发现要用百度全景。</p>
+<p>这是当时用 Python 写的遍历</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium.webdriver.common.keys</span> <span class="kn">import</span> <span class="n">Keys</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium.common.exceptions</span> <span class="kn">import</span> <span class="n">NoSuchElementException</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">bs</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;http://202.38.93.111:10001/?token=1294%3AMEYCIQDGGgsw4ZIS8VYoonINuZNHwWagU8HonbAS8xibpRsb8QIhAMtC8zWSEbqwPOgmgaix0hzT%2Bho30JdIC8fp%2B1Uojwdg&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[1]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[1]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[2]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[2]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[3]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[3]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[4]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[4]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[5]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[5]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 用眼睛看吧，不想写字符串识别了</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">23</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[2]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[2]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[3]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[3]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">256</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[4]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[4]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[5]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[5]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[6]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/div[6]/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">17098</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/div/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># keyboard interrupt 后第一问答案为 12</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>写的很丑，但既然用到了，那就写进 Write-up</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/11/06/FR7QMYHPUn3ilNj.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>最终得到第二题的 Flag</p>
+<h3 id="2048">2048</h3>
+<blockquote>
+<p>要实现 FLXG，你需要过人的智慧，顽强的意志，和命运的眷属。只有在 2048 的世界里证明自己拥有这些宝贵的品质，实现「大成功」，你才有资格扛起 FLXG 的大旗。</p>
+</blockquote>
+<p>一个并不寻常的 2048</p>
+<p>我一开始真的就玩了起来&hellip;然后玩到<code>炸毁金矿</code>我心态就跟着炸了，这 TM 怎么还没结束啊（</p>
+<p>我当时也挺呆的，就写了个脚本让它自己跑&hellip;emm</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium.webdriver.common.keys</span> <span class="kn">import</span> <span class="n">Keys</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium.common.exceptions</span> <span class="kn">import</span> <span class="n">NoSuchElementException</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 打开firefox，并访问2048游戏界面</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;http://202.38.93.111:10005/&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s2">&#34;token&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s2">&#34;token&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&#34;1294:MEYCIQDGGgsw4ZIS8VYoonINuZNHwWagU8HonbAS8xibpRsb8QIhAMtC8zWSEbqwPOgmgaix0hzT+ho30JdIC8fp+1Uojwdg&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/form/input[2]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">html</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 每四个方向操作后判断游戏是否结束</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;send up,right,down,left&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">html</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">UP</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">html</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">RIGHT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">html</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">DOWN</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">html</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">game_over</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div/div[3]/div/p&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">game_over</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s1">&#39;FLXG 永不放弃！&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">#score = bs.find_element_by_class_name(&#39;score-container&#39;)    #当前得分</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">#print(&#39;game over, score is %s&#39; % score.text)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">#print(&#39;wait 3 seconds, try again&#39;)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">#time.sleep(3)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 游戏结束后，等待3秒，自动点击try again重新开始</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;重新开始&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">try_again</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_class_name</span><span class="p">(</span><span class="s1">&#39;retry-button&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">try_again</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后丢到后台没理它，开始做下一题了</p>
+<blockquote>
+<p>Two thousand years later&hellip;</p>
+</blockquote>
+<p>当我翻到后台——</p>
+<p><img src="https://i.loli.net/2020/11/05/yYrAFqGbuva5PKx.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>WTF？跑到了 5436 还没结果时我就知道我方法错了</p>
+<p>View-source 走起</p>
+<p><img src="https://i.loli.net/2020/11/05/5DaNYxegl7RjcQP.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>诶这不是赤裸裸的提示嘛</p>
+<p>点进去看看</p>
+<p><img src="https://i.loli.net/2020/11/05/zQgDj395It7FB2A.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>看到这里我就知道脚本永远跑不出来了</p>
+<p>再往下翻翻</p>
+<p><img src="https://i.loli.net/2020/11/05/o6yi9xf5ZcMCSXs.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>原来是 js 跳转，那我们直接把<code>url</code>拿出来就行了，可这个<code>url</code>有点奇怪，里面有个函数，拿到控制台跑一下试试</p>
+<p><img src="https://i.loli.net/2020/11/05/sil8qUzjNCvWSGI.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>成功获取了真正的<code>url</code>！输入网址回车</p>
+<p>得到第三题的 Flag</p>
+<h3 id="一闪而过的-flag">一闪而过的 Flag</h3>
+<blockquote>
+<p>flag 来了，可是我什么也看不见！</p>
+</blockquote>
+<p>先下载文件</p>
+<p><img src="https://i.loli.net/2020/11/06/pIFYix1yEhCAjsG.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>直接双击运行只会看到黑框出现一下就消失了</p>
+<ul>
+<li>
+<p>第一种方法：直接快速截屏，肉眼识别</p>
+</li>
+<li>
+<p>第二种方法：在命令行运行文件</p>
+</li>
+</ul>
+<p>这里采用第二种</p>
+<p><img src="https://i.loli.net/2020/11/06/iu18QkLMeKd23fc.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>复制</p>
+<p>得到第四题的 Flag</p>
+<h3 id="从零开始的记账工具人">从零开始的记账工具人</h3>
+<blockquote>
+<p>这不是很简单吗？电子表格里面一拖动就算出来了</p>
+</blockquote>
+<p>考察搜索引擎使用以及小脚本的编写</p>
+<p>先把题目下载下来</p>
+<p><img src="https://i.loli.net/2020/11/06/OWnagBTKFYqHN6Z.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>先看看<code>bills.xlsx</code>，里面是 1000 行人民币大写金额，那么题目要求就是全部转换小写求和了</p>
+<p>这题我一开始就想到了<code>Python</code>，又是我最熟悉的大数据分析，于是直接把<code>bills.xlsx</code>上传到了树莓派的内网<code>notebook</code>服务器上</p>
+<p>首先需要找一个人民币大写转小写的函数做轮子，再用数量乘金额并求和</p>
+<p>代码如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">aoligeiganle</span><span class="p">(</span><span class="n">amount</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chinese_num</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;零&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;壹&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;贰&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;叁&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;肆&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;伍&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;陆&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;柒&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;捌&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;玖&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">chinese_amount</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;分&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;角&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;元&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;拾&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;佰&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;仟&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;圆&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">amount_float</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s1">&#39;亿&#39;</span> <span class="ow">in</span> <span class="n">amount</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">yi</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(.+)亿.*&#39;</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">amount_yi</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chinese_amount</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">yi</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">amount_yi</span> <span class="o">+=</span> <span class="n">chinese_num</span><span class="p">[</span><span class="n">yi</span><span class="p">[</span><span class="n">yi</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="n">chinese_amount</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">yi</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">chinese_num</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">            <span class="n">amount_yi</span> <span class="o">+=</span> <span class="n">chinese_num</span><span class="p">[</span><span class="n">yi</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">amount_float</span> <span class="o">+=</span> <span class="n">amount_yi</span> <span class="o">*</span> <span class="mi">100000000</span>
+</span></span><span class="line"><span class="cl">        <span class="n">amount</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.+亿&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s1">&#39;万&#39;</span> <span class="ow">in</span> <span class="n">amount</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">wan</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="k">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(.+)万.*&#39;</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">amount_wan</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chinese_amount</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">wan</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">amount_wan</span> <span class="o">+=</span> <span class="n">chinese_num</span><span class="p">[</span><span class="n">wan</span><span class="p">[</span><span class="n">wan</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="n">chinese_amount</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">wan</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">chinese_num</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">            <span class="n">amount_wan</span> <span class="o">+=</span> <span class="n">chinese_num</span><span class="p">[</span><span class="n">wan</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">amount_float</span> <span class="o">+=</span> <span class="n">amount_wan</span> <span class="o">*</span> <span class="mi">10000</span>
+</span></span><span class="line"><span class="cl">        <span class="n">amount</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.+万&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">amount_yuan</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chinese_amount</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">amount</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">amount</span><span class="p">[</span><span class="n">amount</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">chinese_num</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">                <span class="n">amount_yuan</span> <span class="o">+=</span> <span class="n">chinese_num</span><span class="p">[</span><span class="n">amount</span><span class="p">[</span><span class="n">amount</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="n">chinese_amount</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">amount_float</span> <span class="o">+=</span> <span class="n">amount_yuan</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">amount_float</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;./bills.xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;Sheet1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">raw_price_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">price_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">num_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;数量&#39;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">raw_price_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aoligeiganle</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;单价&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl"><span class="n">raw_price_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">raw_price_list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">num_list</span><span class="p">,</span> <span class="n">raw_price_list</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里其实麻烦也挺多的，很后面才发现找来的这个函数不完整，没有对<code>拾</code>开头汉字金额的进行处理</p>
+<p><img src="https://i.loli.net/2020/11/06/S4duyZ5mxzRWa2P.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>于是在函数尾部加上以下代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">if</span> <span class="s1">&#39;拾&#39;</span> <span class="ow">in</span> <span class="n">amount</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">amount_float</span> <span class="o">+=</span> <span class="mi">10</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最终运算结果是这样的</p>
+<p><img src="https://i.loli.net/2020/11/06/DZtu5snPmXKgJ2Y.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>答案<code>12422.75</code>，这就是第五题的 Flag 值了</p>
+<p>得到第五题 Flag</p>
+<h3 id="自复读的复读机">自复读的复读机</h3>
+<blockquote>
+<p>能够复读其他程序输出的程序只是普通的复读机。</p>
+<p>顶尖的复读机还应该能复读出自己的源代码。</p>
+<p>什么是国际复读机啊（战术后仰）</p>
+</blockquote>
+<p>这题应该是我耗时最长的题目了，不过题目本身还是非常有意思的</p>
+<p>先来读题</p>
+<blockquote>
+<p>你现在需要编写两个只有一行 Python 代码的顶尖复读机：</p>
+<p>满足两个条件分别对应了两个 flag</p>
+<ul>
+<li>
+<p>其中一个要输出代码本身的逆序（即所有字符从后向前依次输出）</p>
+</li>
+<li>
+<p>另一个是输出代码本身的 sha256 哈希值，十六进制小写</p>
+</li>
+</ul>
+</blockquote>
+<p>遇事不懂，首先谷歌</p>
+<p>Quine 是什么？</p>
+<blockquote>
+<p>A quine is a computer program which takes no input and produces a copy of its own source code as its only output. The standard terms for these programs in the computability theory and computer science literature are &ldquo;self-replicating programs&rdquo;, &ldquo;self-reproducing programs&rdquo;, and &ldquo;self-copying programs&rdquo;.</p>
+<p>&mdash;-Wiki</p>
+</blockquote>
+<p>简而言之就是打印出代码本身</p>
+<p>看来 Quine 就是我们所需要的了</p>
+<p>找到以下文章供参考</p>
+<p><a class="link" href="http://littledva.cn/article-24/"  target="_blank" rel="noopener"
+    >http://littledva.cn/article-24/</a></p>
+<p>还是打开我最熟悉的<code>notebook</code>，一步步来解析题目吧！</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">);</span><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c)&#34;</span><span class="p">;</span><span class="nb">print</span><span class="p">((</span><span class="s1">&#39;a=chr(39);c=&#34;+a)*2+c)&#34;;print((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>先把范例拿进去试试，的确输出了代码本身</p>
+<p>然后解析一下这段代码的原理</p>
+<ul>
+<li>
+<p>代码只有一个<code>print</code>函数</p>
+</li>
+<li>
+<p>代码可以拆成以下三部分</p>
+<ol>
+<li>
+<p>a=chr(39);c=&quot;+a)*2+c)&quot;;print(('</p>
+</li>
+<li>
+<p>a=chr(39);c=&quot;+a)*2+c)&quot;;print(('</p>
+</li>
+<li>
+<p>+a)*2+c)</p>
+</li>
+</ol>
+</li>
+<li>
+<p><code>print</code>的层级</p>
+<ol>
+<li>
+<p>&lsquo;a=chr(39);c=&quot;+a)*2+c)&quot;;print((&rsquo;</p>
+</li>
+<li>
+<p>(&lsquo;1&rsquo;+a)*2</p>
+</li>
+<li>
+<p>(&lsquo;1&rsquo;+a)*2+c</p>
+</li>
+</ol>
+</li>
+</ul>
+<p>仔细看看就可以明白代码自复读的原理了</p>
+<h4 id="以上不详细讲了进入解题吧">以上不详细讲了，进入解题吧</h4>
+<blockquote>
+<p>第一题：输出代码本身的逆序（即所有字符从后向前依次输出）</p>
+</blockquote>
+<p>我们知道<code>Python</code>字符串逆序有以下两种方法（其余不介绍）：</p>
+<ul>
+<li>
+<p>str[::-1]</p>
+</li>
+<li>
+<p>&lsquo;&rsquo;.join(reversed(str))</p>
+</li>
+</ul>
+<p>显然第一个看起来简单好写，从第一个入手</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">);</span><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c)&#34;</span><span class="p">;</span><span class="nb">print</span><span class="p">((</span><span class="s1">&#39;a=chr(39);c=&#34;+a)*2+c)&#34;;print((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们要输出逆序，那就直接在<code>print</code>最后加个<code>[::-1]</code>试试呗</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">);</span><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c)&#34;</span><span class="p">;</span><span class="nb">print</span><span class="p">(((</span><span class="s1">&#39;a=chr(39);c=&#34;+a)*2+c)&#34;;print((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 输出 )c+2*)a+&#39;((tnirp;&#34;)c+2*)a+&#34;=c;)93(rhc=a&#39;((tnirp;&#34;)c+2*)a+&#34;=c;)93(rhc=a</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 正序 a=chr(39);c=&#34;+a)*2+c)&#34;;print((&#39;a=chr(39);c=&#34;+a)*2+c)&#34;;print((&#39;+a)*2+c)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>少了<code>[::-1]</code>和一对括号，那就加到<code>c</code>里面去</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">);</span><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c)[::-1])&#34;</span><span class="p">;</span><span class="nb">print</span><span class="p">(((</span><span class="s1">&#39;a=chr(39);c=&#34;+a)*2+c)[::-1])&#34;;print(((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 输出 )]1-::[)c+2*)a+&#39;(((tnirp;&#34;)]1-::[)c+2*)a+&#34;=c;)93(rhc=a&#39;(((tnirp;&#34;)]1-::[)c+2*)a+&#34;=c;)93(rhc=a</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 正序 a=chr(39);c=&#34;+a)*2+c)[::-1])&#34;;print(((&#39;a=chr(39);c=&#34;+a)*2+c)[::-1])&#34;;print(((&#39;+a)*2+c)[::-1])</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>完成！它输出了自身的倒序！</p>
+<p>可这还不够，我们把它丢到<code>web executor</code>试试</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">Your</span> <span class="n">code</span> <span class="ow">is</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;a=chr(39);c=&#34;+a)*2+c)[::-1])&#34;;print(((</span><span class="se">\&#39;</span><span class="s1">a=chr(39);c=&#34;+a)*2+c)[::-1])&#34;;print(((</span><span class="se">\&#39;</span><span class="s1">+a)*2+c)[::-1])&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Output</span> <span class="n">of</span> <span class="n">your</span> <span class="n">code</span> <span class="ow">is</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;)]1-::[)c+2*)a+</span><span class="se">\&#39;</span><span class="s1">(((tnirp;&#34;)]1-::[)c+2*)a+&#34;=c;)93(rhc=a</span><span class="se">\&#39;</span><span class="s1">(((tnirp;&#34;)]1-::[)c+2*)a+&#34;=c;)93(rhc=a</span><span class="se">\n</span><span class="s1">&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>它发生了什么？多了个<code>\n</code>！</p>
+<p>其实我看到这里犯了个迷糊，既然你输出<code>\n</code>那我也输出一个<code>\n</code>不就是了吗（大声）<del>不</del></p>
+<p>然后有了以下代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">);</span><span class="n">b</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">92</span><span class="p">)</span><span class="o">+</span><span class="s2">&#34;n&#34;</span><span class="p">;</span><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c)[::-1]+b)&#34;</span><span class="p">;</span><span class="nb">print</span><span class="p">(((</span><span class="s1">&#39;a=chr(39);b=chr(92)+&#34;n&#34;;c=&#34;+a)*2+c)[::-1]+b)&#34;;print(((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后&hellip;</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">Your</span> <span class="n">code</span> <span class="ow">is</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;a=chr(39);b=chr(92)+&#34;n&#34;;c=&#34;+a)*2+c)[::-1]+b)&#34;;print(((</span><span class="se">\&#39;</span><span class="s1">a=chr(39);b=chr(92)+&#34;n&#34;;c=&#34;+a)*2+c)[::-1]+b)&#34;;print(((</span><span class="se">\&#39;</span><span class="s1">+a)*2+c)[::-1]+b)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Output</span> <span class="n">of</span> <span class="n">your</span> <span class="n">code</span> <span class="ow">is</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;)b+]1-::[)c+2*)a+</span><span class="se">\&#39;</span><span class="s1">(((tnirp;&#34;)b+]1-::[)c+2*)a+&#34;=c;&#34;n&#34;+)29(rhc=b;)93(rhc=a</span><span class="se">\&#39;</span><span class="s1">(((tnirp;&#34;)b+]1-::[)c+2*)a+&#34;=c;&#34;n&#34;+)29(rhc=b;)93(rhc=a</span><span class="se">\\</span><span class="s1">n</span><span class="se">\n</span><span class="s1">&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我就忍不住笑了 hhh</p>
+<p>后来我才想到是<code>print</code>自带的换行啊，那我加个<code>end=''</code>不就行了吗</p>
+<p>于是正确代码如下——</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">);</span><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c)[::-1],end=&#34;</span><span class="o">+</span><span class="n">a</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="s2">&#34;)&#34;</span><span class="p">;</span><span class="nb">print</span><span class="p">(((</span><span class="s1">&#39;a=chr(39);c=&#34;+a)*2+c)[::-1],end=&#34;+a*2+&#34;)&#34;;print(((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://i.loli.net/2020/11/06/5YKdA9vHisSmODh.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>得到此题第一个 Flag</p>
+<blockquote>
+<p>第二题：输出代码本身的 sha256 哈希值，十六进制小写</p>
+</blockquote>
+<p>此题难度高一点</p>
+<p>先贴出源代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span><span class="p">;</span><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">);</span><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c+a+&#34;</span><span class="p">;</span><span class="n">d</span><span class="o">=</span><span class="n">a</span><span class="o">+</span><span class="s2">&#34;+d).encode()).hexdigest(),end=&#34;</span><span class="o">+</span><span class="n">a</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="s2">&#34;)&#34;</span><span class="p">;</span><span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(((</span><span class="s1">&#39;import hashlib;a=chr(39);c=&#34;+a)*2+c+a+&#34;;d=a+&#34;+d).encode()).hexdigest(),end=&#34;+a*2+&#34;)&#34;;print(hashlib.sha256(((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="o">+</span><span class="n">a</span><span class="o">+</span><span class="s1">&#39;.encode()).hexdigest())&#39;</span><span class="o">+</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">(),</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>就随便讲讲思路吧，前面其实挺好构造的，主要是后面那一块</p>
+<p>这个构造就是靠眼力，哪里多了个单引号，哪里少了个括号，添添补补就完事了。</p>
+<p>构造<code>d</code>的原理和构造<code>c</code>的原理是一样的</p>
+<p>构造原型是这样的——</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">hashlib</span><span class="p">;</span><span class="nb">print</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="s2">&#34;codeself&#34;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>codeself</code>就是输出这个代码本身了</p>
+<p>在进行构造时，可以把<code>codeself</code>写成如下形式方便参考</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">a</span><span class="o">=</span><span class="nb">chr</span><span class="p">(</span><span class="mi">39</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">c</span><span class="o">=</span><span class="s2">&#34;+a)*2+c+a+&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span><span class="o">=</span><span class="n">a</span><span class="o">+</span><span class="s2">&#34;+d).encode()).hexdigest(),end=&#34;</span><span class="o">+</span><span class="n">a</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="s2">&#34;)&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">((</span><span class="s1">&#39;import hashlib;a=chr(39);c=&#34;+a)*2+c+a+&#34;;d=a+&#34;+d).encode()).hexdigest(),end=&#34;+a*2+&#34;)&#34;;print(hashlib.sha256(((&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="n">c</span><span class="o">+</span><span class="n">a</span><span class="o">+</span><span class="s1">&#39;.encode()).hexdigest())&#39;</span><span class="o">+</span><span class="n">d</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>一般来说，只要这里输出和你的源代码一样，那这个题目就完成了</p>
+<p>然后放到<code>web executor</code></p>
+<p><img src="https://i.loli.net/2020/11/06/nulRX6h31i98Hsx.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>得到此题第二个 Flag</p>
+<h4 id="小小的题外话">小小的题外话</h4>
+<p>当时做这题时周末已经结束了，于是我用思修课加一节晚自习，靠手写把这两题硬生生写出来的，用了整整四张草稿纸。</p>
+<p><img src="https://i.loli.net/2020/11/06/dclWbRTk6yEOXPa.jpg"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h3 id="233-同学的-docker">233 同学的 Docker</h3>
+<blockquote>
+<p>既然已经删掉了，应该不会被人找出来吧？</p>
+</blockquote>
+<p>我本人并未使用过<code>Docker</code>，因此解这题并没有用到什么特别高级的技巧或者命令</p>
+<p>先把镜像拉下来</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo docker pull 8b8d3c8324c7/stringtool
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看一下修改历史</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo docker <span class="nb">history</span> 8b8d3c8324c7/stringtool
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://i.loli.net/2020/11/06/LCGN6Dmo57wahKZ.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>第二行这个<code>flag.txt</code>明显就是我们需要的了</p>
+<p>进入<code>docker</code>主目录</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">cd</span> /var/lib/docker
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>直接搜索<code>flag.txt</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo find . <span class="p">|</span> grep flag.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://i.loli.net/2020/11/06/geqpa78cIlAN3Vr.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>出现了两个结果，分别<code>cat</code>一下看看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo cat ./overlay2/a81374850a078b714197906a329e0250980bb2d44506c274e367c1e65e0af83d/diff/code/flag.txt
+</span></span><span class="line"><span class="cl">sudo cat ./overlay2/1595e998716bd50a416f17e04ac40a819e138974da1463cab6428319794c42e8/diff/code/flag.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://i.loli.net/2020/11/06/9SZWPEXBHVRFCGL.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>在第二个文件中发现了我们需要的 Flag</p>
+<h3 id="其它的">其它的</h3>
+<h3 id="狗狗银行">狗狗银行</h3>
+<blockquote>
+<p>你能在狗狗银行成功薅到羊毛吗？</p>
+</blockquote>
+<p>先说明这题我并没能解出来，后来才听我朋友说要用<code>burp</code></p>
+<blockquote>
+<p>不对，没解出来能算进<code>Write-up</code>的一部分嘛，于是我就写了个<code>其它的</code></p>
+</blockquote>
+<p>进去网页看看</p>
+<p><img src="https://i.loli.net/2020/11/06/z6N93RicFg8Q7TS.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>一开始会给你初始资产<code>1000</code>，把它薅到<code>2000</code>就是胜利了</p>
+<ul>
+<li>
+<p>收入来源：<code>储蓄卡利息</code></p>
+</li>
+<li>
+<p>支出方向：<code>吃饭</code>、<code>还款利息</code></p>
+</li>
+</ul>
+<p>研究一下利息可以发现，它在<code>1000</code>时每日利息为<code>3</code>，可在<code>167</code>时每日利息为<code>1</code>，那我分出把<code>1000</code>分成六张<code>167</code>的卡试试，结果发现利息涨为每日<code>6</code>了，于是我的基本思路就是<code>借款吃饭，用储蓄卡利息叠钱叠利息</code></p>
+<p>手动有点麻烦，写个<code>selenium</code>自动脚本试试</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium.webdriver.common.keys</span> <span class="kn">import</span> <span class="n">Keys</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">selenium.common.exceptions</span> <span class="kn">import</span> <span class="n">NoSuchElementException</span><span class="p">,</span> <span class="n">StaleElementReferenceException</span><span class="p">,</span> <span class="n">ElementClickInterceptedException</span><span class="p">,</span> <span class="n">UnexpectedAlertPresentException</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 打开狗狗银行</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">bs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;http://202.38.93.111:10100/?token=1294%3AMEYCIQDGGgsw4ZIS8VYoonINuZNHwWagU8HonbAS8xibpRsb8QIhAMtC8zWSEbqwPOgmgaix0hzT%2Bho30JdIC8fp%2B1Uojwdg&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">html</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 添加 600 个储蓄卡，33 为对应办新卡的数字+1</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># bs.find_element_by_xpath(&#34;/html/body/div/section/main/section/aside/div/div[184]&#34;).click()</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># time.sleep(1)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># for i in range(600):</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     bs.find_element_by_class_name(&#34;ant-card-extra&#34;).click()</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     time.sleep(0.8)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">transfer</span><span class="p">(</span><span class="n">hunter</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div/section/main/section/main/div[1]/div/div/div[1]/div[2]/button&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span> <span class="c1"># 点击转账按钮</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div[2]/div/div[2]/div/div[2]/div[2]/form/div[1]/div[2]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span> <span class="c1"># 点击第一个框</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># bs.find_element_by_xpath(&#34;/html/body/div[3]/div/div/div/div[2]/div/div/div[&#34; + hunter + &#34;]&#34;).click() # 选择 hunter，数字代表对应储蓄卡</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ele_first</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div[3]/div/div/div/div[2]&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">hunter</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ele_first</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">ENTER</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hunter</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ele_first</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">DOWN</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ele_first</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">ENTER</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div[2]/div/div[2]/div/div[2]/div[2]/form/div[2]/div[2]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span> <span class="c1"># 点击第二个框</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># bs.find_element_by_xpath(&#34;/html/body/div[4]/div/div/div/div[2]/div/div/div[&#34; + target + &#34;]&#34;).click() # 选择 target，数字代表对应储蓄卡</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">ele_second</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div[4]/div/div/div/div[2]&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ele_second</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">ENTER</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ele_second</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">DOWN</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ele_second</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">ENTER</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div[2]/div/div[2]/div/div[2]/div[2]/form/div[3]/div[2]/div/div/div/div[2]/input&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># 输入金额，目前固定 5 元</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div[2]/div/div[2]/div/div[2]/div[3]/button[2]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span> <span class="c1"># convert</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 基本设计方法，每次信用卡借款5次，从大于167余额的储蓄卡转相应数额到不足的卡</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 信用卡借款 5 次</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">rent_money</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div/section/main/section/aside/div/div[8]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">times</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div/section/main/section/main/div[2]/div/form/button&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 获取所有卡的余额,余额为 172 或者大于 172 的卡转给不足 167 的卡，根据差分倍数进行多次转账</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 借款模块</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div/section/main/section/aside/div/div[8]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">times</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;借款 1 次&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div/section/main/section/main/div[2]/div/form/button&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="n">NoSuchElementException</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;无此元素报错，可能是页面未刷新完全，继续下一个动作&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bs</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 转账模块</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">banl_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">):</span> <span class="c1"># 减小内存占用，请在此设置操作的储蓄卡区间，需要大于下面设置的值</span>
+</span></span><span class="line"><span class="cl">            <span class="n">banl</span> <span class="o">=</span> <span class="n">bs</span><span class="o">.</span><span class="n">find_element_by_xpath</span><span class="p">(</span><span class="s2">&#34;/html/body/div/section/main/section/aside/div/div[&#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;]/div[2]/div/span[2]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+</span></span><span class="line"><span class="cl">            <span class="n">banl_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">banl</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">insuff</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">banl_list</span><span class="p">))</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">167</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span> <span class="c1"># 减小内存占用，请在此设置操作的储蓄卡区间</span>
+</span></span><span class="line"><span class="cl">            <span class="n">insuff_Card_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">            <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">172</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; 余额为 &#34;</span> <span class="o">+</span> <span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; 转给储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">transfer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">167</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; 转给储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&#34; 第二次&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">transfer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">167</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; 转给储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&#34; 第三次&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                            <span class="n">transfer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">                            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="mi">167</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                                <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; 转给储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&#34; 第三次&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">transfer</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">insuff</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">                                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">except</span> <span class="n">NoSuchElementException</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;无此元素报错，可能是页面未刷新完全，继续下一个动作&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">                <span class="k">except</span> <span class="n">StaleElementReferenceException</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;选择元素报错，原因未知，刷新页面，继续下一个动作&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">bs</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">except</span> <span class="n">ElementClickInterceptedException</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;表单选择错误，可能是识别混乱，刷新页面，继续下一个动作&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">bs</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">172</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">insuff_Card_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="n">banl_list</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">                    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;储蓄卡 &#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; 不足172元，跳过&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">insuff_Card_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;储蓄卡 &#34;</span> <span class="o">+</span> <span class="s2">&#34;&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">insuff_Card_list</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34; 空空如也&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="n">UnexpectedAlertPresentException</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;未知错误，刷新&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bs</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>首先设置了一个转账函数<code>transfer()</code>，把固定金额从一个卡转到另一个卡</p>
+<p>其次是生成储蓄卡，用于自动生成<code>600</code>张储蓄卡</p>
+<p>再是借款模块，在每次循环开始借款<code>5</code>次</p>
+<p>再写一个转账模块，包括识别和函数</p>
+<p>再把报错处理一下，全部模块丢进<code>while True</code></p>
+<blockquote>
+<p>以上仅为测试用，所以并没有写的很深入，比如固定金额转账，还有一些报错处理没完善</p>
+</blockquote>
+<p>当时我是比赛第一天熬夜写的脚本，花了<code>4</code>个钟</p>
+<p>第二天就丢在后台运行了一个下午，后来就变成上面图片那样，负资产越来越多直到<code>-5000</code></p>
+<p>然后我就不想去碰这题了（题目真屑————啊不对，我真屑</p>
+<p>至于用<code>burp</code>解题，我不会啊啊啊（（</p>
+<h3 id="总结">总结</h3>
+<blockquote>
+<p>当前分数：900， 总排名：379 / 2340</p>
+</blockquote>
+<p>binary：0 ， general：750 ， math：0 ， web：150
+（非准确数值）</p>
+<p>估计再过一天也做不出来什么题目</p>
+<p>排行榜看看，发现苏卡卡已经<code>3100</code>分了</p>
+<p><img src="https://i.loli.net/2020/11/06/kPH9vUGtiYsJM1T.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>对比赛总结一下就是</p>
+<ul>
+<li>
+<p><code>web</code>相关的难一点点的话一个解不出来，思路倒是有挺多，主要是工具不会用（</p>
+</li>
+<li>
+<p>能真正用到<code>selenium</code>的地方确实不多，<del>以后还是不费这么大劲去写它了</del></p>
+</li>
+<li>
+<p>能做出来的题目做得还是非常愉快的，也确实<code>老少皆宜</code></p>
+</li>
+<li>
+<p>（果然我就是菜鸡）</p>
+</li>
+</ul>
+<p>明年预计是要继续打的</p>
+<p>就算是提前放出<code>Write-up</code>，只要我的分数够低也是没有问题的（逃</p>
+<blockquote>
+<p>注意：博文图片可能需要翻墙访问，虽说之前说过要翻新博客，可也一直咕着，虽有基本的框架，但并不想那么早放出来，以前就被人爆破过。</p>
+</blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2024/hackergame-2024/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2024</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/hackergame-2023/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2023</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2021/tzmcm-2021/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">TZMCM 2021 比赛代码</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2021/hackergame2021-writeup/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2021 Writeup</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/2020/xiangyun-school-ctf-writeup/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="https://i.loli.net/2020/11/23/ASHrxb2RhTsZtGy.jpg" loading="lazy" data-key="" data-hash="https://i.loli.net/2020/11/23/ASHrxb2RhTsZtGy.jpg"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">祥云杯 校赛 Write-up</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2024 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.21.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

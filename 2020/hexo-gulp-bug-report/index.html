@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='年初 1 月多时我的博客访问出了问题'>
+<title>Gulp 的神奇 BUG</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2020/hexo-gulp-bug-report/'>
+
+<link rel="stylesheet" href="/scss/style.min.8191399262444ab68b72a18c97392f5349be20a1615d77445be51e974c144cff.css"><meta property='og:title' content='Gulp 的神奇 BUG'>
+<meta property='og:description' content='年初 1 月多时我的博客访问出了问题'>
+<meta property='og:url' content='https://blog.tinyume.com/2020/hexo-gulp-bug-report/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-02-14T20:02:14&#43;08:00'/><meta property='article:modified_time' content='2021-10-24T22:35:00&#43;08:00'/>
+<meta name="twitter:title" content="Gulp 的神奇 BUG">
+<meta name="twitter:description" content="年初 1 月多时我的博客访问出了问题">
+    <link rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/iyume/static/hexo-blog/img/favicon.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://cdn.jsdelivr.net/gh/iyume/static/hexo-blog/img/avatar.png" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="social-menu">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>暗色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E4%BB%A3%E7%A0%81/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2020/hexo-gulp-bug-report/">Gulp 的神奇 BUG</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            年初 1 月多时我的博客访问出了问题
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2020-02-14 20:02</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>大概在年初 1 月多时被友人提醒了我的博客访问可能出了问题，后半信半疑地在隐私模式打开博客确实发现了一些问题，再拿去 Google insight 也出现了一样的问题，这才开始了 Bug 的分析。</p>
+<p>异常如下：</p>
+<!-- raw HTML omitted -->
+<p>check console，没有重大警告或者错误。</p>
+<p>check network，无异常。</p>
+<blockquote>
+<p>Cloudflare proxy 已关闭</p>
+</blockquote>
+<p>当时近期的改动便是 Gulp。将 node_modules 重装一遍异常页面依旧。</p>
+<blockquote>
+<p>刚开始使用 Gulp 时，build 网页是可以正常访问的，故之后的每次 build 便懒得去检查页面的是否正常显示。</p>
+</blockquote>
+<p>从 gulpfile.js 中逐一分析排查出了 Bug 的位置，是在 compressJs。</p>
+<p>再将有执行 compressJs 的和没有执行的分别保存为 html 并 diff</p>
+<p>神奇之处出现了————</p>
+<p>这两个文件除了端口号不同，其他都一致。</p>
+<blockquote>
+<p>端口号的不同是由于使用 Brackets 在 Chrome 动态调试的结果。</p>
+</blockquote>
+<p>懵了一圈后去命令行找了找 gulp build 的输出 log</p>
+<p>如下————</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">INFO</span>  <span class="mi">178</span> <span class="n">files</span> <span class="n">generated</span> <span class="ow">in</span> <span class="mf">1.9</span> <span class="n">s</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">46</span><span class="p">]</span> <span class="n">Finished</span> <span class="s1">&#39;generate&#39;</span> <span class="n">after</span> <span class="mf">3.56</span> <span class="n">s</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">46</span><span class="p">]</span> <span class="n">Starting</span> <span class="s1">&#39;compressHtml&#39;</span><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">46</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="mf">404.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">46</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">46</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">laycomment</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">about</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2019</span><span class="o">-</span><span class="n">nian</span><span class="o">-</span><span class="n">du</span><span class="o">-</span><span class="n">zong</span><span class="o">-</span><span class="n">jie</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">bu</span><span class="o">-</span><span class="n">shu</span><span class="o">-</span><span class="n">gitalk</span><span class="o">-</span><span class="n">chu</span><span class="o">-</span><span class="n">xian</span><span class="o">-</span><span class="n">de</span><span class="o">-</span><span class="n">keng</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">gulp</span><span class="o">-</span><span class="n">de</span><span class="o">-</span><span class="n">shen</span><span class="o">-</span><span class="n">qi</span><span class="o">-</span><span class="n">bug</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">how</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">walk</span><span class="o">-</span><span class="n">tiny</span><span class="o">-</span><span class="n">little</span><span class="o">-</span><span class="n">life</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">47</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">lu</span><span class="o">-</span><span class="n">nai</span><span class="o">-</span><span class="n">samfree</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">material</span><span class="o">-</span><span class="n">geng</span><span class="o">-</span><span class="n">duo</span><span class="o">-</span><span class="n">xin</span><span class="o">-</span><span class="n">xi</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">our</span><span class="o">-</span><span class="n">end</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">the</span><span class="o">-</span><span class="n">world</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">tzmcm</span><span class="o">-</span><span class="n">bi</span><span class="o">-</span><span class="n">sai</span><span class="o">-</span><span class="n">guo</span><span class="o">-</span><span class="n">cheng</span><span class="o">-</span><span class="n">jie</span><span class="o">-</span><span class="n">guo</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">xian</span><span class="o">-</span><span class="n">chong</span><span class="o">-</span><span class="n">du</span><span class="o">-</span><span class="n">bao</span><span class="o">-</span><span class="n">zha</span><span class="o">-</span><span class="n">ba</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">yin</span><span class="o">-</span><span class="n">se</span><span class="o">-</span><span class="n">feng</span><span class="o">-</span><span class="n">jing</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">zai</span><span class="o">-</span><span class="n">html</span><span class="o">-</span><span class="n">zhong</span><span class="o">-</span><span class="n">yong</span><span class="o">-</span><span class="n">js</span><span class="o">-</span><span class="n">cao</span><span class="o">-</span><span class="n">zuo</span><span class="o">-</span><span class="n">json</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">categories</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">48</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">links</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">kami</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">timeline</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2020</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2019</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">categories</span><span class="o">/</span><span class="err">日常</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">categories</span><span class="o">/</span><span class="err">代码</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">categories</span><span class="o">/</span><span class="err">知识</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">categories</span><span class="o">/</span><span class="err">随想</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">49</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">page</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">page</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2020</span><span class="o">/</span><span class="mi">01</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2020</span><span class="o">/</span><span class="mi">02</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2020</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2019</span><span class="o">/</span><span class="mi">09</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2019</span><span class="o">/</span><span class="mi">07</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2019</span><span class="o">/</span><span class="mi">10</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2019</span><span class="o">/</span><span class="mi">11</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">page</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="n">page</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">archives</span><span class="o">/</span><span class="mi">2019</span><span class="o">/</span><span class="n">page</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">HTML</span><span class="p">:</span> <span class="mi">38</span> <span class="n">items</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Finished</span> <span class="s1">&#39;compressHtml&#39;</span> <span class="n">after</span> <span class="mf">4.69</span> <span class="n">s</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Starting</span> <span class="s1">&#39;compressCss&#39;</span><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">disqus</span><span class="o">-</span><span class="n">proxy</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">duoshuo</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">gitalk</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">ie</span><span class="o">-</span><span class="n">blocker</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">material</span><span class="o">-</span><span class="n">icons</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">material</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">prettify</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">style</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="n">uc</span><span class="o">.</span><span class="n">css</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">CSS</span><span class="p">:</span> <span class="mi">9</span> <span class="n">items</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Finished</span> <span class="s1">&#39;compressCss&#39;</span> <span class="n">after</span> <span class="mi">948</span> <span class="n">ms</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">51</span><span class="p">]</span> <span class="n">Starting</span> <span class="s1">&#39;compressJs&#39;</span><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">52</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">MathJax</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">53</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">Valine</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">clicklove</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">funnytitle</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">gitalk</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">56</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">hanabi</span><span class="o">-</span><span class="n">browser</span><span class="o">-</span><span class="n">bundle</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">57</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">ie</span><span class="o">-</span><span class="n">blocker</span><span class="o">.</span><span class="n">en</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">57</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">ie</span><span class="o">-</span><span class="n">blocker</span><span class="o">.</span><span class="n">zhCN</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">57</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">jquery</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">58</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">js</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">59</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">js</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">46</span><span class="p">:</span><span class="mi">59</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">lazyload</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">lsloader</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">lsloader</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">md5</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">nprogress</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">prettify</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">queue</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">queue</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">smoothscroll</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="n">public</span><span class="o">/</span><span class="n">js</span><span class="o">/</span><span class="n">gallery</span><span class="o">/</span><span class="n">gallery</span><span class="o">.</span><span class="n">js</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">00</span><span class="p">]</span> <span class="n">Compress</span> <span class="n">JS</span><span class="p">:</span> <span class="mi">21</span> <span class="n">items</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">01</span><span class="p">]</span> <span class="n">Finished</span> <span class="s1">&#39;compressJs&#39;</span> <span class="n">after</span> <span class="mf">9.22</span> <span class="n">s</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">18</span><span class="p">:</span><span class="mi">47</span><span class="p">:</span><span class="mi">01</span><span class="p">]</span> <span class="n">Starting</span> <span class="s1">&#39;deploy&#39;</span><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="n">INFO</span>  <span class="n">Deploying</span><span class="p">:</span> <span class="n">git</span>
+</span></span><span class="line"><span class="cl"><span class="n">INFO</span>  <span class="n">Setting</span> <span class="n">up</span> <span class="n">Git</span> <span class="n">deployment</span><span class="o">...</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">INFO  178 files generated in 2.71 s
+</span></span><span class="line"><span class="cl">[19:17:09] Finished &#39;generate&#39; after 5.07 s
+</span></span><span class="line"><span class="cl">[19:17:09] Starting &#39;compressHtml&#39;...
+</span></span><span class="line"><span class="cl">[19:17:09] Compress HTML: public/404.html
+</span></span><span class="line"><span class="cl">[19:17:09] Compress HTML: public/index.html
+</span></span><span class="line"><span class="cl">[19:17:09] Compress HTML: public/laycomment.html
+</span></span><span class="line"><span class="cl">[19:17:09] Compress HTML: public/about/index.html
+</span></span><span class="line"><span class="cl">[19:17:10] Compress HTML: public/categories/index.html
+</span></span><span class="line"><span class="cl">[19:17:10] Compress HTML: public/archives/2019-nian-du-zong-jie.html
+</span></span><span class="line"><span class="cl">[19:17:10] Compress HTML: public/archives/bu-shu-gitalk-chu-xian-de-keng.html
+</span></span><span class="line"><span class="cl">[19:17:10] Compress HTML: public/archives/gulp-de-shen-qi-bug.html
+</span></span><span class="line"><span class="cl">[19:17:10] Compress HTML: public/archives/how-to-walk-tiny-little-life.html
+</span></span><span class="line"><span class="cl">[19:17:11] Compress HTML: public/archives/index.html
+</span></span><span class="line"><span class="cl">[19:17:11] Compress HTML: public/archives/lu-nai-samfree.html
+</span></span><span class="line"><span class="cl">[19:17:11] Compress HTML: public/archives/material-geng-duo-xin-xi.html
+</span></span><span class="line"><span class="cl">[19:17:11] Compress HTML: public/archives/our-end-of-the-world.html
+</span></span><span class="line"><span class="cl">[19:17:11] Compress HTML: public/archives/tzmcm-bi-sai-guo-cheng-jie-guo.html
+</span></span><span class="line"><span class="cl">[19:17:11] Compress HTML: public/archives/xian-chong-du-bao-zha-ba.html
+</span></span><span class="line"><span class="cl">[19:17:12] Compress HTML: public/archives/yin-se-feng-jing.html
+</span></span><span class="line"><span class="cl">[19:17:12] Compress HTML: public/archives/zai-html-zhong-yong-js-cao-zuo-json.html
+</span></span><span class="line"><span class="cl">[19:17:12] Compress HTML: public/kami/index.html
+</span></span><span class="line"><span class="cl">[19:17:12] Compress HTML: public/links/index.html
+</span></span><span class="line"><span class="cl">[19:17:12] Compress HTML: public/timeline/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/categories/日常/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/categories/代码/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/categories/随想/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/categories/知识/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/archives/2019/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/archives/2020/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/page/2/index.html
+</span></span><span class="line"><span class="cl">[19:17:13] Compress HTML: public/page/3/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/2019/07/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/page/3/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/2019/09/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/2019/10/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/page/2/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/2020/01/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/2019/11/index.html
+</span></span><span class="line"><span class="cl">[19:17:14] Compress HTML: public/archives/2020/02/index.html
+</span></span><span class="line"><span class="cl">[19:17:15] Compress HTML: public/archives/2020/03/index.html
+</span></span><span class="line"><span class="cl">[19:17:15] Compress HTML: public/archives/2019/page/2/index.html
+</span></span><span class="line"><span class="cl">[19:17:15] Compress HTML: 38 items
+</span></span><span class="line"><span class="cl">[19:17:15] Finished &#39;compressHtml&#39; after 6.32 s
+</span></span><span class="line"><span class="cl">[19:17:15] Starting &#39;compressCss&#39;...
+</span></span><span class="line"><span class="cl">[19:17:15] Compress CSS: public/css/disqus-proxy.css
+</span></span><span class="line"><span class="cl">[19:17:15] Compress CSS: public/css/duoshuo.css
+</span></span><span class="line"><span class="cl">[19:17:15] Compress CSS: public/css/gitalk.css
+</span></span><span class="line"><span class="cl">[19:17:15] Compress CSS: public/css/ie-blocker.css
+</span></span><span class="line"><span class="cl">[19:17:15] Compress CSS: public/css/material-icons.css
+</span></span><span class="line"><span class="cl">[19:17:15] Compress CSS: public/css/material.css
+</span></span><span class="line"><span class="cl">[19:17:16] Compress CSS: public/css/prettify.css
+</span></span><span class="line"><span class="cl">[19:17:16] Compress CSS: public/css/style.css
+</span></span><span class="line"><span class="cl">[19:17:16] Compress CSS: public/css/uc.css
+</span></span><span class="line"><span class="cl">[19:17:16] Compress CSS: 9 items
+</span></span><span class="line"><span class="cl">[19:17:16] Finished &#39;compressCss&#39; after 1.08 s
+</span></span><span class="line"><span class="cl">[19:17:16] Starting &#39;deploy&#39;...
+</span></span><span class="line"><span class="cl">INFO  Deploying: git
+</span></span><span class="line"><span class="cl">INFO  Clearing .deploy_git folder...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>两次的 build 是不一样的，但是生成的文件却相同。</p>
+<p>相同的文件也由于不同的 build 产生了不同的结果。</p>
+<p>问题尚未解决。因为没时间就先把记录留在这里。</p>
+<p>若在别处得到了答案，我会在第一时间补充博客。</p>
+<h2 id="after-day">After Day</h2>
+<p>这篇文章原计划是 2 月初便要写的，咕了一段时间后连着 3 月那篇闲聊发了出来。</p>
+<p>日期就随便糊了个单身狗的日子（简称狗日的）</p>
+<p>顺便封面也是可爱的狗狗（是幼犬酱啦~）</p>
+<p>疾病盛行，小心出行。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最后更新于 2021-10-24 22:35
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2024/hackergame-2024/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2024</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/hackergame-2023/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2023</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2021/tzmcm-2021/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">TZMCM 2021 比赛代码</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2021/hackergame2021-writeup/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2021 Writeup</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2021/terminal-prettify-guideline/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">简易的个性化终端指南</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2024 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.21.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
