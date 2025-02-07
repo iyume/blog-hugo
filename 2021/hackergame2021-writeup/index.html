@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="中科大的 CTF，今年也是趣味十足">
+<title>Hackergame 2021 Writeup</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2021/hackergame2021-writeup/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Hackergame 2021 Writeup">
+<meta property='og:description' content="中科大的 CTF，今年也是趣味十足">
+<meta property='og:url' content='https://blog.tinyume.com/2021/hackergame2021-writeup/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2021-10-29T12:54:22&#43;08:00'/><meta property='article:modified_time' content='2021-10-30T03:53:42&#43;08:00'/>
+<meta name="twitter:title" content="Hackergame 2021 Writeup">
+<meta name="twitter:description" content="中科大的 CTF，今年也是趣味十足">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?size=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#1-签到">1. 签到</a></li>
+    <li><a href="#2-进制十六----参上">2. 进制十六 &ndash; 参上</a></li>
+    <li><a href="#3-去吧追寻自由的电波">3. 去吧！追寻自由的电波</a></li>
+    <li><a href="#4-猫咪问答-pro-max">4. 猫咪问答 Pro Max</a></li>
+    <li><a href="#5-卖瓜">5. 卖瓜</a></li>
+    <li><a href="#6-透明的文件">6. 透明的文件</a></li>
+    <li><a href="#7-旅行照片">7. 旅行照片</a></li>
+    <li><a href="#8-flag-助力大红包">8. FLAG 助力大红包</a></li>
+    <li><a href="#9-amnesia">9. Amnesia</a>
+      <ol>
+        <li><a href="#91-轻度失忆">9.1 轻度失忆</a></li>
+        <li><a href="#92-记忆清除">9.2 记忆清除</a></li>
+      </ol>
+    </li>
+    <li><a href="#10-图之上的信息">10. 图之上的信息</a></li>
+    <li><a href="#12-加密的-u-盘">12. 加密的 U 盘</a></li>
+    <li><a href="#13-赛博厨房">13. 赛博厨房</a>
+      <ol>
+        <li><a href="#131-level-0">13.1 Level 0</a></li>
+        <li><a href="#132-level-1">13.2 Level 1</a></li>
+        <li><a href="#133--134">13.3 / 13.4</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/live/" style="background-color: #2a9d8f; color: #fff;">
+                日常
+            </a>
+        
+            <a href="/categories/code/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2021/hackergame2021-writeup/">Hackergame 2021 Writeup</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            中科大的 CTF，今年也是趣味十足
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2021-10-29 12:54</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 11 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="overlook">Overlook
+</h1><p>比赛时间：北京时间 2021 年 10 月 23 日 中午 12:00 ～ 10 月 30 日 中午 12:00（共七天）
+赛制：个人线上赛，解题模式，约 25 道题目，有实时排行榜。</p>
+<p>比赛题目分为 4 类，分类如下：</p>
+<ul>
+<li>综合技能（general）</li>
+<li>程序逆向与漏洞利用（binary）</li>
+<li>密码学与数学（math）</li>
+<li>网站安全（web）</li>
+</ul>
+<p>当前分数：1400， 总排名：236 / 2677</p>
+<p>binary：150 ， general：650 ， math：0 ， web：600</p>
+<h1 id="preface">Preface
+</h1><p>今年比 <a class="link" href="https://blog.tinyume.com/2020/2020-hackergame-writeup/"  target="_blank" rel="noopener"
+    >去年</a> 高了 500 分，但是 &ldquo;简单题&rdquo; 的难度明显比去年高，难度梯度更小（平均）了。</p>
+<p>文章已发表于 <a class="link" href="https://github.com/USTC-Hackergame/hackergame2021-writeups#%E6%9D%A5%E8%87%AA%E9%80%89%E6%89%8B"  target="_blank" rel="noopener"
+    >选手题解</a></p>
+<h1 id="题目">题目
+</h1><h2 id="1-签到">1. 签到
+</h2><blockquote>
+<p>类型: web</p>
+<p>耗时: 20s</p>
+</blockquote>
+<p>进入网页，首先点一下 <code>next</code>，发现 url 变成了 <code>http://202.38.93.111:10000/?page=1</code>。马上可以想到 query parameter <code>page</code> 是时间戳。</p>
+<p>直接进入 Python Interpreter，执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="mf">1635489757.9277494</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时不知道时间戳是 9 位还是 13 位的，但是先把 9 位的拿上去试试。</p>
+<p>exp: <code>http://202.38.93.111:10000/?page=1635489757</code></p>
+<p>得到 flag{HappyHacking2021-a95dcfa4bd}</p>
+<h2 id="2-进制十六----参上">2. 进制十六 &ndash; 参上
+</h2><blockquote>
+<p>类型: general</p>
+<p>耗时: 2min</p>
+</blockquote>
+<p>hex to ascii，搞定！</p>
+<p>时间主要花费在把图里的 hex 一个个手动提取出来了。</p>
+<p>打开解释器</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mh">0x7b</span><span class="p">,</span><span class="mh">0x59</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="mh">0x55</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x53</span><span class="p">,</span><span class="mh">0x48</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="mh">0x55</span><span class="p">,</span><span class="mh">0x31</span><span class="p">,</span><span class="mh">0x44</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x6b</span><span class="p">,</span><span class="mh">0x6e</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="mh">0x77</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x48</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="mh">0x57</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x74</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x43</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="mh">0x6e</span><span class="p">,</span><span class="mh">0x76</span><span class="p">,</span><span class="mh">0x33</span><span class="p">,</span><span class="mh">0x72</span><span class="p">,</span><span class="mh">0x74</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x48</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;{Y0U_SH0U1D_kn0w_H0W_t0_C0nv3rt_H&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mh">0x45</span><span class="p">,</span><span class="mh">0x58</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x74</span><span class="p">,</span><span class="mh">0x6f</span><span class="p">,</span><span class="mh">0x5f</span><span class="p">,</span><span class="mh">0x54</span><span class="p">,</span><span class="mh">0x65</span><span class="p">,</span><span class="mh">0x78</span><span class="p">,</span><span class="mh">0x54</span><span class="p">,</span><span class="mh">0x7d</span><span class="p">,</span><span class="mh">0x20</span><span class="p">,</span><span class="mh">0x46</span><span class="p">,</span><span class="mh">0x6f</span><span class="p">,</span><span class="mh">0x72</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;EX_to_TexT} For&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>flag{Y0U_SH0U1D_kn0w_H0W_t0_C0nv3rt_HEX_to_TexT}</p>
+<h2 id="3-去吧追寻自由的电波">3. 去吧！追寻自由的电波
+</h2><blockquote>
+<p>类型: general</p>
+<p>耗时: inf</p>
+</blockquote>
+<p>Audacity 拖入音频，观察波形发现没啥特征。</p>
+<p>题目提到了 &ldquo;使得最终接受到的录音的速度有所改变&rdquo;，可以说明音频文件的速度是不正确的。</p>
+<p>将采样率下调，当调为 16000Hz 时，可以听出来了一些很清晰的英文单词，然后直接导出。</p>
+<p>将听到的单词提取出来分组，就可以得到 foxtrot, leaner, alpha, golf, left bracket, proper, hotel, ostreet, november, echo, tango, india, charlie, alpha, brago, right bracket</p>
+<p><code>left bracket</code> 和 <code>right bracket</code> 对应 flag 的两个花括号。<code>left bracket</code> 前面四个单词提取首字母就是 flag，因此推测将括号内的单词取首字母就是 flag 的主体了。</p>
+<p>flag{phoneticab}</p>
+<p>第一天脑袋卡住了，第二天才想出此题的解法。</p>
+<h2 id="4-猫咪问答-pro-max">4. 猫咪问答 Pro Max
+</h2><blockquote>
+<p>类型: general</p>
+<p>耗时: 20min</p>
+</blockquote>
+<ol>
+<li>
+<p>2017 年，中科大信息安全俱乐部（SEC@USTC）并入中科大 Linux 用户协会（USTCLUG）。目前，信息安全俱乐部的域名（sec.ustc.edu.cn）已经无法访问，但你能找到信息安全俱乐部的社团章程在哪一天的会员代表大会上通过的吗？</p>
+<p>看到此题第一时间想到 <a class="link" href="https://web.archive.org/"  target="_blank" rel="noopener"
+    >https://web.archive.org/</a></p>
+<p>答案: 20150504</p>
+<p>Ref: <a class="link" href="https://web.archive.org/web/20181004003308/http://sec.ustc.edu.cn/doku.php/codes"  target="_blank" rel="noopener"
+    >https://web.archive.org/web/20181004003308/http://sec.ustc.edu.cn/doku.php/codes</a></p>
+</li>
+<li>
+<p>中国科学技术大学 Linux 用户协会在近五年多少次被评为校五星级社团？</p>
+<p>保留此题。</p>
+</li>
+<li>
+<p>中国科学技术大学 Linux 用户协会位于西区图书馆的活动室门口的牌子上“LUG @ USTC”下方的小字是？</p>
+<p>答案: Development Team of Library</p>
+<p>Ref: <a class="link" href="https://news.ustclug.org/2016/06/new-activity-room-in-west-library/"  target="_blank" rel="noopener"
+    >https://news.ustclug.org/2016/06/new-activity-room-in-west-library/</a></p>
+</li>
+<li>
+<p>在 SIGBOVIK 2021 的一篇关于二进制 Newcomb-Benford 定律的论文中，作者一共展示了多少个数据集对其理论结果进行验证？</p>
+<p>答案: 13</p>
+<p>Ref: <a class="link" href="http://sigbovik.org/2021/proceedings.pdf"  target="_blank" rel="noopener"
+    >http://sigbovik.org/2021/proceedings.pdf</a></p>
+</li>
+<li>
+<p>不严格遵循协议规范的操作着实令人生厌，好在 IETF 于 2021 年成立了 Protocol Police 以监督并惩戒所有违背 RFC 文档的行为个体。假如你发现了某位同学可能违反了协议规范，根据 Protocol Police 相关文档中规定的举报方法，你应该将你的举报信发往何处？</p>
+<p>答案: /dev/null</p>
+<p>Ref: <a class="link" href="https://www.rfc-editor.org/rfc/rfc8962.html#section-6"  target="_blank" rel="noopener"
+    >https://www.rfc-editor.org/rfc/rfc8962.html#section-6</a></p>
+<p>（别啥都往 /dev/null 塞啊 kora</p>
+</li>
+</ol>
+<p>最后，5 题有 4 题解出来了，剩 1 题可简单遍历，那么直接打开 hackbar 是最快的。此题没有任何遍历脚本。</p>
+<p>和往年一样，此题考察搜索引擎的使用，还是挺不错的，出题比去年好一点。</p>
+<p>flag{8804d9f3_7320de5724}</p>
+<h2 id="5-卖瓜">5. 卖瓜
+</h2><blockquote>
+<p>类型: web</p>
+<p>耗时: 1h</p>
+</blockquote>
+<p>严格来说不算 web 题。偏 misc。</p>
+<p>首先 f12，发现 input 设置了 min，给它改成 -1 并把 value 设为 -1，提交后跳转到一个纯文本页面: <code>操作无效：不能放负数个瓜。点击这里回到主页。</code></p>
+<p>然后尝试把 type 改成 text，依次输入 <code>-1</code>, <code>1+1</code>, <code>1.5</code>, <code>'1'.'1'</code> 发现都没有得到预期行为，因此 value 的简单 payload 是行不通的。</p>
+<p>然后注意到 input 框的命名是 <code>b6</code>, <code>b9</code> 的形式，那尝试改成 <code>b2</code> 或者其他数字是否能提交不同斤数的瓜，提交后 trackback 马上显示了出来。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Warning: Undefined array key &#34;b6&#34; in /mnt/app/index.php on line 63
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Warning: Cannot modify header information - headers already sent by (output started at /mnt/app/index.php:63) in /mnt/app/index.php on line 69
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>比赛第一天我以为这是 php 代码漏洞注入题，然后就没做了。</p>
+<p>比赛第二天题目解的都差不多了，实在没有题可以解了。回来看这题的时候，随便输了几个大数字，然后发现，我超，原来有 overflow！</p>
+<p>（下面以 b6 代指 6 斤瓜，b9 代指 9 斤瓜）</p>
+<p>仔细摸索了一下，可以发现</p>
+<ul>
+<li>电子枰上的数字是 bigint</li>
+<li>b6 合算斤数高于 int64 会被当成 0</li>
+<li>b9 输入为 1024819115206086200 时，电子枰正确地加上了 9223372036854775800 斤；而输入高于上面这个值，也就是合算斤数高于 int64 时，值会突然变成 -9223372036854775808 并且保持不变</li>
+</ul>
+<p>-9223372036854775808 并不被 6 或 9 整除</p>
+<p>理解到这一步，后面的步骤就很简单了</p>
+<p>在 b9 框输入个很大的数先把 -9223372036854775808 这个数字弄出来，然后在 b6 或 b9 构造合算斤数不超过 int64 的数字加在上面的负的斤数上。</p>
+<p>拿 b9 举例，我在 b9 输入 1024819115206086200 提交，然后电子枰读数就变成了 -8/20 斤。重复以上步骤，得到 -16/20 斤。36 % 6 = 0，直接拿 6 个 b6 加在电子枰上就完成了此题。</p>
+<p>flag{HUAQIANG!HUAQIANG!_78b45b2322}</p>
+<h2 id="6-透明的文件">6. 透明的文件
+</h2><blockquote>
+<p>类型: general</p>
+<p>耗时: 30min</p>
+</blockquote>
+<p>打开文件，大概长下面这样，行数 1，有 17590 个字符。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[0;0H[20;58H[8;34H[13;27H[4;2H[38;2;1;204;177m [39m[14;10H[20;51H[23;4H[12;2H[38;2;2;207;173m [39m[19;61H[9;12H[22;8H[20;2H[38;2;3;210;169m [39m[3;23H[8;68H[19;10H[4;3H[38;2;4;214;165m
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>作为一个熟悉 Linux 的人不可能不知道上面这个是什么，所以我一眼认出来了这是 bash colorize prompt 的配置内容，也称为 ANSI 转义序列</p>
+<p>不知道的人可以看 <a class="link" href="https://wiki.archlinux.org/title/Bash_%28%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%29/Prompt_customization_%28%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%29"  target="_blank" rel="noopener"
+    >这里</a></p>
+<p>之前我写过 oh-my-posh 的 <a class="link" href="https://blog.tinyume.com/2021/terminal-prettify-guideline/"  target="_blank" rel="noopener"
+    >终端美化</a>，而在这之前我都是使用原始的 PS1 来控制 prompt 的。</p>
+<p>了解文件内容:</p>
+<ul>
+<li>
+<p>一个颜色标识符应该形如 <code>\e[&lt;color code&gt;m</code>，而颜色的结束标识符为 <code>\e[39m</code></p>
+</li>
+<li>
+<p>一个光标跳转标识符应该形如 <code>\e[&lt;row&gt;,&lt;column&gt;H</code>，表示将光标移动到 <code>&lt;row&gt;</code> 行、<code>&lt;column&gt;</code> 列</p>
+</li>
+</ul>
+<p>再看源文件，显然缺少了 <code>\e</code> 这个前缀；没有看到 set background 的代码，那么就把 <code>&lt;space&gt;</code> 换成可辨识字符即可。</p>
+<p>文件修复:</p>
+<ul>
+<li>将 <code>[</code> 全部替换为 <code>\e[</code> 或者 <code>\003[</code></li>
+<li>将 <code>&lt;space&gt;</code>（空格） 全部替换为 <code>#</code></li>
+</ul>
+<p>文件修好啦。进入 shell</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">nano ~/.bashrc
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>^w</code> 搜索 <code>export ps1</code>，或者在最后一行添加 <code>export PS1=&quot;&quot;</code></p>
+<p>如果原来有内容的话，建议注释掉而不要删除，以免引发混乱。</p>
+<p>把修复好的文件内容全部复制到双引号内，保存退出。</p>
+<p>执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">source</span> ~/.bashrc
+</span></span><span class="line"><span class="cl">clear
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="https://i.loli.net/2021/10/30/GCzN9DujMl5vLUJ.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>题目给了提示，内容全是小写字母，那么就是 flag{abxnniohkalmcowsayfiglet}</p>
+<h2 id="7-旅行照片">7. 旅行照片
+</h2><blockquote>
+<p>类型: general</p>
+<p>耗时: inf</p>
+</blockquote>
+<p>没有解出。但是思路是有的。</p>
+<p>就是图像变换，利用图像变换把不太明显的信息凸显出来。</p>
+<p>但是我无法理解的是为什么有 800 多号人做了出来（</p>
+<p>作为一个 150 分值的题目，这是不合理的。</p>
+<p>edit: 看了官方 wp，真简单（</p>
+<h2 id="8-flag-助力大红包">8. FLAG 助力大红包
+</h2><blockquote>
+<p>类型: general</p>
+<p>耗时: 2h</p>
+</blockquote>
+<p>此题常规思路是绕过 ip 验证，只要绕过了就可以构造任意 ip 助力大红包。</p>
+<blockquote>
+<p>非常规解法: 如果你或者你认识的人在 <code>/8</code> 每个子网都有代理机，包括 <code>0.0.0.0/8</code>（懂不懂什么叫人脉啊？），那你可以用最快（x）的方式结束此题。</p>
+</blockquote>
+<p>回到常规解法，首先 f12 看助力按钮</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-inline&#34;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#34;POST&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;hidden&#34;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;ip&#34;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;ip&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;submit&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;btn btn-danger ml-2&#34;</span><span class="p">&gt;</span>点击按钮，为您的好友助力<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以得知点击按钮的时候，页面 post 了当前 ip，这是前端验证。</p>
+<p>前端验证的绕过方法很简单，打开 hackbar，构造 Post data <code>ip=1.1.1.1</code>，执行后弹出警告 <code>失败！检测到前后端检测 IPv4 地址不匹配，前端地址： 1.1.1.1 ，后端地址： 111.27.47.10 。疑似地址伪造！</code>。从这个 &ldquo;温情提示&rdquo; 可以看出前端成功绕过了。</p>
+<p>接下来绕过后端验证，首先尝试伪造 http header，此处可以伪造的只有 <code>X-Forwarded-For</code>。这个 header 的作用是在代理访问时保留自己的源 ip 供服务器识别。</p>
+<p>在 hackbar 选择 <code>Add Header</code>，添加 <code>X-Forwarded-For: 1.1.1.1</code>，Post data <code>ip=1.1.1.1</code></p>
+<p>得到回显: <code>助力成功！您的 IPv4 地址是： 1.1.1.1 ，成功共同打造世界一流大砍刀！</code></p>
+<p>绕过很简单，不是么？</p>
+<p>活动规则提到了 <code>活动要求位于同一 /8 网段的用户将会被视为同一个用户</code>，而 <code>/8</code> 网段对应掩码 <code>255.0.0.0</code>，表示共有 255 个子网，需要请求 255 次，显然手工在 10min 内完成是不可能的，也不方便解题。</p>
+<p>于是尝试写请求脚本。payload 就是伪造的 ip pool</p>
+<p>首先需要测试请求间隔，间隔过短的话请求会被拒绝，最后得出的间隔为 <code>1s</code></p>
+<p>然后是对于助力成功的判断、对助力重复的判断，这两种情况都要把 ip 从 ip pool 移除</p>
+<p>response status_code 都是 200，显然不能从这里判断，那么只能从文本回显来判断了。</p>
+<p>回显有如下 4 种</p>
+<ul>
+<li>助力成功！您的 IPv4 地址是： 0.1.1.1 ，成功共同打造世界一流大砍刀！</li>
+<li>失败！重复的 /8 地址： 1.1.1.1 。</li>
+<li>失败！操作速度太快了，请稍后再试！</li>
+</ul>
+<p>下面是我写的脚本</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>  <span class="c1"># type: ignore</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">IPv4Address</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://202.38.93.111:10888/invite/2a1abf61-fb9b-456d-bac7-1e14e138e2b2&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">f_ip</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.1.1.1&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ip_set</span> <span class="o">=</span> <span class="p">{</span><span class="o">*</span><span class="p">()}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">256</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ip</span> <span class="o">=</span> <span class="n">f_ip</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ip_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="n">ip_set</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ip_set</span><span class="o">.</span><span class="n">copy</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ip&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)},</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;X-Forwarded-For&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)})</span>
+</span></span><span class="line"><span class="cl">        <span class="n">content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s1">&#39;助力成功&#39;</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">or</span> <span class="s1">&#39;重复&#39;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">ip_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">({</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ip_set</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;剩余 ip 数量: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ip_set</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是执行完毕发现 flag 并没有达到 1，但是很接近了，可能缺的只有 1 个 ip。</p>
+<p>直接 hackbar 请求，找到了漏网的 ip <code>0.1.1.1</code></p>
+<p>至此 256 个助力完成了（成功打造世界一流大砍刀）</p>
+<p>flag{r3d-enve10p3-9df0e42771}</p>
+<h2 id="9-amnesia">9. Amnesia
+</h2><blockquote>
+<p>类型: binary</p>
+</blockquote>
+<h3 id="91-轻度失忆">9.1 轻度失忆
+</h3><blockquote>
+<p>耗时: 30min</p>
+</blockquote>
+<p>时间大多花在了阅读 <a class="link" href="https://ctf-wiki.org/executable/elf/structure/basic-info/"  target="_blank" rel="noopener"
+    >ELF 文件结构</a></p>
+<p>源代码编译时，字符串这样的常量（只读数据）会被存储在 .rodata 内，而分配了空间的变量会被存储在 .data 内，像是 extern 这种不分配空间的符号是没有占用的，.text 存储的是表达式之类的东西。</p>
+<p>而此题提到 .rodata 和 .data 段都会被清除，那么目的就是不使用字符串常量和变量来输出 <code>Hello world!</code></p>
+<p>先编写一个简单的程序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;stdio.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;Hello, world!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>gcc -o helloworld helloworld.c</code> 编译出可执行文件</p>
+<p><code>objdump -s helloworld</code> 查看 ELF 文件结构</p>
+<p>然后看下结构内的 .rodata 段</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Contents of section .rodata:
+</span></span><span class="line"><span class="cl"> 2000 01000200 48656c6c 6f20776f 726c6421  ....Hello world!
+</span></span><span class="line"><span class="cl"> 2010 00                                   .
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>看到了 <code>Hello world!</code>，意料之内。</p>
+<p>然后尝试编写</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;stdio.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;H&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;e&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;l&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;l&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;o&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;,&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39; &#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;w&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;o&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;r&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;l&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;d&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">putchar</span><span class="p">(</span><span class="sc">&#39;!&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译可执行然后看 .rodata</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Contents of section .rodata:
+</span></span><span class="line"><span class="cl"> 2000 01000200                             ....
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>很好！没有 <code>Hello world!</code> 了。</p>
+<p>把代码送上网页终端，得到 flag{S0_S1mp1e_r1ght_5d6537dcc8}</p>
+<h3 id="92-记忆清除">9.2 记忆清除
+</h3><p>没做，识趣地离开了。</p>
+<h2 id="10-图之上的信息">10. 图之上的信息
+</h2><blockquote>
+<p>类型: web</p>
+<p>耗时: 2h</p>
+</blockquote>
+<p>我觉得是今年 hackergame 最有意思的一道题了，寓教于乐。</p>
+<p>首先看看啥是 <a class="link" href="https://graphql.org/learn/"  target="_blank" rel="noopener"
+    >GraphQL</a></p>
+<p>以及请求一个 GraphQL API 的 <a class="link" href="https://graphql.org/learn/serving-over-http/"  target="_blank" rel="noopener"
+    >方法</a></p>
+<p>再仔细翻看 GraphQL 文档，可以发现这么一个 <a class="link" href="https://graphql.org/learn/introspection/"  target="_blank" rel="noopener"
+    >特殊的页面</a>。它提到了如何查询内部数据库的信息，根据这个页面首先尝试一下请求所有的 Type</p>
+<blockquote>
+<p>下面的请求 Url 都是 <code>http://202.38.93.111:15001/graphql</code></p>
+</blockquote>
+<p>打开 Postman</p>
+<blockquote>
+<p>注意，你首先得访问 <code>http://202.38.93.111:15001/?token=&lt;your token&gt;</code> 获取 cookie 才能使用 query</p>
+</blockquote>
+<p>我这里使用 POST 的请求方法，你也可以使用 GET，无所谓</p>
+<p>构造 Body，选择 json</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="s2">&#34;{__schema{types{name}}}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后发送 POST 请求</p>
+<p>回显</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;data&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;__schema&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;types&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Query&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;GNote&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Int&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;String&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;GUser&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Boolean&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__Schema&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__Type&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__TypeKind&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__Field&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__InputValue&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__EnumValue&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__Directive&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;__DirectiveLocation&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发生了什么？这些返回是啥啊？？</p>
+<p>GraphQL 设计了类型系统，一切皆为类型，一个 API 查询由简单类型构成，也可以由嵌套类型构成，但类型的字段最终分为基本 <code>Int</code>, <code>String</code>, <code>Boolean</code>。</p>
+<p>上面的 payload 获取的就是所有的 type，其中包含了很多 GraphQL 内置的类型可以忽略。其中对我们有用的信息只有形如 <code>GNote</code>, <code>GUser</code> 这样的类型名字。</p>
+<p>知道了类型名字后就可以查询 <code>GUser</code> 这个类型的字段有哪些了。</p>
+<p>构造 Body</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="s2">&#34;{__type(name:\&#34;GUser\&#34;){name fields{name type{name}}}}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>回显</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;data&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;__type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;GUser&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;fields&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;id&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Int&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;username&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;String&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;privateEmail&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;String&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>于是我们知道了 <code>GUser</code> 的 schema，将其简记为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">GUser</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+</span></span><span class="line"><span class="cl">    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">    <span class="n">privateEmail</span><span class="p">:</span> <span class="nb">str</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>光知道类型还不够，接下来还得知道有哪些东西是可以查询的。</p>
+<p>就像 <code>types</code> 内置在 <code>__schema</code> 内，<code>__schema</code> 也包含一个字段叫做 <code>queryType</code>，用于查询可用 query。不过这个 <code>queryType</code> 实际上是个名为 <code>Query</code> 的类型，也就是说使用 <code>__type</code> 也可以查询到它的字段。</p>
+<p>构造 Body</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="s2">&#34;{__type(name:\&#34;Query\&#34;){name fields{name type{name}}}}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="s2">&#34;{__schema{queryType{name fields{name type{name} description}}}}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>POST，得到回显</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;data&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;__schema&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;queryType&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Query&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="nt">&#34;fields&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;note&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                            <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;GNote&#34;</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;Get a specific note information&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;notes&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                            <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="kc">null</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;Get notes information of a user&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;user&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                            <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;GUser&#34;</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">                        <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;Get a specific user information&#34;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>知道了 query name，就可以构造用户查询 payload 了。不过注意这个查询是 <code>Get a specific user information</code>，也就是说 argument 是至少需要一个的，否则会返回 NoneType，但是此时我们不知道这个 queryType 有啥 argument，我们知道的只有示例的 username</p>
+<p>尝试构造 Body</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="s2">&#34;{user(username:Guest){username,privateEmail}}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>回显</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;errors&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;message&#34;</span><span class="p">:</span> <span class="s2">&#34;Unknown argument &#39;username&#39; on field &#39;Query.user&#39;.&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;locations&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;line&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                    <span class="nt">&#34;column&#34;</span><span class="p">:</span> <span class="mi">7</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="kc">null</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>那么换个 argument 试试</p>
+<p>尝试构造 Body</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;query&#34;</span><span class="p">:</span> <span class="s2">&#34;{user(id:1){username,privateEmail}}&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>回显</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;data&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;username&#34;</span><span class="p">:</span> <span class="s2">&#34;admin&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;privateEmail&#34;</span><span class="p">:</span> <span class="s2">&#34;flag{dont_let_graphql_l3ak_data_9f34dccd08@hackergame.ustc}&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>搞定！flag{dont_<a class="link" href="mailto:let_graphql_l3ak_data_9f34dccd08@hackergame.ustc" >let_graphql_l3ak_data_9f34dccd08@hackergame.ustc</a>}</p>
+<h2 id="12-加密的-u-盘">12. 加密的 U 盘
+</h2><blockquote>
+<p>类型: general</p>
+<p>耗时: None</p>
+</blockquote>
+<p>没解出来，但是看了 wp 大受震撼。</p>
+<h2 id="13-赛博厨房">13. 赛博厨房
+</h2><blockquote>
+<p>类型: general</p>
+</blockquote>
+<h3 id="131-level-0">13.1 Level 0
+</h3><blockquote>
+<p>耗时: 5min</p>
+</blockquote>
+<p>很简单，直接给 payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">向右 2 步
+</span></span><span class="line"><span class="cl">拿起 1 个物品
+</span></span><span class="line"><span class="cl">向下 1 步
+</span></span><span class="line"><span class="cl">向左 2 步
+</span></span><span class="line"><span class="cl">放下 1 个物品
+</span></span><span class="line"><span class="cl">向上 1 步
+</span></span><span class="line"><span class="cl">向右 1 步
+</span></span><span class="line"><span class="cl">拿起 1 个物品
+</span></span><span class="line"><span class="cl">向下 1 步
+</span></span><span class="line"><span class="cl">向左 1 步
+</span></span><span class="line"><span class="cl">放下 1 个物品
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="132-level-1">13.2 Level 1
+</h3><blockquote>
+<p>耗时: 20min</p>
+</blockquote>
+<p>先看看有多少个 0</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="o">&gt;&gt;&gt;</span> <span class="nb">len</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="mi">73</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>payload 就是</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">向右 1 步
+</span></span><span class="line"><span class="cl">拿起 73 个物品
+</span></span><span class="line"><span class="cl">向下 1 步
+</span></span><span class="line"><span class="cl">向左 1 步
+</span></span><span class="line"><span class="cl">放下 1 个物品
+</span></span><span class="line"><span class="cl">如果手上的物品大于等于 1 向上跳转 1 行
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>值得一提的是 <code>如果手上的物品大于等于 n 向上跳转 m 行</code> 表示的是一个 if-goto 语句，把当前执行权交给向上 m 行的代码，再向下执行。</p>
+<h3 id="133--134">13.3 / 13.4
+</h3><p>没做</p>
+<h1 id="总结">总结
+</h1><p>截止至 2021-10-30 01:31:06，排名为 236 / 2677</p>
+<p>解题时间的消耗明显比去年短了，今年是从 2021-10-23 晚上开始 CTF，得到了 5 个 flag，于 2021-10-24 获取了能力范围内的所有 flag，后面就没做了，两天完成了这篇博文的所有解题。</p>
+<p>能解出来的题目也比去年多了，有了那种得心应手的感觉。（被其他 CTF 比赛虐死的菜鸡的自述）</p>
+<p>今年的题目做起来真的挺开心的，明年应该也会参加。</p>
+<p>math 题今年也是一分没拿，明年争取一下吧。（虽然买了基本操作密码学但是看不懂的菜鸡怎么可能会手算因数呢？）</p>
+<blockquote>
+<p>贴图不多，主要是图床管理太烂了，又没时间自己写</p>
+</blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最后更新于 2021-10-30 03:53
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #1</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #0</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2024/hackergame-2024/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2024</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/cs144/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CS 144 TCP</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/hackergame-2023/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2023</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2025 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

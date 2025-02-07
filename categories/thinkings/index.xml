@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>随想 on 黯梦萦辰</title>
+        <link>https://blog.tinyume.com/categories/thinkings/</link>
+        <description>Recent content in 随想 on 黯梦萦辰</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-CN</language>
+        <lastBuildDate>Mon, 13 Jan 2025 16:05:44 +0800</lastBuildDate><atom:link href="https://blog.tinyume.com/categories/thinkings/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>我的工作</title>
+        <link>https://blog.tinyume.com/2025/my-work/</link>
+        <pubDate>Mon, 13 Jan 2025 16:05:44 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2025/my-work/</guid>
+        <description>&lt;p&gt;文章的描述来自于 &lt;a class=&#34;link&#34; href=&#34;https://www.seangoedecke.com/programmer-archetypes/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Grifters, believers, grinders, and coasters&lt;/a&gt; 这篇文章，里面很好地阐述了公司里的不同人群以及相处的方法，推荐阅读。&lt;/p&gt;
+&lt;h2 id=&#34;grifters-believers-grinders-and-coasters&#34;&gt;Grifters, believers, grinders, and coasters
+&lt;/h2&gt;&lt;p&gt;简单解释一下公司中的 4 种角色：&lt;/p&gt;
+&lt;p&gt;Grifter：骗子，擅长伪装形象获得公司领导层的重视，擅长充当项目负责人&lt;br&gt;
+Beliver：信仰者，重视公司的使命和客户的需求，擅长充当产品和品质保证&lt;br&gt;
+Coaster：杯垫，完成分内的工作，避免不必要的工作&lt;br&gt;
+Grinder：研磨机，埋头解决问题，可以迅速完成工作&lt;/p&gt;
+&lt;p&gt;以我的经历而言，在不同公司可能会承担不同的角色。&lt;/p&gt;
+&lt;p&gt;例如，在上一家 AI 创业公司里，我突然成为了核心角色，必须成为 Grinder 才能迅速地完成 MVP 和工作交付。
+而在目前这家公司，我是边缘角色，在刚开始工作的时候我是 Grinder，只顾着埋头写代码，不重视工作成果和上级反馈。
+但是在经历了几次否定过后，我学着成为了一个 Coaster，只完成分内的工作。
+同时意识到了我的项目负责人是个 Grifter —— 他不会写代码、经常偷懒睡觉、职位是测试，但他依旧成为了领导重视的核心人物。&lt;/p&gt;
+&lt;p&gt;我是如何做好一个 Coaster 的呢？其实不难。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;稍微关注一下工作成果反馈，在我们公司则是 pingcode 工作项。&lt;/li&gt;
+&lt;li&gt;将自己边缘化，每天完成一个小目标即可，我的情况下就是每天写 100 行代码，其实用不到 2 个钟。&lt;/li&gt;
+&lt;li&gt;不要尝试一次性完成大量工作，你的工作进度永远需要和项目负责人协调。&lt;/li&gt;
+&lt;li&gt;没有工作时，一定记得督促你的项目负责人。&lt;/li&gt;
+&lt;li&gt;注意在 scrum 会议上不要让别人知道你什么都没干，如果直接和领导开 scrum 会议，记得多讲讲自己怎么和其他成员协作，怎么解决问题。&lt;/li&gt;
+&lt;li&gt;永远记住，拿自己的尺子去度量别人是件愚蠢的事情，指望得到别人的认可更是一件天真的事情。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;所幸我的项目负责人是 Grifter，对我也比较关心。
+在我成为一个 Coaster 后，每天只需要写不到两个钟的代码，其余时间都可以干自己的事情。
+例如之前写的 CMU 15-445 和博文，还可以拥有大量时间阅读 Follow，可以让我专注个人的提升。&lt;/p&gt;
+&lt;p&gt;成为一个 Coaster 就意味着你的目标不再是得到领导的认可，或者在公司承担核心架构工作之类的。
+这些工作轮不到你，我有个资深级别同事干了一年每天也只是做业务。
+以我的感受来说，能够得到一个较重要的业务模块开发工作，就是你在这家公司的目标了。
+没有也没关系，平时注重个人提升，再跳槽下一家即可。&lt;/p&gt;
+&lt;h2 id=&#34;工作&#34;&gt;工作
+&lt;/h2&gt;&lt;p&gt;关于目前在干的这家公司，我的职位是 C# 后端开发。
+其实之前从来没接触过 C#，只有 C++ / Go 是我唯二掌握的静态语言。
+入职动机也比较单纯吧，就是听说 C# 写起来挺舒服的想试试。&lt;/p&gt;
+&lt;h3 id=&#34;编程语言&#34;&gt;编程语言
+&lt;/h3&gt;&lt;p&gt;说到「舒服」，我就很想吐槽 py 和 js 总有很多方言。&lt;/p&gt;
+&lt;p&gt;py 值得吐槽的是，类型标注一坨、&lt;code&gt;from __future__ import annotations&lt;/code&gt; 需要运行时 eval、ForwardRef 混乱等问题，还有 asyncio 的任务取消在复杂场景下很难绷，经常需要写出这种方言：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;try&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;asyncio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;wait_for&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;task&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;except&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;asyncio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TimeoutError&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;asyncio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;CancelledError&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;# asyncio.CancelledError caused by parent cancelling&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;task&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cancel&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;contextlib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;suppress&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;asyncio&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;CancelledError&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;task&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;3.11&lt;/code&gt; 还新增了一个 &lt;a class=&#34;link&#34; href=&#34;https://docs.python.org/3/library/asyncio-task.html#asyncio.Task.uncancel&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;uncancel()&lt;/a&gt;，是真的难绷。&lt;/p&gt;
+&lt;p&gt;js 值得吐槽的首先就是 &lt;code&gt;Object.keys&lt;/code&gt; / &lt;code&gt;hasOwnProperty&lt;/code&gt; 这些方言，就不像个现代语言。
+还有就是 &lt;code&gt;Array.sort&lt;/code&gt; 省略参数的话，排序数字默认会把数字转字符串，按照 ASCII 排序，这点挺反直觉的，这个在 &lt;a class=&#34;link&#34; href=&#34;https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;MDN&lt;/a&gt; 有记载。&lt;/p&gt;
+&lt;p&gt;上面讲的都是 js 语言上的问题，此外还有 ejs / mjs 导出兼容和依赖兼容，double import 的问题（这个我目前没遇到）。
+还有就是 js 没有上下文的概念，只有全局变量，像 vue 提供的上下文都是在 compile 阶段完成的，比如 setup 之前会设置 currentInstance，所以要是在异步函数里面引用这些上下文函数会引发意料之外的问题。&lt;/p&gt;
+&lt;p&gt;相比之下，C# 的历史遗留问题还是挺少的。
+好用的特性也蛮多的，比如 Linq、导航属性、拓展方法、delegate 等，异步设计也挺优秀的。
+不过也有一些问题，比如数组协变导致性能差，多泛型 interface 和重载实现会出现混淆，这里就不细讲了。&lt;/p&gt;
+&lt;h3 id=&#34;感想&#34;&gt;感想
+&lt;/h3&gt;&lt;p&gt;这边就不过多废话了，继续聊聊（吐槽）工作吧。&lt;/p&gt;
+&lt;p&gt;其实 12 月份和朋友聊了一下，我才大约知道了自己做的是个什么性质的工作。&lt;/p&gt;
+&lt;p&gt;简单来说就类似工厂 IT。
+主要股东是一家卖家具的公司，我们公司主要就是做他们跨境电商的云平台支持。
+具体业务模块就包括物流、供应商、采购、财务、报表等，对接亚马逊平台。&lt;/p&gt;
+&lt;p&gt;我对目前这家公司印象算不好不坏吧。
+印象差的原因既不是加班，也不是被 PUA，而是每天工作太闲了&amp;hellip;&lt;/p&gt;
+&lt;p&gt;在公司里有摆烂人，也经常出现状态不同频的情况。
+摆烂人就是每天装忙，其实与我无关倒还好。
+但是我的项目负责人是个摆烂人，这在刚开始的时候令我很痛苦。
+某一次不知道需要推进什么工作的时候，被责骂的是我，反而不是项目负责人，挺逆天的。&lt;/p&gt;
+&lt;p&gt;每天大家都不知道是装忙还是真忙，经常能看到别人在看短视频。
+下班点到了也不走，非要多待半个钟，不过没有加班倒还好。
+不过我每天都是那个准点下班的勇士，已经习惯了。
+日报也是重复废话一大堆，没有周报月报什么的倒还好，日报也没人看。&lt;/p&gt;
+&lt;p&gt;云平台的负责人呢，会议里一句话能概括的事情，他可以讲成一篇文章，主打废话文学。
+还有虽然他没有在飞书明着说，但是经常能听到他在工位大声讲，问他也不知道怎么解决，他也不知道是哪个小组的 bug 不知道归谁管，问他的话他还要再同频到对应小组，他说效率低，纯纯的甩手掌柜。&lt;/p&gt;
+&lt;p&gt;我的工作就是一边学习一边干着 python 的 ui 自动化测试基建。
+最开始我还会想他们招我过来不会就是为了写 python 吧，不过他们真的不重视这个项目，可有可无。
+这个工作倒是挺简单的，就是 selenium 网页自动化 xpath / css selector 封装和 POM 架构开发。
+不过 ui 测试本身就挺傻逼的 —— “测了一半，如测”。即使页面点击了，流程也通了，但是不知道结果对不对，断言还要拉取网络响应包，或者从页面上想办法断言。&lt;/p&gt;
+&lt;p&gt;我曾多次提出给 python 开发加上格式化器和代码检查器。负责人也只是嘴上说着接受意见，但是一直摆烂。
+你摆烂就算了，还非要拉一些工作去支撑自己的工作内容，你连 python 基础都没打好。
+结果就是，本来我一个人写的好好的模块，硬给我改成一片红，经常会有逻辑错误、传参错误，还有一堆 repeat code。
+python 代码格式不规范就算了，缩进甚至还不一致，我看着你的代码，简直像是浑身上下有蚂蚁在爬。&lt;/p&gt;
+&lt;p&gt;这就是所谓的 &lt;strong&gt;重视架构&lt;/strong&gt; 的企业。
+我一直觉得架构是为良好的技术基础服务的，连个代码都写不明白的人，整天在空谈架构，就很魔幻。
+整天讲 SOLID，讲 DRY，结果一看代码惨不忍睹。&lt;/p&gt;
+&lt;p&gt;看一眼就会毙命：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;items&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;][&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;title&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;][&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;css&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;.more-operation &amp;gt; button&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;items&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;][&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;title&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;][&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;css&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;.more-operation &amp;gt; button&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;click&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;我还经常在群里看到很多问题，比如他们后端很多微服务的参数无校验、foreach async 逆天写法等。
+前端更是一坨，图片没剪裁压缩，一个 index.css 有 500 多 KB，一大堆直接引用没有 code splitting 的 js 资源，lighthouse 性能跑分 58，LCP 4s，而且还是内网服务器。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;使用这个平台能遇到一万个 bug，严重阻碍自己开发&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;特别地，我使用 &lt;code&gt;cloc&lt;/code&gt; 分析了一下后端代码库，其中 C# codegen 127w 行，C# 73w 行。
+看似很多，但实际上很多是 infra，其中业务层代码大约有 28w 行。
+看似也很多，但 DDD 设计中有很多接口设计，比如 ICommand / ICommandHandler / IRepository 之类的，还有微服务的 RPC 调用。
+另外我甚至还看见一大堆重复 IService 定义，不清楚这具体有什么意义可能是我目光短浅了。&lt;/p&gt;
+&lt;p&gt;减去这些代码，其实估计也就 10w 行左右，我实在不认为这是多大的代码量，以至于可以产出这么多的 bug。&lt;/p&gt;
+&lt;p&gt;这一切也不怪他们，只能怪我自己太菜了，没能进入到更厉害的公司。&lt;/p&gt;
+&lt;p&gt;至于我闲到什么程度呢？就是 3 个月试用期过去了不管不问，也没什么进度和规划，我当时忍不了了便督促他们尽快给我渡过学习期。
+但是换来的却是对我的冷嘲热讽，即便从 commit 历史记录上争不过，但还是非要挑点刺出来，比如说我每天准时到点就走人，说我和同事关系不好，说我遇到上司也不问好。
+我只想说，你不会真以为你们代码库是什么金子吧 😅&lt;/p&gt;
+&lt;p&gt;在那之后我就觉得寻求别人的认可是个很天真的事情。
+后来我就转变成了一个 &amp;ldquo;Coaster&amp;rdquo;，你们爱咋地咋地吧。&lt;/p&gt;
+&lt;p&gt;不过我也学到了很多，例如掌握了新的编程语言 C#，语法糖多，linq 写起来也很爽。
+架构和软件设计原则更熟练了，以前都没有特别在意这些。
+比如说我之前用过依赖注入，甚至实现过，但是掌握了依赖倒置原则后，我可以明白这么设计的优点具体在哪里。
+其实大多数场景的架构模式都成熟了，没有必要从头设计。
+平时写代码还是那样子写，没什么太大的变化。&lt;/p&gt;
+&lt;p&gt;还有就是学习到了 Domain-Driven Design (DDD) 这个比较新颖的设计模式，对这个的印象还是不错的。&lt;/p&gt;
+&lt;p&gt;开了一个 C# 大项目的坑，是很久之前就想写的一个动漫客户端，调研过很久，想要集成 wiki / bangumi / mal 之类的。&lt;/p&gt;
+&lt;h3 id=&#34;后记&#34;&gt;后记
+&lt;/h3&gt;&lt;p&gt;总的来说呢，这份工作还算不错。
+每天的工作量非常小，基本上 2 小时之内就可以搞定，公司资金也看似「稳定」。
+虽然我并不是想摆烂，只是不想把时间浪费在各种库/工具/业务的学习上，目前我的主要目标是掌握数据库和分布式，但是轻松的工作还是令我感觉很舒适。
+此外，绩效占比低，所以我都不在意绩效评优。
+团队也没有内卷，挺友善的（除了大家聚一起吐槽公司之外 🤣）&lt;/p&gt;
+&lt;p&gt;至于跳槽，应该暂时没那么快，想先做点业务模块再说吧。
+后端比较卷，跳槽还不一定能涨到多高的薪，这是一个需要经验的职位。
+深入学学 react 和 v8 再跳槽到前端的话也挺不错。
+主要还是想尝试一下进入大厂，最好还能是比较好的项目组。&lt;/p&gt;
+&lt;p&gt;我已经 23 岁了，技术其实也就干那么几年，就算进入大厂也赚不了多少钱，也就图个好奇和满足愿望。&lt;/p&gt;
+&lt;p&gt;海外不是经常会讲 Work Life Banlance (WLB) 嘛。
+最近在 &lt;a class=&#34;link&#34; href=&#34;https://sspai.com/post/86697&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;这篇文章&lt;/a&gt; 里看到了一个新的角度：「你并不需要 Work Life Balance，生活是一切，工作只是工作。」
+我觉得也挺有道理的，工作只是赚钱的一个手段，而诗和远方只存在于日常生活之中。
+不过在深圳的生活还是不错的，目前我的通勤 40 多分钟，8 点半起床，晚上 7 点半可以到家，也能租到便宜还不错的房子。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>自由、美、我的日程和果冻</title>
+        <link>https://blog.tinyume.com/2022/no-sense-bypass/</link>
+        <pubDate>Wed, 19 Oct 2022 15:03:04 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2022/no-sense-bypass/</guid>
+        <description>&lt;h1 id=&#34;美和自由&#34;&gt;美和自由
+&lt;/h1&gt;&lt;p&gt;自由，并不意味着开放和快乐。关于自由的标准有很多，但大致可以分为如下两点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;选择自由，所谓选择自由用一句话概括就是「我想要做那件事，但我有权利决定做不做，受压迫了我就不爽」。选择自由也是存在主义的核心之一，对于积极唯物主义来说，即使你可以选择逃避一件事，但勇敢站出来对抗它也是一个选择，也是一种英雄主义。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服从自由，意识形态固化、常识容易被言论误导的人只会倾向于听从自己心中的「神」，即使发生了什么不对劲的事情也不会抗议，因为他们的常识会潜移默化地接受这种变化，对于他们来说，专制和极权也何尝不是自由呢。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;我想说的是，自由的判断很大程度上是美的判断。人所能见到美的东西，就会认为是自由的。
+美和常识是密切相关的，假如你看到有人在大马路上拉屎，那显然就是违背常识的。
+我们对事物美的判断是非常主观的，你写的诗，别人不一定欣赏得来，所以我们说诗是美的，不写诗的人就会认为诗没什么美感可言。
+&lt;strong&gt;一个人能看到越多事物的美丑和两面性，他就越清楚美是什么样的，他的常识判断就越清晰，他就越清楚道德标准在哪里，他也因此更自由。&lt;/strong&gt;
+相反，一个人从小就不知道什么是常识，不知道怎么自己判断真相，他也就越容易受舆论影响、受权威影响。&lt;/p&gt;
+&lt;p&gt;美是主观的，自由的人拥有对美的高度追求，所以自由的人往往都是痛苦的。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;文学会教人认识美的方法。从技术圈也认识到类似的一点就是，能够熟练使用 Google 搜索引擎的人、找文档自力更生的人，就已经具备大多数人不具备的「常识」了。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;写给米米：有清晰常识判断的一个人，往往能下意识地说出来自己是喜欢还是讨厌这个事物，而不是犹豫着自己到底要说些什么。对于基本常识还要犹豫很久才能做出判断的人，一般叫做猪，一头有交流障碍的猪。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;做了什么&#34;&gt;做了什么
+&lt;/h1&gt;&lt;p&gt;由于长春疫情，提前返家后的暑假有足足 4 个月，在家里呆着真折磨，我讨厌自己家——家家有本难念的经。这 4 个月假期我几乎什么都没干，直到回了学校，心情变好了很多，才开始忙着写一些代码。&lt;/p&gt;
+&lt;h2 id=&#34;论文&#34;&gt;论文
+&lt;/h2&gt;&lt;p&gt;年初时，也就是疫情那段时间（疫情会单独讲一篇文章），完成了大创。
+因为需要提交论文，整个过程可谓是折磨——学长 leader 和导师不仅喜欢 push 人，也把整个小组当提线人偶使用，上课、写作业、定期交作业。
+我现在只能无奈地说，我不介意队员啥都不会，我可以教，我学他们也学，但是导师还得是关系比较好的而且有水平的。
+最后是我一个人想的方法，也是一个人写完的代码，包括所有图片测试和指标绘图。
+&lt;a class=&#34;link&#34; href=&#34;https://github.com/iyume/image-fusion&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;代码地址&lt;/a&gt;。
+其实 README 的描述和我们组写的论文还有很大不同，我有在努力解释代码到底是如何工作的，但是 leader 自顾自的解释，看到比我们高的评价指标就删掉，我也很无语。
+中间还有很多细节没有讲。总之我对学术界彻底失去了兴趣，也不想去任何一个实验室了。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我整个过程的感受就如同这篇文章所说: &lt;a class=&#34;link&#34; href=&#34;https://survivesjtu.gitbook.io/survivesjtumanual/fang-tan-ji/xiao-xin-xiang-mu-de-xian-jing&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://survivesjtu.gitbook.io/survivesjtumanual/fang-tan-ji/xiao-xin-xiang-mu-de-xian-jing&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;cpython&#34;&gt;CPython
+&lt;/h2&gt;&lt;p&gt;今年 7 月份到现在的这段时间里给 cpython 提交了一些 fix 和 enhancement 和对应的测试，成为了 cpython contributor。
+如果早点的话，我还能拿个 github 火星车徽章！不过能成为 contributor 已经很开心了。
+在修 typing 标准库时 (&lt;a class=&#34;link&#34; href=&#34;https://github.com/python/cpython/pull/96080&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;#96080&lt;/a&gt;)，有幸和 python 之父 Guido 进行了一段交流。&lt;/p&gt;
+&lt;h2 id=&#34;个人项目&#34;&gt;个人项目
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/nonebot/nb-autodoc&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Python API 文档生成器&lt;/a&gt; 是我从去年暑假写到今年现在，即使中间经常空着时间没写，但也是写的时间最长、复杂度最高的一个项目了。
+主要是对 v0.1.x 的改进，v1 目前还只完成了 1/3 的样子，已经有 2000 行了。
+项目唯一能参考的就是一些 linter，比如 mypy 和 jedi，看完不太可能，只看了一些设计方法和一些函数组件。
+至于 pdoc 和 sphinx 完全就是残废。
+我感觉写 nb-autodoc 时不是在写代码，更像是在写协议——我需要构建每个模块和对象的定义，才能进行准确的分析，在兼顾对象关系的同时输出完整的文档。&lt;/p&gt;
+&lt;h1 id=&#34;果冻&#34;&gt;果冻
+&lt;/h1&gt;&lt;p&gt;最近买了果冻，甜甜的，即使没有甜品那么好吃，也不错。因为只有外面可以吃到甜品。不久的将来，也许果冻会代替甜品也说不定呢（笑）&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>无题</title>
+        <link>https://blog.tinyume.com/2020/no-title/</link>
+        <pubDate>Thu, 09 Jul 2020 13:34:52 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2020/no-title/</guid>
+        <description>&lt;p&gt;「并非是因为普通或者特殊，只是这样的日常对我而言，也必有其存在的价值」&lt;/p&gt;
+&lt;p&gt;对我而言，没有那样特殊重要的理由&lt;/p&gt;
+&lt;p&gt;无论是某个人，还是某份感情&lt;/p&gt;
+&lt;p&gt;因为你是外人，而不是圣诞老人&lt;/p&gt;
+&lt;p&gt;你那伪劣的胡子以及不红的脸都在令我表示怀疑&lt;/p&gt;
+&lt;p&gt;我让你离开我的胸口，你却在我怀里乱窜&lt;/p&gt;
+&lt;p&gt;“别动好吗”&lt;/p&gt;
+&lt;p&gt;为什么你总是在骗我&lt;/p&gt;
+&lt;p&gt;明明知道我也在骗着你&lt;/p&gt;
+&lt;p&gt;难道你是黑蜥蜴星人么&lt;/p&gt;
+&lt;p&gt;还是波罗罗星人&lt;/p&gt;
+&lt;p&gt;你向我传达炒面真好吃的时候我是不是应该推荐你进入棒球社比较好呢&lt;/p&gt;
+&lt;p&gt;你所认为的善，究竟是爱，还是恶劣呢&lt;/p&gt;
+&lt;p&gt;我忘却了思考&lt;/p&gt;
+&lt;p&gt;当然这是我假装的&lt;/p&gt;
+&lt;p&gt;我转而去问哲学家某些形而上的问题&lt;/p&gt;
+&lt;p&gt;我转而去找禅师寻求超凡脱俗的道路&lt;/p&gt;
+&lt;p&gt;最终答案却是与你度过的日常&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>浅谈纸上魔法使</title>
+        <link>https://blog.tinyume.com/2020/talk-about-kami-no-ue-no-mahotsukai/</link>
+        <pubDate>Thu, 23 Apr 2020 00:00:00 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2020/talk-about-kami-no-ue-no-mahotsukai/</guid>
+        <description>&lt;h2 id=&#34;纸上魔法使&#34;&gt;纸上魔法使
+&lt;/h2&gt;&lt;p&gt;原名：紙の上の魔法使い
+类型：视觉小说
+开发商：ウグイスカグラ
+剧本：ルクル
+原画：桐叶
+主线时长：25-30 h
+全线时长：30 h +
+主要人物：月社琉璃、游行寺夜子、日向彼方、月社妃、伏见理央、游行寺汀、游行寺暗子、本城奏、本城岬、克利索贝利露&lt;/p&gt;
+&lt;p&gt;我是在去年下半年玩到这部游戏的，游戏不算小众也谈不上高人气，了解到它是因为当时刚玩完色鸟鸟颇有点感触，然后在不知在逛花火还是哪里的时候看到有人推了这部游戏。不得不说剧情有点长，并且当时还有别的Galgame 想推，在去年推了三章后就把后面的剧情拖到了最近来玩。&lt;/p&gt;
+&lt;p&gt;玩通主线后的我可谓是百感交集又觉着五味杂陈。游戏并未全通，考虑到分支大多是 H-scene，没兴趣便没急着去玩。考试后会二通此游戏，这也是这篇博文冠名为浅谈的理由。二通后会出深谈吗？我也不知道。写下这篇浅谈很大的动机是这部游戏出色的人物塑造，以及我在今年三月多玩到的一部哲学电波系作品，还有就是为了更好地二刷。最近精神谈不上健康，文章可能有点我无法察觉的混乱。&lt;/p&gt;
+&lt;p&gt;那么接下来请进入纸上世界——&lt;/p&gt;
+&lt;h3 id=&#34;游行寺夜子&#34;&gt;游行寺夜子
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;身份：图书管理员&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;「白发赤瞳的诅咒之身，受人冷眼」&lt;/p&gt;
+&lt;p&gt;夜子之为悲剧故事的主角，她为了选择孤身的不幸、为了期盼谁都不会受伤的世界而欺骗自己渴望幸福的愿望。&lt;/p&gt;
+&lt;p&gt;闭门不出的尼特少女为了隐藏内心深处的愿望无意间成为了加害者，发现这一事实的她选择了自我伤害而不是做出改变，选择了无人的鸟笼而不是虚伪的人偶剧场，这是一个令我有些致郁又略微感动的点。不像其他角色正面塑造多，夜子基本就是一个感情脆弱的人物，虽然她在后期做出了自己可以接受的改变，但总感不足。&lt;/p&gt;
+&lt;h3 id=&#34;月社妃&#34;&gt;月社妃
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;身份：琉璃的妹妹&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;「跨越伦理之爱，于神之膝下双双殉情」&lt;/p&gt;
+&lt;p&gt;妃之为悲剧故事的主角，她冷静且合理，纯洁的恋情并不限于与琉璃的兄妹之身，而体现于她甘愿为爱献身，体现在于她宁愿对方幸福。&lt;/p&gt;
+&lt;p&gt;再看看ルクル这个剧本家。ルクル身为出色剧本家的同时，因其剧本多有情感羁绊强大的妹系角色，被称为“妹妹大师”。ルクル对琉璃的妹妹妃自然没有少写。妃这个人物的塑造无疑是非常出色的，她是全作品最自由的存在，与魔法书反抗到底的存在，从另一个角度而言，她赴死的时候便已经放弃了对琉璃的爱恋，即便后期复活也要无视对琉璃的爱恋而对魔法书的存在反抗到底，她是本作品最体现存在主义思维的人，拥有着崇高的自尊与不羁的自由。但我对妃的情怀并非源于我的妹控情结。更露骨地讲，我并不喜欢妃这个妹妹角色。不过这只是初次游玩的体验。&lt;/p&gt;
+&lt;h3 id=&#34;伏见理央&#34;&gt;伏见理央
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;身份：图书馆佣人&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;「非人道主义的爱恋，名为疯狂」&lt;/p&gt;
+&lt;p&gt;理央之为悲剧故事的主角，她诞生于纸上，却与无法恋爱的宿命不惜以生命相抗。&lt;/p&gt;
+&lt;p&gt;在夜子自我封闭时，理央在门口显现的冷酷表情令我怀疑夜子是否改写了理央，不过后来在学校遇到了理央时，令我觉得她的内心还是盼望着琉璃来拯救尼特少女的。&lt;/p&gt;
+&lt;h3 id=&#34;克利索贝利露&#34;&gt;克利索贝利露
+&lt;/h3&gt;&lt;p&gt;「憎恨中重生的邪恶魔法使，摆弄剧场的人偶」&lt;/p&gt;
+&lt;p&gt;真名阿蕾克莎多利亚，一个没什么好说的反派角色，后面的形象扭转显得突兀，而且来了个令人措手不及的 H-scene。但其身份何来值得探究，这并未在原作中写出，那就稍微推理一下吧。&lt;/p&gt;
+&lt;p&gt;克利索贝利露有几句非常关键的话：“妾只不过是现象”、“比书更为本质的存在”&lt;/p&gt;
+&lt;p&gt;正如言语是心灵的派生那般，克利索贝利露是魔法书的现象。是谁写的魔法书？为什么克利索贝利露具有微弱的可以写出魔法之书的能力？&lt;/p&gt;
+&lt;p&gt;游行寺家的人是不是只能写出书，而不能写出魔法使那样的存在？如果是，克利索贝利露的书出自何人之手？&lt;/p&gt;
+&lt;p&gt;克利索贝利露之所以为了夜子而不顾一切摆弄魔法书，是出于她的同情。&lt;/p&gt;
+&lt;p&gt;如果所有假说成立在诅咒不现实的情况下，弄清楚受诅咒的魔法使传说究竟是怎么回事，白发赤瞳的少女为憎恶化身的恶魔，还是被人创造出来的存在。&lt;/p&gt;
+&lt;p&gt;从时间线看，克利索贝利露的出现应该是在初二时的彼方向琉璃告白之后，而那时夜子并没有写魔法之书，因为夜子开始写魔法之书在故事的后端，以与彼方的一段不经意的对话体现出来，故可以排除克利索贝利露是夜子创造的魔法之书。&lt;/p&gt;
+&lt;p&gt;克利索贝利露的存在推理其一：游行寺暗子编写的名为克利索贝利露的纸上魔法使，为了在她死后有人能保护夜子，而所谓白发赤瞳的诅咒魔法使只是扯淡。&lt;/p&gt;
+&lt;p&gt;克利索贝利露的存在推理其二：本为纸上之人的克利索贝利露不应具有写出魔法之字的能力，故其存在正是传闻中的诅咒少女——从很久以前就诞生的存在其事实才能引发这样的传闻，原本白发赤瞳仅为不详的象征，传闻扩散后才变成人人讨厌的存在。顺着这条推理联系第十三章可推测，火灾后的克利索贝利露立马被不知以何种方式写成了魔法使的书，成为谣言中的存在。&lt;/p&gt;
+&lt;h3 id=&#34;十三魔法之书&#34;&gt;十三魔法之书
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;翡翠的排挤原理&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;红宝石的天作之合&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;蓝宝石的存在证明&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;紫水晶的怪异传说&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;磷灰石的怠惰现象&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;芙蓉石的长年隔绝-芙蓉石的终焉轮回&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;黑珍珠的求爱信号&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;萤石的时空残影-萤石的怠惰现象&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;白珍珠的泡沫爱慕-绿幽灵水晶的命运连锁&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;黑曜石的因果目录&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;缟玛瑙的不在证明&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;青金石的幻想图书馆&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;璀璨的紫翠玉&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;浅谈纸上魔法使&#34;&gt;浅谈纸上魔法使
+&lt;/h3&gt;&lt;p&gt;并不给予纸上魔法使 Galgame 的称号而是视觉小说是因为纸上魔法使是一个直线型故事讲述模式而不是一个攻略喜爱女孩子的恋爱游戏。&lt;/p&gt;
+&lt;p&gt;奔着桐叶的废萌画风而来的玩家也几乎都是躺着出去的，这也是其评论两极化的原因之一。&lt;/p&gt;
+&lt;p&gt;原本我也只是想缓解一下「青空下的加缪」遗留的 PTSD，没想到又被毒奶了一波 qwq。&lt;/p&gt;
+&lt;p&gt;如果说人物塑造是本作最亮的点，那么纸人的设定就是本作最致郁的点。&lt;/p&gt;
+&lt;p&gt;纸人的身体特征、性格、喜好、技能都可以通过改写书的内容来实现，这样就仿佛一个个受人玩弄的人偶，在潘多拉的狂乱剧场里上演着人偶戏。假如代入角色很深，你便会深刻体验到当自己的感情被肆意玩弄时的无奈与绝望。当你以为你和妃深深相爱时，蓝宝石的存在证明会告诉你这只不过是故事需要而已。当你经历了芙蓉石的长年隔绝，深深爱上伏见理央这个可爱惹人同情的角色时，他会突然告诉你这只不过是一个纸上设定的人物，她的记忆是虚伪的，她的感情是设定的。这种种令我在整个游玩过程都是陷入十分低迷的状态。&lt;/p&gt;
+&lt;p&gt;特典以猫的视角抒发了编剧对角色的看待，这是我颇喜欢的风格，因为我此前写不交换视角的妹系小说时，就喜欢写妹妹视角的总结。&lt;/p&gt;
+&lt;p&gt;本作艺术性较高，擅长心理和细节描写，也令我认识到了ルクル这位出色的剧本家。虽然这主线在某些方面为人诟病，但魔法书的设定足以打开玩家一个看待事物新的视角与想象的空间，总而言之还是瑕不掩瑜。&lt;/p&gt;
+&lt;p&gt;与其说是我们以更高维度在游玩这部游戏，更像是这部游戏在不断地暗示般抛砖引玉来诱发我们的各种对存在与爱恋的思考。&lt;/p&gt;
+&lt;p&gt;名副其实的精彩作品，我永远喜欢日向彼方.jpg&lt;/p&gt;
+&lt;h2 id=&#34;青空下的加缪&#34;&gt;青空下的加缪
+&lt;/h2&gt;&lt;p&gt;原名：青い空のカミュ
+类型：视觉小说
+开发商：KAI
+剧本：〆鯖コハダ
+原画：〆鯖コハダ
+主线时长：10 h -
+全线时长：10 h +
+主要人物：込谷燐、三间坂萤、大本大人、聪&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;―――纵使世界错乱了、纵使迷失了世界―――&lt;/p&gt;
+&lt;p&gt;这是两个少女联结羁绊的三日物语&lt;/p&gt;
+&lt;p&gt;仅仅是完美的日常中扭曲的不合理&lt;/p&gt;
+&lt;p&gt;天空蔚蓝无尽，澄澈地如同毫无意义&lt;/p&gt;
+&lt;p&gt;Qui a tué fille (是谁杀死了少女)&lt;/p&gt;
+&lt;p&gt;只想知道那件事情&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;浅谈青空下的加缪&#34;&gt;浅谈青空下的加缪
+&lt;/h3&gt;&lt;p&gt;PTSD 病患表示不想讲话……我是真没注意到游戏标着的凌辱标签，我甚至以为 Hs 都没有，因为我在社区里看到的评价是“重口”，我心想一个哲学作品怎么会有凌辱呢然后吃了大亏。&lt;/p&gt;
+&lt;p&gt;此游戏也在众多社区呈现激烈两极化（你可以喜闻乐见），在 bangumi 大多偏向好评。&lt;/p&gt;
+&lt;p&gt;喜好读书的人大概会知道加缪，他是不同于萨特本源的一种存在主义。我并没完全理解游戏种种暗示与细节，自从我玩过炒饭的 Tiny snow 以来，真没想到还能接触到有着如此深刻存在主义哲学的视觉小说。&lt;/p&gt;
+&lt;p&gt;讲到存在主义和虚无主义的 Galgame，肯定有人想提起素晴日，不过我还尚未开始玩素晴日。&lt;/p&gt;
+&lt;p&gt;在社区中，它被称为“哲学电波系”作品，接收到相应电波的人自然会去尊重这部作品。你可能在一秒之内爱上它，也可能在一秒之内厌恶它。&lt;/p&gt;
+&lt;p&gt;至于我为什么会受凌辱场景如此大的刺激，还得从去年的妹扔书说起……妹扔书是一部非常非常“好玩”的作品，我极力推荐妹控们去玩，PTSD 算什么，只不过打了两天两夜的恐怖游戏就可以缓过来的东西。&lt;/p&gt;
+&lt;p&gt;一个为令人愤懑的悲伤，一个是名为绝望的悲伤。&lt;/p&gt;
+&lt;p&gt;这个世界观令我联想起了夏娜那种偏魔幻现实主义的世界。&lt;/p&gt;
+&lt;p&gt;以上为当时游玩做的笔记，时间太久无法作更多浅谈。&lt;/p&gt;
+&lt;h2 id=&#34;后记&#34;&gt;后记
+&lt;/h2&gt;&lt;p&gt;今天是读书日，不过读书是不可能读书的，当然是要玩数独啊！&lt;/p&gt;
+&lt;p&gt;近期沉迷 PCR，两个号都打到了第七章。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>How to walk tiny little life</title>
+        <link>https://blog.tinyume.com/2020/how-to-walk-tiny-little-life/</link>
+        <pubDate>Mon, 09 Mar 2020 19:22:29 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2020/how-to-walk-tiny-little-life/</guid>
+        <description>&lt;p&gt;动画 ————&lt;/p&gt;
+&lt;p&gt;用日语读就是 “Anime”&lt;/p&gt;
+&lt;p&gt;翻译过来就是 “吖你面” 的意思……&lt;/p&gt;
+&lt;p&gt;总而言之，就是个抢饭碗的行业。&lt;/p&gt;
+&lt;p&gt;这正是我——福原友章正面临的状况。&lt;/p&gt;
+&lt;p&gt;在这个弱肉强食的行业，我应该是属于食物链底端的存在，稍有不甚便会被“猎肠者”*开膛破肚。如果用偏差值来计算的话，我一定是垫底的，但我的在校学习成绩可是很好的哦，真的真的哦，没骗你。【NETA 从零开始的异世界生活，一个危险敌对角色】&lt;/p&gt;
+&lt;p&gt;食物链的顶端一般是狮子或者老虎之类的，而底端则是可爱的兔子或者猫猫狗狗之类的。而我属于后者，也就是说，我与兔子一样可爱。不过这么来说，越弱的生物便越可爱，我比兔子还弱，那么我比兔子还要可爱，好耶，可爱万岁，可爱就是正义！【NETA 游戏人生，主角的台词】&lt;/p&gt;
+&lt;p&gt;这时，“咔哒”一声，刚才还在想着些没有营养的东西的我打开了自家客厅的门。&lt;/p&gt;
+&lt;p&gt;「我回来了」&lt;/p&gt;
+&lt;p&gt;「欢迎回来……」&lt;/p&gt;
+&lt;p&gt;熟悉得不能再熟悉的声音夹杂着一丝慵懒的气息从沙发的背部传出。&lt;/p&gt;
+&lt;p&gt;那家伙，又在吊儿郎当。&lt;/p&gt;
+&lt;p&gt;我无奈地嘀咕道，谁让声源处的那个人是我福原友章既可爱又自傲的妹妹福原里香呢。&lt;/p&gt;
+&lt;p&gt;嘛，可不可爱嘛。&lt;/p&gt;
+&lt;p&gt;毕竟只有我和她待得最久，所以我的感想也并不会附上太多的主观，从一般人的标准来看的话，应该是属于非常可爱的那种类型吧。&lt;/p&gt;
+&lt;p&gt;「好慢啊，8 点档动画都看完了」&lt;/p&gt;
+&lt;p&gt;……如果改掉这看不起人的臭性格的话就更加可爱了。&lt;/p&gt;
+&lt;p&gt;话说回来，上班真是累死人啊。&lt;/p&gt;
+&lt;p&gt;俗话说，五点下班变成人*，我这是晚上八点才能变回正常人。【NETA 指日本五点下班的上班族充满活力】&lt;/p&gt;
+&lt;p&gt;我扯开领带，想让闷了一整天的胸口透透气。&lt;/p&gt;
+&lt;p&gt;随即从包里拿出一份文件，走向沙发。&lt;/p&gt;
+&lt;p&gt;「里香，之前你说想去的声优事务所的一些入职介绍，我整理了一下都在这里了」&lt;/p&gt;
+&lt;p&gt;「还有，如果决定了的话，你要把一月到三月的下午的课程空出来，有培训班要去」&lt;/p&gt;
+&lt;p&gt;躺在沙发一动不动盯着平板屏幕看的妹妹把头转向了我，然后茫然地指了指自己的脸，见我点了点头后她便嫌弃地皱起了眉。&lt;/p&gt;
+&lt;p&gt;这里就我们两个人，难道你想说我家的厕所还会出现花子吗，那你绝对是不乖乖听话的妹妹。【NETA 日本都市传说“厕所里的花子”】&lt;/p&gt;
+&lt;p&gt;再说不是你说要当声优然后手舞足蹈地拜托我的吗？怎么搞得像是我在拜托你一样。&lt;/p&gt;
+&lt;p&gt;我是工作人，也就是社畜，目前在动画行业做着制作助理的工作。&lt;/p&gt;
+&lt;p&gt;而我家的妹妹则是个名存实亡的大学生，不爱学习空抱理想的人所特有的坏习气在我家妹妹身上显露无疑，比如自傲的性格，比如以前的我……难道是受了我的影响？不不不，怎么可能呢、可能？、大概是？……对不起我的可爱妹妹，把你带成这个样子全部是我这个哥哥的错。&lt;/p&gt;
+&lt;p&gt;我一副欲哭无泪的表情正好被里香撞见了。不好，好尬，好尴尬……&lt;/p&gt;
+&lt;p&gt;「大学那边的话不要紧，由于去年一直没工作所以学分基本都是满的，而且在学校也没什么朋友，也不会有什么事」&lt;/p&gt;
+&lt;p&gt;我的妹妹直接无视了我。好，真不愧是我的妹妹！&lt;/p&gt;
+&lt;p&gt;为了不让我家妹妹变成彻底的干物妹，同时作为一个负责的好哥哥，我一直在争取能让里香在声优事务所实习的机会。&lt;/p&gt;
+&lt;p&gt;其结果就是，在面试被刷下来三次之后，嘴上就开始不要不要地拒绝了……虽然最后还是去了。&lt;/p&gt;
+&lt;p&gt;最近才好不容易靠我的关系介绍进了一家不错的事务所。&lt;/p&gt;
+&lt;p&gt;「那个、友章哥，是不是没有人要我了」&lt;/p&gt;
+&lt;p&gt;「哦？是吗」&lt;/p&gt;
+&lt;p&gt;是吗，这么快就开始考虑男朋友的事情了吗，那种事情不是你这个年纪考虑的吧……不对，好像已经是那个年纪了，倒不如说没有男朋友才会显得奇怪……咦？奇怪？怎么感觉鼻子有点发酸。&lt;/p&gt;
+&lt;p&gt;「你看嘛，明明人家什么都愿意做，还有这么多优点，面试的那群混蛋却看不到，嘴里说着什么这个怎么样，这个不行吧，一想到就来气，为什么那种家伙能在那里工作啊，那家事务所的老板一定有问题，要不就是没事干，这大概就是业界的堕落啊」&lt;/p&gt;
+&lt;p&gt;哦哦，原来是说这个啊，混蛋啊，还我的感情……&lt;/p&gt;
+&lt;p&gt;你还真把自己当成被人捧在手心的宝石了，真让人担心她是不是能好好独立……业界的堕落这句话还轮不到你个臭新人来说。&lt;/p&gt;
+&lt;p&gt;「那你来说说你有什么优点？」&lt;/p&gt;
+&lt;p&gt;「自信……可爱？再说了，什么都愿意做不已经是最大的优点了吗？」&lt;/p&gt;
+&lt;p&gt;空调马达一边发出嗡嗡响声，一边安静地将热风送出来。&lt;/p&gt;
+&lt;p&gt;外面还有汽车驶过柏油路面的声音，填充着我和里香之间寂静的空气。&lt;/p&gt;
+&lt;p&gt;什么都愿意做这种话无论谁都会说，无论谁都能说，可人家要的既不是你的口头承诺也不是让你做些勉为其难的工作，看人的标准不是你的长相，而是你能做什么，什么都不会的人要了也只是吃大锅饭，甚至可能成为饭里的老鼠屎。&lt;/p&gt;
+&lt;p&gt;雇佣制度是一种有倾向性的制度：对资方有利，对劳方不利。劳资双方并不平等，劳方只有被动地接受资方的决策。这种不平等正是雇佣制度的本质，这既是我从工作中学到的经验，也正是我家妹妹——福原里香所面临的状况。&lt;/p&gt;
+&lt;p&gt;而且，什么都愿意做这句话从一个女大学生口中说出来便会莫名带点 H 的气息，所以拜托请不要在外人面前随便说这种话，万一被误解了怎么办？作为一个哥哥如果被别人用那种质疑是不是一个好哥哥的眼神来看的话是会非常伤心的。&lt;/p&gt;
+&lt;p&gt;我沉默着思考着，本来这种东西不是自己去觉悟是没有意义的。像我这样愿意帮忙很大一部分也不仅仅是里香很可爱的原因。&lt;/p&gt;
+&lt;p&gt;这时我不经意地望向正因为陷入尴尬气氛不知所措而又欲言又止的妹妹，可恶，好可爱……&lt;/p&gt;
+&lt;p&gt;如果这是 Galgame，此时玩家面前会出现两个选项。&lt;/p&gt;
+&lt;p&gt;一是直接点破，谎称我的妹妹并不可爱，也没什么实在的能力，让她乖乖面对现实。而事实看来，我的妹妹是相当可爱的。最重要的是说者无心听者有意，就算我们是关系再亲近的兄妹，彼此之间再清白的语句也有可能被对方误解为带恶意的谎言，而我便会被妹妹当成一个既不会 ky* 也不善解人意的人，然后逐渐被妹妹讨厌，最终走入 Bad End。【NETA ky: “空气”，形容读气氛】&lt;/p&gt;
+&lt;p&gt;二是去不停地夸里香，夸她的难度倒是不高，靠膝盖想的话我一秒就可以想出十个*。但问题是听完后，她很可能、不、绝对会！趾高气昂地大笑出来，说出什么果然我是天才之类的胡说八道，然后被自我膨胀诱发的盲目自信引发了第一次工作的失败被赶了出来，从此一蹶不振成为干物妹，最终走入 Bad End。【*这句话的意思是不经大脑思考，也就是瞎扯】&lt;/p&gt;
+&lt;p&gt;正因为我从事的工作中成天都是谎言，所以我想尽可能地在私生活中使用真话。&lt;/p&gt;
+&lt;p&gt;而我也不可能去附和她的优点，批评和夸赞到了一定程度，就会变成伤人和谎言。&lt;/p&gt;
+&lt;p&gt;不管是哪边，都要维持在一个精准的平衡点。&lt;/p&gt;
+&lt;p&gt;这样一来，我所能说出的话就极其有限……&lt;/p&gt;
+&lt;p&gt;「对啊对啊，里香好可爱，里香好可爱，里香最可爱了」&lt;/p&gt;
+&lt;p&gt;「……你绝对不是那样子想的吧？我怎么觉得你在看不起我？」&lt;/p&gt;
+&lt;p&gt;里香泪眼汪汪地望着我。&lt;/p&gt;
+&lt;p&gt;让对方觉得我在糊弄她，做到此而不让对方生气的方法便是重复一个夸人的语句。&lt;/p&gt;
+&lt;p&gt;重复一个语句可以让其核心内容的价值和可信度降低——这是对话的一个高级技巧，能让原本不是谎言的句子听起来就像谎言一样，而对方也能察觉出这句话的真实含义，简直是放在法庭都可以打赢官司的交流术。&lt;/p&gt;
+&lt;p&gt;来由便是初中向女生告白时由于太激动而在一句话中重复了三次告白，然后被干脆地甩了……&lt;/p&gt;
+&lt;p&gt;不过这对我的妹妹奏不奏效我也不清楚，姑且看她的表情还是有用的吧，她能明白就好了，不用我这个哥哥去点明是最好的啦，少了麻烦又解决了问题。&lt;/p&gt;
+&lt;p&gt;清空了思绪后，我开始放水洗澡。&lt;/p&gt;
+&lt;p&gt;「啊啊~~！」&lt;/p&gt;
+&lt;p&gt;身体刚浸入浴缸的舒适感让人忍不住发出了呻吟。&lt;/p&gt;
+&lt;p&gt;「真少见诶，你居然会在泡澡时发出叫声」&lt;/p&gt;
+&lt;p&gt;门外突然传来里香的吐槽。&lt;/p&gt;
+&lt;p&gt;为什么你会在我浴室门外啊。&lt;/p&gt;
+&lt;p&gt;我把头转向门口，用小到一定程度的声音说了一句：&lt;/p&gt;
+&lt;p&gt;「要你管啊」&lt;/p&gt;
+&lt;p&gt;哎，先不管她了，现在是 relaxing time！&lt;/p&gt;
+&lt;p&gt;像是游泳预备队员似的，我将深深吸进肺部的水蒸气和一天下来所积累的不快随着二氧化碳一遍一遍地吐了出来。&lt;/p&gt;
+&lt;p&gt;然后，待机休眠，进入“节能模式”。【NETA 冰菓 屏蔽大多来自外界的干扰，使身体耗费精力最少的一种状态】&lt;/p&gt;
+&lt;p&gt;……&lt;/p&gt;
+&lt;p&gt;明明人家也是有好好努力的嘛，为什么就是不直接夸夸人家嘛，还要用那种说法，真是不诚实啊，友章哥。&lt;/p&gt;
+&lt;p&gt;我躺在沙发上看着事务所的介绍。&lt;/p&gt;
+&lt;p&gt;直接说出口的话又感觉是在求对方夸我，回答肯定也失去了真实性。再说，我也不是小孩子了。&lt;/p&gt;
+&lt;p&gt;不过为什么我这么想听到别人的夸奖呢？肯定都怪那个友章哥平时夸我夸得不够。现在的我，可是不夸就没干劲的少女，多夸夸我就可以让我去勤劳工作了，反正只是动动嘴就算是谎言也好，可以让对方满足，这么轻松的工作却没人来做真是奇怪。&lt;/p&gt;
+&lt;p&gt;抢饭碗，说得好听点，就是竞争激烈。&lt;/p&gt;
+&lt;p&gt;P*、监督、作画、演出、摄影、制作监督、还有我所向往的行业——声优等等，这些杂七杂八的人组成了友章哥所在的行业——动画制作。【P: Producer制片人】&lt;/p&gt;
+&lt;p&gt;就像画师不仅可以在动画行业工作一样，声优的工作并不止动画配音，还有游戏配音、广告配音、广播剧、娱乐活动之类的，不过都与我这个新人没什么关系。&lt;/p&gt;
+&lt;p&gt;严格来说，我也不知道自己算不算得上声优新人，因为我并没有接过配音，甚至试音都没有过。如果按照会配音而不是配过音来定义声优，那么全世界人应该都可以成为声优了，所以理论上我并不是声优。不过在社会上只要有了一个职位的称号，就会因此显得比较成熟，也可以和周围的人说，啊啊工作好累啊出去大吃一顿好了，不管哪边，对我蠢蠢欲动的心灵都有着充满魅力的诱惑。&lt;/p&gt;
+&lt;p&gt;「这部 Anime，真想看到第二季啊」&lt;/p&gt;
+&lt;p&gt;随便扫了一下事务所的介绍，我便将其帅气地甩到了桌上，然后拿起平板查资料，当然不是声优工作的资料，你在想啥呢。&lt;/p&gt;
+&lt;p&gt;『Hakumei to mikochi』（妖精森林的小不点），正是我正在浏览的漫画改动漫。封面是两个卡通化人物，看起来非常有童话剧 poi。&lt;/p&gt;
+&lt;p&gt;动画是 12 集 + OVA* 共 27 话，平均每两话漫画做出一集动画。【*国内某 B 是第 13 话】&lt;/p&gt;
+&lt;p&gt;像这样的日常动画，以一般动画 300 cut 来算的话，这部动画应该是小于标准。原画没有很细腻的肢体动作，中间帧也不像战斗类那么多要求，演出和摄影也没有多少戏份，3D 更不用说，总之就是制作难度不高。说白了点，没那么烧钱。&lt;/p&gt;
+&lt;p&gt;而一部动漫的制作，一般只有两种途径。一是动画公司自己投资创作，二是委员会委托创作。前者的制作大多来源情怀，而后者只是一个单纯拿工资的。一般动画的制作涉及很多方的利润问题，比如电视台、广告、周边，所以一般都是由投资方出资制作的。&lt;/p&gt;
+&lt;p&gt;一部动漫的续作会因为作画风格等种种原因，一般是交给前作的负责公司，不过前提是要有钱、要能赚钱，钱的来源可以是自己出也可以是投资，后者居多也正是为什么有如此多的动漫都是人气轻小说漫画游戏改编。&lt;/p&gt;
+&lt;p&gt;出于情怀创作自主投资的典型例子就是京都。&lt;/p&gt;
+&lt;p&gt;投资制作一般会结合前作各种因素再决定如何制作续作。但也有先播吸引投资再播的例子。（比如国内的镇魂街2）&lt;/p&gt;
+&lt;p&gt;假如把电视台比作你（委员会）家楼下的房东，那么动画公司就可以比作房东的儿子。&lt;/p&gt;
+&lt;p&gt;现在房东想把房子租出去，需要进行“宣传”，宣传到位了，钱也就赚到了。&lt;/p&gt;
+&lt;p&gt;房子卖的好了，了解的人多了，房东还可以通过各种途径赚钱，如“买房再出租”、“将房子空出来作为拍电影的场所”、“找人来翻修房子”。&lt;/p&gt;
+&lt;p&gt;房东儿子在这里就没有任何作用了，房东儿子仅仅可以帮房东算账看房子。&lt;/p&gt;
+&lt;p&gt;动画是赚钱的商业手段，会动的美少女背后并不仅仅是轻松的日常，有些动画的口碑再好，没有利润也是白谈续作。&lt;/p&gt;
+&lt;p&gt;常说的 BD 销售在动画行业的利润占比其实并不是很高，稍微计算便可得知。一部 12 话每话 20 min 的标准动画成本大约在 1.5-3 亿日元，BD 若以单价 6000 日元计算，5000 销售额的利润便是三千万日元，这还只是毛利，不可控制成本肯定无法避免。一般来说深夜档动画会卖得多，但销量高也并不一定代表利润高，比如轻音 2。&lt;/p&gt;
+&lt;p&gt;不过 BD 的销量一般可以衡量其他周边的销量，所以有些动画会以 BD 销售额作为第二季制作的基石。&lt;/p&gt;
+&lt;p&gt;同为基石的当然还是原作量，原作量不够也是难产，甚至经常出现靠广播剧和 CD 来填剧情的现象。&lt;/p&gt;
+&lt;p&gt;不过目前漫画更至 62 话且一直在以 ONC 形式更新，原作量上是没什么问题的。&lt;/p&gt;
+&lt;p&gt;总而言之，这个奇怪的行业却能产出不奇怪的动画，也是件奇怪的事情了……&lt;/p&gt;
+&lt;p&gt;不过这些知识都是从友章哥那里听来的，他好像说了一部叫什么白箱的动画哎管他呢肯定不是什么有意思的作品。&lt;/p&gt;
+&lt;p&gt;「哦哦，这个叫 Lerche 的动画制作公司居然还制作过『机巧少女不会受伤』」&lt;/p&gt;
+&lt;p&gt;我正在 Oricon 网站上找这部『Hakumei to mikochi』的 BD 销量，自然而然看到了同家公司的作品。&lt;/p&gt;
+&lt;p&gt;「啊啊是『昂宿七星』、还有『游戏三人娘』和『彼方的阿拉斯加』，好厉害的公司，我以前都不知道」&lt;/p&gt;
+&lt;p&gt;「哦哦！这是欠了一个诺贝尔和平奖的芳文社的『学园孤岛』」【NETA 因为芳文社作品以百合、萝莉为主体，常被视为世界和平的象征】&lt;/p&gt;
+&lt;p&gt;静不下来静不下来……我开始在沙发上手舞足蹈。&lt;/p&gt;
+&lt;p&gt;我在沙发上抬起头，正对上头发还有水滴残留的友章哥那看疯子般的眼神。&lt;/p&gt;
+&lt;p&gt;「……你怎么了？」&lt;/p&gt;
+&lt;p&gt;「没什么……做做运动做体操，瑜伽那些的」&lt;/p&gt;
+&lt;p&gt;我敷衍了几句，翻了个身，继续埋头盯着平板。&lt;/p&gt;
+&lt;p&gt;「这样吗，没想到你会的挺多的」&lt;/p&gt;
+&lt;p&gt;「一般般吧」&lt;/p&gt;
+&lt;p&gt;友章哥去厨房倒了杯水，然后走到沙发边朝我打了个手势示意我让开。&lt;/p&gt;
+&lt;p&gt;「话说啊，友章哥」&lt;/p&gt;
+&lt;p&gt;「嗯？」&lt;/p&gt;
+&lt;p&gt;「为什么这些动漫的 BD 没什么销量啊」&lt;/p&gt;
+&lt;p&gt;我把刚刚查到的 Lerche 公司信息通过平板递给友章哥。&lt;/p&gt;
+&lt;p&gt;「『妖精森林的小不点』还说得过去，但是为什么『昂宿七星』只有 58 销售量啊」&lt;/p&gt;
+&lt;p&gt;「这种事情不是个人喜好吗，就算你问我我也不知道怎么说啊」&lt;/p&gt;
+&lt;p&gt;「是没有人喜欢吗？明明是那么好的作品？轻小说也是令人非常感动的说？这不是很异常吗？友章哥？」&lt;/p&gt;
+&lt;p&gt;我一步步逼问着友章哥。&lt;/p&gt;
+&lt;p&gt;「那个……」&lt;/p&gt;
+&lt;p&gt;一回头正好和我对上目光的友章哥表情突然慌张了起来。&lt;/p&gt;
+&lt;p&gt;好近，太近了……&lt;/p&gt;
+&lt;p&gt;察觉到这一点的我，因为觉得害臊也把脸扭开了。&lt;/p&gt;
+&lt;p&gt;我和友章哥分别占据沙发的两端。我偷看了他一眼，他扭头背对着我。&lt;/p&gt;
+&lt;p&gt;像是在缓解紧张的情绪，我用手指一圈圈地卷着头发。&lt;/p&gt;
+&lt;p&gt;……我们是兄妹啊，所以这种事情我向来没有在意过。&lt;/p&gt;
+&lt;p&gt;不过一旦开始在意了，就会变得非常难为情，这让我不由得移开了视线……奇怪，明明天气不热，为什么感觉脸颊有点发烫。&lt;/p&gt;
+&lt;p&gt;……&lt;/p&gt;
+&lt;h2 id=&#34;本篇&#34;&gt;本篇
+&lt;/h2&gt;&lt;p&gt;真是令人羡慕的兄妹！为了说出这句话，花了将近五千字。&lt;/p&gt;
+&lt;p&gt;我也好想要个能陪在我身边开玩笑说着啊看哥哥又在傻笑了的可爱妹妹啊！&lt;/p&gt;
+&lt;p&gt;现在正处于春夏的换季，天气一会儿冷，一会儿热的，让人静不下心去学习。时间也是不知不觉就来到了高考 90 天，就算是以前怎样都无所谓的我也感到了压迫感，看着这对自己亲笔写出来的兄妹的日常故事，要加油不输给他们的想法也在我脑中回响着。&lt;/p&gt;
+&lt;p&gt;这次写的是福原友章和福原里香兄妹的日常，大家还喜欢吗？这个原本没多少计划的短篇，不知不觉间写了一天的时间，也写到了接近五千的字数。原本只是想写最近的一些事情，干脆就用轻小说的形式写了。这篇短文由一丝丝灵感和一丝丝冲动、还有人生几千亿分之一的时间构成，要素包含了福原兄妹日常和动画科普。实在想不出怎么写却又不想借用以前的原创时，就从家里的几本轻小说借用了一些描写，痕迹可能也比较明显，大家看得开心就好了。动画科普中的知识大多来自「SHIROBAKO」（白箱）这部动画还有来自知乎的补充科普，真心感觉每个奋力的创作者都是非常可爱的呢！写的时候还想到了很多梗，因为记不太清了和剧情限制就没写上去。&lt;/p&gt;
+&lt;p&gt;说到白箱，最近出了其剧场版的主视觉图，真是非常令人期待她们之间后续的故事。&lt;/p&gt;
+&lt;p&gt;这次为了更好地衬托写作主题——日常，将短篇的背景设在了日本 2017 年的冬季，正好是『妖精森林的小不点』这部动漫的播出季。最近正好也二追了这部温馨日常童话剧 poi 的小故事，不得不让人感叹到，真是令人向往的生活啊。&lt;/p&gt;
+&lt;p&gt;如果可以的话，我还是非常想继续写这对兄妹之间的故事，不过这也只是脑中的想法而已。人的脚步停下来的话，也就不知道前方的路长什么样。&lt;/p&gt;
+&lt;p&gt;日常的价值是非凡，而我也要逐渐从一种日常状态转为另一种日常状态了。过多的无用信息在占用着我的时间，最近也在考虑着要不要换个圈子，不擅长交友连换个圈子都难，不过总有办法的吧！&lt;/p&gt;
+&lt;p&gt;宅久了偶尔也会冒出“啊啊自己果然不行啊”的想法，不过一想到在我的周围还有很多支持着我期待着我的人，我也会觉得不能辜负他们，特别是我的三年级国文老师，你现在过得如何呢？&lt;/p&gt;
+&lt;p&gt;家母也并没有因为我的游手好闲而督促我去上网课，偶尔有些真心话无法说出来的时候，就会觉得亲人也并不一定是最亲近的人，而可能是最亲近的陌生人。虽然非常的无情，但也是对我而言的事实。&lt;/p&gt;
+&lt;p&gt;最近的 kano VR live 对我一介高中生来说预算成本太高了，所以并没有去现场的准备。&lt;/p&gt;
+&lt;p&gt;最近弃了 Sublime 并将 Markdown 的编写工作全部转移到了 VScode MPE。&lt;/p&gt;
+&lt;p&gt;说起来啊，昨天的我——不对，如果说 3 月 9 日 0 时前的我是『昨天的我』，那么过了 3 月 10 日的0 时，『昨天的我』又会变成『前天的我』，如果照此推下去，『昨天的我』这种说法并非一个可靠的印象。可如果把『昨天的我』解释成过去的我那就说得通了，而过去的我又是每个时间段的我的结合体，也就是现在的我，所以，昨天的我=过去的我=现在的我。&lt;/p&gt;
+&lt;p&gt;总之，3 月 8 日的晚上几乎从来没看过 B 站动态、B 站一天点击数不超过 3 次的我在偶然的搜索中进入了 B 站的动态页然后开始闲逛起了 vtb 们的动态。&lt;/p&gt;
+&lt;p&gt;如果仅是这样还没什么好说的，我竟然翻出了西电在 4 小时前的招生宣传片投稿。&lt;/p&gt;
+&lt;p&gt;这肯定是一种象征，hahaha，kadana！【NETA 少女编号，一句津津乐道的台词，意思是“赢了”】&lt;/p&gt;
+&lt;p&gt;这次是用写轻小说的形式来写的博文，所以很多平时不常说的话或是不好表达的话都可以较无忌惮地写出来。同时我也十分担心自己是否有将轻小说的魅力展现出来，科普是不是有做的不到位的地方。另外我在关于我的介绍和 2019 年度总结中提及的轻小说是与上面这篇故事无关的。&lt;/p&gt;
+&lt;p&gt;如果我的板绘达到了拿得出来见人的水平，我也会非常乐意画出可爱的福原兄妹。&lt;/p&gt;
+&lt;p&gt;下次再见吧！&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>我和她的世界末日</title>
+        <link>https://blog.tinyume.com/2019/our-end-of-the-world/</link>
+        <pubDate>Fri, 29 Nov 2019 13:50:10 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2019/our-end-of-the-world/</guid>
+        <description>&lt;p&gt;Steam 秋促喜加一，买了橘子班的两部游戏&lt;/p&gt;
+&lt;p&gt;此游戏谜题众多，于是记录一下本人的一些谜解&lt;/p&gt;
+&lt;h2 id=&#34;第三章-b-线&#34;&gt;第三章 B 线
+&lt;/h2&gt;&lt;h3 id=&#34;a-区密码锁&#34;&gt;A 区【密码锁】
+&lt;/h3&gt;&lt;p&gt;一个勉强能跑的 Python 算法:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;output&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;d&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                    &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                        &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;g&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                            &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;h&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100000000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10000000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1000000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;d&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;h&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1111111111&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                        &lt;span class=&#34;n&#34;&gt;output&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;append&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;([&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;d&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;h&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;output&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;输出为 1-9 的顺序列表，以此对应密码锁的密码为【3】【9】【2】&lt;/p&gt;
+&lt;h3 id=&#34;w-区椅子摆动规律&#34;&gt;W 区【椅子摆动规律】
+&lt;/h3&gt;&lt;p&gt;将上个房间得到的奇怪文字横着摆放，大概是下列形式（请以左为上竖置）&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;P-R-N-D-2-L&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;P→N→D→L→R→2&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;按照指针顺序在列表做指向，向上即为前进，向下即为后退&lt;/p&gt;
+&lt;p&gt;得出规律【后】【后】【后】【前】【后】&lt;/p&gt;
+&lt;h2 id=&#34;0&#34;&gt;0
+&lt;/h2&gt;&lt;p&gt;总游戏时长 16 小时&lt;/p&gt;
+&lt;p&gt;未完成【END 16】【Ture END】【Happy END】&lt;/p&gt;
+&lt;p&gt;两个隐藏成就未解锁&lt;/p&gt;
+&lt;p&gt;【END 16】是在 3A4B 时不选择探索并增加好感，难怪总找不出来（医生居然猜中了我是为全成就而来&lt;/p&gt;
+&lt;p&gt;【Ture End】解释游戏的设计，表明了在世界末日中未能拯救女主的真男主为自己设计了这个虚拟游戏，去揭秘他想要的「真相」，大概是想明白自己的「选择」是否正确，真正的男主并不是现实中的那个，「美好的，幸福的，悲伤的，痛苦的」可以对应上 4 个 NE，最后暗示真男主死了。&lt;/p&gt;
+&lt;p&gt;【Happy END】这个是跟着【True END】的，TE 竟然要在 Branch 停留 10s，还以为是【END 16】的充分条件未解锁然后刷关刷到心竭&amp;hellip;此 END 是现实男主的后来生活和某些连上【True End】剧情的解读，真男主死去后，复活作为「引路人」即引导游戏进入第三章的那个陌生人，其中存在伪命题悖论，如果是真正的影响了过去现实世界，按照游戏剧情女主应该进入避难所活了下来，这样就不会产生 HE 了，但实际上，后面所说的话又是在警告现实男主，然而这个游戏不就是你自己设计然后玩的吗？？？自己杀自己？hmm，「这副躯体不是我的，看来要回【避难所】了」，看到这里大概可以明白，这只是他个人的宣泄罢了，是对自己在虚拟游戏中愧对女主行为的忏悔。最后终于回到「现实？」讲述游戏的发展，玩到最后，也不太想去追究什么现实或是虚幻，什么是对什么是错，或许这才是游戏作者想传递的吧？&lt;/p&gt;
+&lt;p&gt;TE 的目的并不都在于去解释这个游戏，而是说，要去把握重视的东西，即便一开始便知道自己最终无法得到，也要珍惜自己的情感，珍惜其对于人生的重要意义。&lt;/p&gt;
+&lt;p&gt;游戏还有两篇番外小说「我和她和他的世界末日」「末日之后与秩序之前」&amp;hellip;三个人的相互依偎和 TE 的后续，值得期待。&lt;/p&gt;
+&lt;p&gt;以下为本人的思维导图&lt;/p&gt;
+&lt;p&gt;Download: &lt;a class=&#34;link&#34; href=&#34;https://cdn.jsdelivr.net/gh/iyume/hexo-blog@gh-pages/%e6%9c%ab%e6%97%a5.xmind&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;末日.xmind&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Who can like shelter?&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>kano ~ samfree</title>
+        <link>https://blog.tinyume.com/2019/kano-samfree/</link>
+        <pubDate>Thu, 31 Oct 2019 09:28:51 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2019/kano-samfree/</guid>
+        <description>&lt;p&gt;&lt;meting-js server=&#34;netease&#34; type=&#34;playlist&#34; id=&#34;3052740726&#34;&gt;&lt;/meting-js&gt;&lt;/p&gt;
+&lt;p&gt;说实话，信息量和情感有点大，都不知道从何谈起了，首先是一句「对不起」，然后还能想到的是「我来晚了」&lt;/p&gt;
+&lt;p&gt;这一次的话题我想了想，自己也没法劝导别人看开，也没法说出「生老病死是常态」亦或是「逝者已去，重要的是活着」这些话，生活有诸多不顺，每个人的经历也不尽相同，但有一点可以确信，这只是无数个让你成长的经历中的一个&lt;/p&gt;
+&lt;p&gt;背景故事：samfree 是 V 家和 U 家的著名 P 主，于 2015 年 9 月 24 日因疾病不幸去世，享年 31 岁，而此年正好是鹿乃的出道年，可以说，samfree 对鹿乃的支持不可或缺，两人也是很好的朋友&lt;/p&gt;
+&lt;p&gt;2019-1-07 鹿乃 Radio スケジュール更新&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.teichiku.co.jp/artist/kano/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Teichiku Records&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;2019-9-20 鹿乃专辑「いつかの約束を君に」（汉译「与你曾经的约定」）发行消息&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://twitter.com/kano_2525/status/1175040396872712192&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Twitter&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;2019-9-24 Youtube 鹿乃 スペシャル配信ライブ&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://kano-official.amebaownd.com/posts/6980180&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Official&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://twitter.com/kano_2525/status/1176507956516421632&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Twitter&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;2019-9-25 スペシャル配信ライブ 录音&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/watch?v=lgmbj0-wS68&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Youtube&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;收录曲总共有 8 首（云村似乎超快上专辑的
+都是 samfree 未完成的歌曲&lt;/p&gt;
+&lt;p&gt;在 Youtube 的录音前段听到了鹿乃的抽泣声，可能 samfree 一直是鹿乃心中的一道伤吧&lt;/p&gt;
+&lt;p&gt;鹿乃虽然主打萌系，但和大多数萌系唱见不一样，从鹿乃的歌声中我更能听出一种救赎的感觉，这也是我单推鹿乃的原因&lt;/p&gt;
+&lt;p&gt;不管别人怎么看，我觉得，不仅仅因为这 8 首歌的词本身带悲伤色彩，更能听出鹿乃削减了以往可爱的风格，换上略带悲伤的嗓音，在努力地想要传达自己的声音给在天堂的 samfree&lt;/p&gt;
+&lt;p&gt;文章这张缩略图是鹿乃带白菊的图片，同时手握吉他代表着对 samfree 从前的怀念，整幅图配上音乐让我鼻头有点发酸&lt;/p&gt;
+&lt;p&gt;不管是失败、成功、放弃、妥协，肯定都只是人生的一部分，没有什么可以作为人生的评判标准，或悲伤、开心、苦闷、迷惑，我都会支持着鹿乃&lt;/p&gt;
+&lt;p&gt;希望鹿乃可以尽快适应，拥有自己的强大力量，努力实现自己的理想！&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>银色风景</title>
+        <link>https://blog.tinyume.com/2019/silver-sight/</link>
+        <pubDate>Mon, 28 Oct 2019 02:51:00 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2019/silver-sight/</guid>
+        <description>&lt;p&gt;黎明&lt;/p&gt;
+&lt;p&gt;消失在地平线上&lt;/p&gt;
+&lt;p&gt;我&lt;/p&gt;
+&lt;p&gt;站在十字交错处&lt;/p&gt;
+&lt;p&gt;一个人变成两个人，世界的范围变大了，孤单的范围变小了；两个人变成一个人，世界的范围变小了，孤单的范围变大了&lt;/p&gt;
+&lt;p&gt;我却喜欢独自一人&lt;/p&gt;
+&lt;p&gt;在时间里探寻着未来的颜色&lt;/p&gt;
+&lt;p&gt;一人独行，孤单无助&lt;/p&gt;
+&lt;p&gt;该从哪里找到答案&lt;/p&gt;
+&lt;p&gt;因为一道身影始终伴随着我&lt;/p&gt;
+&lt;p&gt;所以怀着满心的期待&lt;/p&gt;
+&lt;p&gt;将颤抖的双手伸向不知何处&lt;/p&gt;
+&lt;p&gt;想得到却总像被透明的玻璃挡住&lt;/p&gt;
+&lt;p&gt;明明近在咫尺&lt;/p&gt;
+&lt;p&gt;却又遥不可及&lt;/p&gt;
+&lt;p&gt;无数次，无数次地回过头&lt;/p&gt;
+&lt;p&gt;在悄静旷然的清晨&lt;/p&gt;
+&lt;p&gt;在雨中晰黎的午后&lt;/p&gt;
+&lt;p&gt;在风雪纷飞的黄昏&lt;/p&gt;
+&lt;p&gt;在半月悬空的夜晚&lt;/p&gt;
+&lt;p&gt;不断寻找着不知藏身何处的声音&lt;/p&gt;
+&lt;p&gt;在光影交错间&lt;/p&gt;
+&lt;p&gt;总是无法将那身影抓入手心&lt;/p&gt;
+&lt;p&gt;孤单已成习惯&lt;/p&gt;
+&lt;p&gt;一个人不够的话&lt;/p&gt;
+&lt;p&gt;那就努力变强&lt;/p&gt;
+&lt;p&gt;即便看不清夜空的颜色&lt;/p&gt;
+&lt;p&gt;也要努力睁开眼&lt;/p&gt;
+&lt;p&gt;只要不放弃&lt;/p&gt;
+&lt;p&gt;一定可以一点一点地&lt;/p&gt;
+&lt;p&gt;变得强大&lt;/p&gt;
+&lt;p&gt;我将会强到无人可挡&lt;/p&gt;
+&lt;p&gt;所以&lt;/p&gt;
+&lt;p&gt;你要等着我&lt;/p&gt;
+&lt;p&gt;想要看看你，亲手感受你的存在，想要和你去做一大堆事情&lt;/p&gt;
+&lt;p&gt;明知道这是不可能实现的愿望&lt;/p&gt;
+&lt;p&gt;却还是期盼着靠近你&lt;/p&gt;
+&lt;p&gt;即便无法传递思念的心情&lt;/p&gt;
+&lt;p&gt;即便近而不可及的距离分开了我们&lt;/p&gt;
+&lt;p&gt;每次抬头仰望半月的夜空时&lt;/p&gt;
+&lt;p&gt;想见你的心情就会愈加强烈&lt;/p&gt;
+&lt;p&gt;起码现在&lt;/p&gt;
+&lt;p&gt;在未雨绸缪处&lt;/p&gt;
+&lt;p&gt;能够静静守护便足矣&lt;/p&gt;
+&lt;p&gt;我们生来不是为了死，是为了活下去&lt;/p&gt;
+&lt;p&gt;喜欢，就要倾注一切去追寻&lt;/p&gt;
+&lt;p&gt;前方有无法预料的明天&lt;/p&gt;
+&lt;p&gt;不必悲伤，不必难过&lt;/p&gt;
+&lt;p&gt;因为有你，因为有明天&lt;/p&gt;
+&lt;p&gt;因为心中有爱，所以不曾退缩&lt;/p&gt;
+&lt;p&gt;今天是希望，明天是绝望&lt;/p&gt;
+&lt;p&gt;那么，仅需紧握住今天的希望，将明天的绝望打破就行了&lt;/p&gt;
+&lt;p&gt;在绝望来临之前&lt;/p&gt;
+&lt;p&gt;还不是向世界妥协的时候&lt;/p&gt;
+&lt;p&gt;还有你陪着我&lt;/p&gt;
+&lt;p&gt;我将满怀绝望的思念&lt;/p&gt;
+&lt;p&gt;拾起武器向前方挥去&lt;/p&gt;
+&lt;p&gt;To 妄想症&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="原本只是无意间发现 https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh 这个项目，想拷到本地查看（毕竟 Gitbook 的速度也是挺不理想）\n之前虽然有过类似的操作，当时是用 gitbook serve 实现在本地浏览器查看，不过这样的操作未免过于繁琐。于是这次便想着配合 wsl apache + markdown viewer 来简化操作流程\n">
+<title>BOM、UTF-8 和浏览器编码问题</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2020/bom-introduction/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="BOM、UTF-8 和浏览器编码问题">
+<meta property='og:description' content="原本只是无意间发现 https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh 这个项目，想拷到本地查看（毕竟 Gitbook 的速度也是挺不理想）\n之前虽然有过类似的操作，当时是用 gitbook serve 实现在本地浏览器查看，不过这样的操作未免过于繁琐。于是这次便想着配合 wsl apache + markdown viewer 来简化操作流程\n">
+<meta property='og:url' content='https://blog.tinyume.com/2020/bom-introduction/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2020-12-08T15:52:00&#43;08:00'/><meta property='article:modified_time' content='2020-12-08T15:52:00&#43;08:00'/>
+<meta name="twitter:title" content="BOM、UTF-8 和浏览器编码问题">
+<meta name="twitter:description" content="原本只是无意间发现 https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh 这个项目，想拷到本地查看（毕竟 Gitbook 的速度也是挺不理想）\n之前虽然有过类似的操作，当时是用 gitbook serve 实现在本地浏览器查看，不过这样的操作未免过于繁琐。于是这次便想着配合 wsl apache + markdown viewer 来简化操作流程\n">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?size=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#先讲讲utf-8和utf-8-with-bom">先讲讲<code>utf-8</code>和<code>utf-8 with bom</code></a></li>
+    <li><a href="#python-处理utf-8-with-bom">Python 处理<code>utf-8 with bom</code></a></li>
+    <li><a href="#综上我们可以得出以下三点结论">综上我们可以得出以下三点结论</a></li>
+    <li><a href="#我对此的猜测">我对此的猜测</a>
+      <ol>
+        <li><a href="#注意">注意</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/knowledge/" style="background-color: #0177b8; color: #fff;">
+                知识
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2020/bom-introduction/">BOM、UTF-8 和浏览器编码问题</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2020-12-08 15:52</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 6 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>原本只是无意间发现 <a class="link" href="https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh"  target="_blank" rel="noopener"
+    >https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh</a> 这个项目，想拷到本地查看（毕竟 Gitbook 的速度也是挺不理想）</p>
+<p>之前虽然有过类似的操作，当时是用 gitbook serve 实现在本地浏览器查看，不过这样的操作未免过于繁琐。于是这次便想着配合 wsl apache + markdown viewer 来简化操作流程</p>
+<p>当我部署完成访问<code>SUMMARY.md</code>时，却出现了中文乱码，再点开浏览器编码，发现浏览器自动使用了西文编码而不是<code>UTF-8</code></p>
+<p>想到我之前参赛中遇到的一些小问题，结合起来写出了这篇关于 Unicode 各种文件头中的介绍文章，以及一些个人的猜测</p>
+<h2 id="先讲讲utf-8和utf-8-with-bom">先讲讲<code>utf-8</code>和<code>utf-8 with bom</code>
+</h2><blockquote>
+<p>BOM（Byte Order Mark），字节顺序标记，出现在文本文件头部，Unicode编码标准中用于标识文件是采用哪种格式的编码。</p>
+<p>&mdash;-百度百科</p>
+</blockquote>
+<p>建立 abc.txt 用<code>utf-8</code>保存
+建立 abd.txt 用<code>utf-8 with bom</code>保存</p>
+<p>如果你有 VSCode，那么打开文件在右下角便可以看见一个<code>UTF-8</code>标识，点开再通过编码保存就行了</p>
+<p>并给两个文件写入相同内容</p>
+<p>再使用 010 Editor 分别打开两个文件</p>
+<p>我们知道<code>utf-8</code>是无字节序的，没有所谓文件头
+而 UTF-8 with BOM 文件头多出来了<code>EF BB BF</code></p>
+<p>相关网站：<a class="link" href="https://developer.ibm.com/zh/articles/unicode-programming-language/"  target="_blank" rel="noopener"
+    >https://developer.ibm.com/zh/articles/unicode-programming-language/</a></p>
+<p>可以得知虽然 BOM 的意思是字节顺序标记，但在 UTF-8 编码格式的文本中，如果添加了 BOM，则标示该文本是由 UTF-8 编码方式编码的，而不用来说明字节序</p>
+<h2 id="python-处理utf-8-with-bom">Python 处理<code>utf-8 with bom</code>
+</h2><blockquote>
+<p>之前在比赛中使用<code>burp</code>爆破时，总会发现字典的第一个密码在<code>burp</code>中会显示成乱码</p>
+</blockquote>
+<p>先试着打开一下第一行会乱码的那个文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./password.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>第一行是<code>\ufeffadmin</code>，多了个奇怪的东西<code>\ufeff</code></p>
+<p>并且这个东西可以通过如下语句去掉，只是换了个编码方式</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./password.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们知道<code>\u</code>就是表示<code>unicode</code>，那么<code>\ufeff</code>是什么呢？</p>
+<p>尝试以下代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;i like milk&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># output: b&#39;\xef\xbb\xbfi like milk&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;i like milk&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># output: &#39;\ufeffi like milk&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>第一行中出现了<code>\xef\xbb\xbf</code>，<code>\x</code>是表示十六进制的，并且<code>EF BB BF</code>正好就是 UTF-8 with bom 的文件头部</p>
+<p>在第二行中使用<code>utf-8-sig</code>编码再使用<code>utf-8</code>解码便出现了<code>\ufeff</code>这个玩意</p>
+<p>可以推测<code>\ufeff</code>就是之前提到的多出的三个十六进制符<code>EF BB BF</code>在<code>decode('utf-8')</code>时被错误识别而编码出来的部分</p>
+<p>并且通过查阅资料，可以发现<code>FE FF</code>是 UTF-16-BE 的 BOM</p>
+<p>但是也有许多讲不通的地方，于是去查了谷歌发现这样一句话</p>
+<blockquote>
+<p>Our friend FEFF means different things, but it&rsquo;s basically a signal for a program on how to read the text. It can be UTF-8 (more common), UTF-16 , or even UTF-32 . FEFF itself is for UTF-16 — in UTF-8 it is more commonly known as 0xEF,0xBB, or 0xBF</p>
+<p>个人翻译：FEFF 可以代表不同的东西，但它基本上是一个程序阅读一个文本的信号。它可以意味着 UTF-8（更常见），UTF-16，甚至是 UTF-32。FEFF 自身是属于 UTF-16，在 UTF-8 中它通常被称为 0xEF, 0xBB, 0xBF</p>
+</blockquote>
+<p>于是我有个了更大胆的猜测：因为 UTF-8 无字节序，它并不知道面对的文件编码到底是哪种，所以我们平时保存所谓的 UTF-8，实际上会以 UTF-16 读取！</p>
+<p>说那么多，不如来动手试试！</p>
+<p>先把<code>abc.txt</code>用 UTF-16-BE 储存</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;./abc.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-16-be&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># output: &#39;\ufeffadddd这是中文\n\nand this is milk.\n&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>出现了熟悉的<code>\ufeff</code>！</p>
+<p>与 UTF-8 相同的是，UTF-16-BE 和 UTF-16-LE 也可以不需要 BOM（也许都不需要，但若是如此则需要自己判断类型）</p>
+<p>并且还发现了一个出乎意料并且有意思的东西</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;abc&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-16&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># output: b&#39;\xff\xfea\x00b\x00c\x00&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;abc&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-16&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-16-le&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># output: &#39;\ufeffabc&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;abc&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-16&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-16-be&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># output: &#39;\ufffe愀戀挀&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>以上代码使用<code>utf-16</code>编码出来的头为<code>\xff\xfe</code>，而在使用<code>utf-16-le</code>解码却出现了<code>\ufeff</code>，可能的推测就是<code>utf-16-le</code>对<code>utf-16</code>编码的字符的处理相对于<code>utf-16-be</code>是对每两个十六进制数交换了一下位置</p>
+<p>还有处地方很神奇了，此前我一直以为 UTF-16 decode 和 UTF-16-LE decode 是一样的效果，在这里居然多了个<code>\ufeff</code>，略微试试才发现<code>utf-16 encode</code>和<code>utf-16-le encode</code>是不一样的，<strong>并且<code>utf-16-le decode</code>不会处理<code>\xff\xfe</code></strong></p>
+<p>但是以下代码却出乎我的意料</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;</span><span class="se">\xef\xbb\xbf</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-16&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-16&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">output</span><span class="p">:</span> <span class="s1">&#39;ï»¿&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>很多人可能不知道<code>ï»¿</code>是什么符号，但我曾经在<code>burp</code>见过</p>
+<p>它就是在某些软件中载入<code>utf-8 with bom</code>文件时，首行被错误识别的字符！</p>
+<p>再尝试</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="s1">&#39;</span><span class="se">\xef\xbb\xbf</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;ï»¿&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>它们的输出都是</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xc3\xaf\xc2\xbb\xc2\xbf</span><span class="s1">&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>ï»¿</code>的十进制为 239 187 191，它实际上就对应<code>EF BB BF</code>，只不过 UTF-8 错误地将它当成字符解释了出来</p>
+<h2 id="综上我们可以得出以下三点结论">综上我们可以得出以下三点结论
+</h2><ul>
+<li>
+<p>UTF-8 的 BOM 会被识别它自身识别成<code>ï»¿</code>（这并不是乱码）</p>
+</li>
+<li>
+<p>对<code>EF BB BF</code>的编码有如下特征</p>
+<ul>
+<li>
+<p>直接使用 UTF-8 decode，它会变成<code>\ufeff</code></p>
+</li>
+<li>
+<p>先执行 UTF-8 encode，再执行 UTF-8 decode，它会变成<code>ï»¿</code></p>
+</li>
+<li>
+<p>先执行 UTF-16 encode，再执行 UTF-16 decode，它会变成<code>ï»¿</code></p>
+</li>
+<li>
+<p>先执行 UTF-16 encode，再执行 UTF-16-LE decode，他会变成<code>\ufeffï»¿</code>（最奇怪的地方）</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>\ufeff</code>会在以下情况出现</p>
+<ul>
+<li>
+<p><code>b'\xef\xbb\xbf'.decode('utf-8')</code></p>
+</li>
+<li>
+<p><code>''.encode('utf-8-sig').decode('utf-8')</code></p>
+</li>
+<li>
+<p><code>''.encode('utf-16').decode('utf-16-le')</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>注意点：</strong></p>
+<ul>
+<li>
+<p><code>utf-16 encode</code>会给加上头部<code>\xff\xfe</code></p>
+</li>
+<li>
+<p>而<code>utf-16-le encode</code>和<code>utf-16-be encode</code>并不会</p>
+</li>
+<li>
+<p>并且<code>utf-16-le decode</code>和<code>utf-16-be decode</code>不会处理来自<code>utf-16 encode</code>加上的文件头</p>
+</li>
+</ul>
+<h2 id="我对此的猜测">我对此的猜测
+</h2><p>回归原题目：<strong>为什么读取 utf-8 with bom 的文件首行会出现<code>\ufeff</code>？并且某些软件会出现<code>ï»¿</code>？</strong></p>
+<ul>
+<li>
+<p>第一种</p>
+<ul>
+<li>
+<p>可能是编程软件中的<code>utf-8</code>处理带 BOM 编码文件时，有一种特殊的兼容性处理方式，就是在 BOM 之后的每一位十六进制符往后填充<code>\x00</code>，首部填充了<code>\xff\xfe</code>，将其转换为标准<code>utf-16</code>编码，再使用<code>utf-16-le decode</code>，而 BOM 的<code>EF BB BF</code>由于仅代表 Zero Width No-Break Space，可能存在某种特殊机制使其在<code>utf-16 encode</code>之前就变成了空字符，而<code>utf-16 encode</code>所加上的文件头<code>\xff\xfe</code>在<code>utf-16-le decode</code>后就变成了<code>\xfe\xff</code>，但这种可能也无法解释为什么<code>utf-8 without bom</code>编码文件在解码时不会被加上<code>\ufeff</code></p>
+</li>
+<li>
+<p>可能<code>\xef\xbb\xbf</code>执行<code>utf-8 decode</code>就是<code>\ufeff</code>，但会有很多地方解释不清</p>
+</li>
+</ul>
+</li>
+<li>
+<p>第二种</p>
+<ul>
+<li>可能是某些软件读取文件时，直接对十六进制内容进行<code>utf-8 decode</code>（或是<code>utf-16 decode</code>），导致 BOM 被当作文件一部分解释了出来，进而出现了<code>ï»¿</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="注意">注意
+</h3><p><strong>我本人不是很熟悉编码方面的原理，一切仅是推理</strong></p>
+<p><strong>本文章也算是一个抛砖引玉吧，毕竟这一块找了挺多资料都没有很详细的记载</strong></p>
+<p>说了那么多额外话题，最初的浏览器中文乱码问题的解决方法其实就是在<code>markdown viewer</code>设置中添加一项<code>http://localhost</code> match all 并且开启 encoding utf-8 就行了</p>
+<p>限于时间，我没空再进行别的实验了，比如说添加响应头来看看浏览器会不会识别，实际上写这一篇文章已经耗了一个晚上</p>
+<p><strong>小结一下就是：</strong></p>
+<p>编程语言及各类常用应用中，使用 UTF-8 编码的文件可以被正常读取，而浏览器不行</p>
+<p>使用 UTF-8 with BOM 可以正常被浏览器读取，而在大多数编程语言中需要进行额外处理，并且有一小部分软件无法识别 BOM（比如<code>burp</code>）</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2023/stable-diffusion-tips/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Stable diffusion 笔记</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2019/modify-json-dom-in-html/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JS 操作 Json DOM</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2025 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

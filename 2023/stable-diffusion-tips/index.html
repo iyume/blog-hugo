@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="为什么我炼不出波奇酱？">
+<title>Stable diffusion 笔记</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2023/stable-diffusion-tips/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Stable diffusion 笔记">
+<meta property='og:description' content="为什么我炼不出波奇酱？">
+<meta property='og:url' content='https://blog.tinyume.com/2023/stable-diffusion-tips/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2023-11-18T20:10:47&#43;08:00'/><meta property='article:modified_time' content='2023-11-18T20:10:47&#43;08:00'/>
+<meta name="twitter:title" content="Stable diffusion 笔记">
+<meta name="twitter:description" content="为什么我炼不出波奇酱？">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?size=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#preface">Preface</a></li>
+    <li><a href="#脚本">脚本</a></li>
+    <li><a href="#sd-模型结构">SD 模型结构</a>
+      <ol>
+        <li><a href="#text-to-image">text-to-image</a></li>
+        <li><a href="#image-to-image">image-to-image</a></li>
+        <li><a href="#context-embeddings">Context Embeddings</a></li>
+      </ol>
+    </li>
+    <li><a href="#训练方法">训练方法</a>
+      <ol>
+        <li><a href="#textual-inversion">Textual Inversion</a></li>
+        <li><a href="#text-to-image-1">text-to-image</a></li>
+        <li><a href="#dreambooth">Dreambooth</a></li>
+      </ol>
+    </li>
+    <li><a href="#高清生成">高清生成</a></li>
+    <li><a href="#笔记">笔记</a></li>
+    <li><a href="#后记">后记</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/knowledge/" style="background-color: #0177b8; color: #fff;">
+                知识
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2023/stable-diffusion-tips/">Stable diffusion 笔记</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            为什么我炼不出波奇酱？
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2023-11-18 20:10</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="preface">Preface
+</h2><p>新笔记本暗影精灵 9 锐龙版自从 6 月多到手后，换了两次系统 —— 换到 win10 发现驱动没有 win10 支持所以又换了回去 win11。
+到了 9 月多时，想着拿这 8g 显卡跑点啥，正好又对 Stable diffusion 感兴趣，于是研究了几天源码，跑了几天训练效果对比。
+最终结果还是不尽人意，数据集不全是一方面的问题，还有我的 8g 显卡不支持我对模型继续深入研究了。</p>
+<p>原本 9 月底炼的差不多时就想着写一篇文章介绍一下 Stable diffusion，但是不知道为什么忘了（转头像转的）。</p>
+<p><strong>此文章旨在用阐述我对 Stable diffusion 源码和架构的一些理解，以及对于 “为什么我炼不出波奇酱？” 这个问题的解答。</strong></p>
+<h2 id="脚本">脚本
+</h2><p>文章用的是 diffusers 提供的示例脚本:</p>
+<blockquote>
+<p><a class="link" href="https://github.com/huggingface/diffusers/tree/main/examples"  target="_blank" rel="noopener"
+    >https://github.com/huggingface/diffusers/tree/main/examples</a></p>
+</blockquote>
+<p>对于略微有点 neural network 知识的人都可以上手。
+此外还有面向新手的 <a class="link" href="https://github.com/7eu7d7/HCP-Diffusion"  target="_blank" rel="noopener"
+    >HCP-Diffusion</a> 值得推荐，照着它给的 example yaml 改改就能跑。
+相对于 diffusers 和 hcpdiff，<a class="link" href="https://github.com/kohya-ss/sd-scripts"  target="_blank" rel="noopener"
+    >sd-scripts</a> 是对 diffusers 的脚本进行的拓展，但是提供的脚本复杂难以配置，不建议使用。不过 <a class="link" href="https://github.com/bmaltais/kohya_ss"  target="_blank" rel="noopener"
+    >基于 sd-scripts 的 GUI</a> 可以考虑使用。</p>
+<h2 id="sd-模型结构">SD 模型结构
+</h2><p>一个 SD 模型组成:</p>
+<ul>
+<li>FeatureExtractor (safety checker 专用)</li>
+<li>Tokenizer, TextEncoder (text)</li>
+<li>Scheduler (add noise)</li>
+<li>UNet (denoise)</li>
+<li>VAE (Variant Auto Encoder)</li>
+</ul>
+<p>上面的部件中除了 UNet，其余都是预训练的。
+FeatureExtractor, TextEncoder 这些是通用型权重，就和从 resnet 独立出 feature extractor 一个道理。</p>
+<p>VAE 也是预训练的，但是有很多人会误解它的方法和作用。
+网上查不到具体训练方法，论文里讲的也不多，在 G. Details on Autoencoder Models 那一部分。
+我的猜测是和 AE 差不多，img -&gt; latents -&gt; img 的自监督训练。其中的 latents 和 embeddings 有异曲同工之处，区别在于 latents 作为模型输入，有具体形状，embeddings 作为上下文嵌入，一般是 linear features。
+VAE 的 encoder 可以实现 img2img 的效果，下面会具体讲讲。</p>
+<blockquote>
+<p>VAE 细节：源码里的 VAE encoder 输出是 8 维的，会使用一个叫做 <code>DiagonalGaussianDistribution</code> 的模型进行变分处理（大概是为了增强重建能力），同时这个变分模型也提供了合并方法输出 4 维，再输入到 UNet。</p>
+</blockquote>
+<blockquote>
+<p>这里是我根据 diffusers 文档实现的完整 pipeline: <a class="link" href="https://github.com/iyume/diffusers-test/blob/main/tours/diffusers_tour_pipeline_depart.py"  target="_blank" rel="noopener"
+    >https://github.com/iyume/diffusers-test/blob/main/tours/diffusers_tour_pipeline_depart.py</a></p>
+</blockquote>
+<h3 id="text-to-image">text-to-image
+</h3><ol>
+<li>tokenize prompt</li>
+<li>根据 tokens 和 textual inversion weights 进行 token -&gt; vectors 映射</li>
+<li>创建一个长度相同的 uncond_embeddings 并 concat 进去（N+1），旨在使用 CFG Scale (guidance_scale) 控制结果与 prompt 的贴合程度</li>
+<li>创建噪声图，scheduler 循环 timestep 调用 UNet 降噪，embedding 在 UNet 内部处理</li>
+</ol>
+<blockquote>
+<p>UNet 有个 time embedding 我没看懂，不知道为什么要将 text embedding 转换为 time embedding。参照 <a class="link" href="https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/unet_2d_condition.py#L925"  target="_blank" rel="noopener"
+    >1</a> <a class="link" href="https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/embeddings.py#L238"  target="_blank" rel="noopener"
+    >2</a> <a class="link" href="https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/embeddings.py#L190"  target="_blank" rel="noopener"
+    >3</a></p>
+</blockquote>
+<h3 id="image-to-image">image-to-image
+</h3><ol>
+<li>利用 VAE encoder 将图像编码为 latents</li>
+<li>根据 step 和 strength 调用 scheduler 对 latents 增加噪声</li>
+<li>scheduler 循环 timestep 调用 UNet 降噪，有 prompt 的话就载入 text embedding</li>
+</ol>
+<h3 id="context-embeddings">Context Embeddings
+</h3><p>Context Embeddings 是 Stable diffusion 模型里面一个非常重要的设计，用于接受各种各样的输入，如文本、图像、音乐、语音。
+embeddings 并不是多模态，它们有着重要的区别：Stable diffusion 只能接受单一种类的 embedding，除非使用 adapter 模型对各种潜在空间进行相互转换。</p>
+<p>具体的嵌入方法就是 Attention 注意力机制。
+Attention 是一个单独的层，大部分有着独立的权重，用于改变输出，一般不影响输出的尺寸。</p>
+<p>就我个人经验而言，在传统的 CNN 领域里，Attention 一般分为 Channel Attention 和 Spatial Attention，根据维度的不同，计算方差或者其他类似的值，加到结果内。</p>
+<p>在 Stable diffusion 则是一个叫做 <a class="link" href="https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/transformer_2d.py#L45"  target="_blank" rel="noopener"
+    >Transformer2DModel</a> 的模型，比较复杂没细看。</p>
+<h2 id="训练方法">训练方法
+</h2><p>基于 RTX 4060 Laptop 8G 测试，只跑得动 textual inversion 和 lora，所以只对这两个训练方法做介绍。</p>
+<p>训练图片采用的是 16 张从 TV 截图的波奇酱的图片，每两张在 anythingv5 模型上做了 img2img 风格化处理（对于 lora 似乎影响不大），所以眼睛会略微偏蓝。</p>
+<h3 id="textual-inversion">Textual Inversion
+</h3><p>文本反转，即不是通过改变权重来改变模型效果，而是通过改变输入来改变输出。</p>
+<p>训练 textual inversion 时，通过创建一个 tokenizer 不认识的 token，映射至对应的向量，这个向量长度可以由 num_vectors 控制。
+向量长度越大，输出的权重文件也就越大，一般 32 vectors 对应 97 kb。</p>
+<blockquote>
+<p>在 tokenizer 中，一个 word 是有可能对应多个 token 的，比如 girls 会被拆分为 girl, s</p>
+</blockquote>
+<p>**结果评价：**训练时间 1 小时。97 KB (32 vectors)。
+完全无法训练姿态，只会扭曲模型效果（姿态有关的都只能采用 ControlNet 和 openpose）。动漫人物的发饰、呆毛、眼球等细节完全无法还原，容易产生撕裂现象，还有模糊不清。大概只能训练结合模型已有的物品。非常容易破坏模型风格。</p>
+<p>综上，Textual Inversion 是一个很黑盒很 DNN 的操作，大炼丹师或许可以得到非常小的权重和非常完美的结果，或者是大魔法师配合优秀的 prompt 也能得到不错的结果，但是不建议使用这个训练方法。</p>
+<p>下图是使用单 keyword (gotou_hitori) 不搭配任何 prompt 生成的图像：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_ti_single_word.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>下图是使用 keyword 搭配 prompt 生成的图像：</p>
+<p>使用了类似 <code>[[gotou_hitori:0.2]::0.8]</code> 的 prompt 魔法。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_ti_prompted.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h3 id="text-to-image-1">text-to-image
+</h3><p>最原始的方法，旨在训练整个 UNet。</p>
+<p>对降噪误差做 backward，比如 DDIM 有 50 timestep，对 20 至 21 的降噪步骤相减并 backward。</p>
+<p>我这里只用了 text-to-image lora 脚本，没有记录训练时间，但是我记得和 textual inversion 的训练时长差不多，且模型效果比 textual inversion 还差，大概率是因为数据集不完善。diffusers 的官方脚本没更新，只能用它老一套的 datasets 载入，比较麻烦。</p>
+<p>评价为不好用，要求数据集完善，可以被 dreambooth 完美取代。</p>
+<h3 id="dreambooth">Dreambooth
+</h3><p>参照官方的 <a class="link" href="https://dreambooth.github.io/"  target="_blank" rel="noopener"
+    >Dreambooth 讲解</a>。
+Dreambooth 也是训练整个 UNet 的方法，但是速度快，要求数据集小。</p>
+<p>我这里只训练了 dreambooth lora 脚本。训练的关键参数是 rank，类似于 textual inversion 中的 num_vectors。
+rank 越高表示控制的维度越深，同时权重文件也会越大，也更容易过拟合。</p>
+<p>防止过拟合的方法最简单的就是用 tensorboard 看看每一百步生成的测试图像。</p>
+<p>**结果评价：**训练时间 10 分钟，可以关掉 validation。3 MB (rank 1)。
+对动漫人物的学习（建议 rank&gt;10）可以达到略胜于 Textual Inversion 的效果，主要是不容易影响模型自带的风格，模型兼容性也比 TI 更好。但对于波奇酱的方块发饰则很难达到好的效果，生成出来要么是圆的，要么一大一小，只有极小概率会生成出不错的发饰。</p>
+<p>参考生成图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_dreambooth_lora.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="Dreambooth lora test"
+	
+	
+></p>
+<p>第一张的效果最佳，不过呆毛偏上了点。相比于 TI 来说，lora 不需要搭配太多 prompt，只要 <code>&lt;lora:gotou_hitori&gt;</code> 载入 lora 即可达到不错的效果。</p>
+<h2 id="高清生成">高清生成
+</h2><p>最后放一张使用 anime6k 配合 prompt 咒语生成的高清图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_highres_hitori_balloon.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="波奇酱高清"
+	
+	
+></p>
+<blockquote>
+<p>里面应该是包含了 generation data 的。话说现在居然还没有一个便利的查看/修改 generation data 的工具，打算自己写一个了。</p>
+</blockquote>
+<h2 id="笔记">笔记
+</h2><p>随手记的一个笔记</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">CFG Scale(classifier-free guidance): 提示词和生成图像的贴合程度
+</span></span><span class="line"><span class="cl">Outpainting: 向外延展画布
+</span></span><span class="line"><span class="cl">Inpainting: 修复图像内部空缺
+</span></span><span class="line"><span class="cl">Color Sketch: 为素描画填充颜色
+</span></span><span class="line"><span class="cl">Prompt Matrix: 提示词矩阵，用 | 分割提示词的排列组合进行扩散
+</span></span><span class="line"><span class="cl">Pormpt S/R: 提示词 Search/Replace，搜索替换并矩阵扩散
+</span></span><span class="line"><span class="cl">Prompt Editing: [from:to:when] 控制每次 inference step 的 prompt
+</span></span><span class="line"><span class="cl">(()) 给予更多权重，(word:1.111) 权重分配
+</span></span><span class="line"><span class="cl">X/Y/Z plot: 同 X/Y plot，根据不同输入参数（提示词，CFG scale，step 等）创建输出矩阵
+</span></span><span class="line"><span class="cl">Textual Inversion: 将特定提示词和相关图像嵌入模型进行训练
+</span></span><span class="line"><span class="cl">Tiling: 将图像周期平铺放大分辨率，比如把花的数量增加
+</span></span><span class="line"><span class="cl">Styles: 保存常用提示词
+</span></span><span class="line"><span class="cl">Variations: 图像微调，与 img2img 不同在于，微调的提示词是可选的，构图通常有很大变化
+</span></span><span class="line"><span class="cl">High-res fix: 防止生成高分辨率（大于 512x512）时出现图像扭曲，在生成 512x512 时设置 upscale 参数 1.5 则输出 768x768，step 设置为 0 时会使用 sampling step 的值
+</span></span><span class="line"><span class="cl">Upscaling: 将图像进行放大
+</span></span><span class="line"><span class="cl">Alternating Words: 交叉使用不同的 prompt，是 Prompt Editing 的自动版
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">tcmalloc: 对显存分配提升巨大，见 https://github.com/AUTOMATIC1111/stable-diffusion-webui/discussions/6722
+</span></span><span class="line"><span class="cl">将 generation data 粘贴到 prompt 然后点击 &#34;Generate&#34; 下方第一个蓝色按钮即可自动应用参数
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">https://www.youtube.com/watch?v=dVjMiJsuR5o
+</span></span><span class="line"><span class="cl">Dreambooth: 训练整个模型最有效的方法，也只能训练整个模型，占用空间大
+</span></span><span class="line"><span class="cl">Textual Inversion: 在 text encoder 进行训练，对某种特定的单词创建特定的 embeddings (vector) 再输入模型，只改变描述，不改变模型效果
+</span></span><span class="line"><span class="cl">LoRA: 在模型中插入低秩权重，对这个权重进行训练，同时会减慢生成速度，数个 LoRA 可以同时使用，但很容易过拟合（容易记住数据集）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Tricks:
+</span></span><span class="line"><span class="cl">(1) num_train_epochs = max_steps * batch_size / len(train_dataloader)
+</span></span><span class="line"><span class="cl">max_steps = num_train_epochs * len(train_dataloader) / batch_size
+</span></span><span class="line"><span class="cl">假如有 14 张训练图片，此时 len(train_dataloader)=1400，则 epochs = max_steps * 4 / 1400，max_steps=1050 时 epochs=3，max_steps=1051 时 epochs=4
+</span></span><span class="line"><span class="cl">(2) Inpainting Mask blur 是进行高斯模糊的参数，0 代表完全改变，越高代表越少的改变
+</span></span><span class="line"><span class="cl">(3) [[gotou_hitori:0.2]::0.8] add gotou_hitori from 0.2 to 0.8
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="后记">后记
+</h2><p>Stable diffusion 太强了，生成美少女也很好玩，源码太复杂没能全部读完，将来要是有兴趣了再读吧。</p>
+<p>虽然我对 AI 感兴趣，从最开始的 CS231n 到后面发论文，期间读了很多 segmentation(deeplabv3,bisenetv2,unet)、fusion(多尺度、曝光、聚焦等各种融合) 等领域的优秀论文，也从中学了很多。
+但我毕竟是个末流一本，也不是搞算法和数学原理的，对我而言沉没成本很大。
+AI 我是打算只当作兴趣学学的。Web3 也差不多，后面可能会写一篇介绍 go-ethereum 的文章。</p>
+<blockquote>
+<p>之前居然还有一个人开了 issue 和我讨论，挺惊讶的：https://github.com/iyume/image-fusion/issues/2</p>
+</blockquote>
+<p>文章花了一整天的时间来写，太久没写文章感觉很生疏。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2020/bom-introduction/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">BOM、UTF-8 和浏览器编码问题</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2019/modify-json-dom-in-html/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JS 操作 Json DOM</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2025 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

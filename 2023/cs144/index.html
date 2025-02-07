@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="难度一般但是坑多的课程">
+<title>CS 144 TCP</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2023/cs144/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="CS 144 TCP">
+<meta property='og:description' content="难度一般但是坑多的课程">
+<meta property='og:url' content='https://blog.tinyume.com/2023/cs144/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2023-12-22T16:14:21&#43;08:00'/><meta property='article:modified_time' content='2023-12-22T16:14:21&#43;08:00'/>
+<meta name="twitter:title" content="CS 144 TCP">
+<meta name="twitter:description" content="难度一般但是坑多的课程">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?size=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#lab-0-bytestream">Lab 0 ByteStream</a></li>
+    <li><a href="#lab-1-reassembler">Lab 1 Reassembler</a></li>
+    <li><a href="#lab-2-receiver">Lab 2 Receiver</a></li>
+    <li><a href="#lab-3-sender">Lab 3 Sender</a></li>
+    <li><a href="#lab-4-network-interface">Lab 4 Network Interface</a></li>
+    <li><a href="#lab-5-router">Lab 5 Router</a></li>
+    <li><a href="#lab-6-all-together">Lab 6 All together</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/live/" style="background-color: #2a9d8f; color: #fff;">
+                日常
+            </a>
+        
+            <a href="/categories/code/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2023/cs144/">CS 144 TCP</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            难度一般但是坑多的课程
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2023-12-22 16:14</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="介绍">介绍
+</h1><blockquote>
+<p>CS 144: Introduction to Computer Networking, 2023 Spring.
+是一门讲 TCP/IP 入门的课程，用 C++ 完成 TCP 栈的各个组件，最后组装起来在真实环境测试。</p>
+</blockquote>
+<p>11 月底愉快地完成了 CS 106L 后开始做 CS 144，耗时大约 3 周，其实和想象中的耗时差不多。
+据 wakatime 统计的 codetime 是 65 h，加上阅读 handouts / labs 的时间应该有 100 h +。</p>
+<p>如果 CS 106L 可以给满分 10 分的话，那么 CS 144 只能给到 8 分，理由有：</p>
+<ol>
+<li>新版 minnow 相对于 2020 libsponge 原版删了 TCPConnection，课程难度直接下降一个星级。TCP benchmark 也全没了。</li>
+<li>有几个 lab 没有发挥的空间，也有很多细节没讲到，甚至被删掉，下面会具体讲讲。</li>
+<li>课程老师有点大病，12 月 16 号左右把仓库 made private 同时关闭了 <a class="link" href="https://cs144.github.io"  target="_blank" rel="noopener"
+    >https://cs144.github.io</a> 课程主页。之前听说他不允许公布个人解法我还能理解，made private 简直莫名其妙。</li>
+</ol>
+<h1 id="labs">Labs
+</h1><h2 id="lab-0-bytestream">Lab 0 ByteStream
+</h2><p>实现一个简单的 byte 流，主要实现 <code>Writer::push( string data )</code> 和 <code>Reader::pop( uint64_t len )</code> 方法。</p>
+<blockquote>
+<p>这里的 Reader 和 Go 的 read(T&amp; obj, size_t len) 接口不太一样，是根据 peek() 返回的字符串数量来 pop，所以设计的时候 peek 为了效率必须返回 string_view，这里也是一个设计限制了。</p>
+</blockquote>
+<p>因为刚接触 C++ 不多，所以我尝试写了各种实现，他们的速度对比如下：</p>
+<ol>
+<li><code>string</code> impl: ByteStream throughput: 3.95 Gbit/s</li>
+<li><code>vector&lt;char&gt;</code> impl: ByteStream throughput: 3.90 Gbit/s</li>
+<li><code>queue&lt;char&gt;</code> impl: ByteStream throughput: 0.67 Gbit/s</li>
+<li><code>char*</code> impl: ByteStream throughput: 3.00 Gbit/s</li>
+<li><code>queue&lt;string&gt;</code> impl: ByteStream throughput: 30.00 Gbit/s</li>
+</ol>
+<p>上面的排序也是我的实现顺序。</p>
+<p><code>queue&lt;char&gt;</code> 慢的原因是不支持迭代，每次 peek 只能得到一个 char。
+我这里写的 <code>char*</code> 实现略显巧妙，思路是初始化 3 * capacity 的大小，然后用几个变量操作滑动窗口。
+写 <code>char*</code> 实现时 sanitizer 一直报内存泄漏，花了好多时间解决。以后再也不想要手操指针了 qwq。</p>
+<p>一开始思维定势在了 char 数组类结构，最优也就 4 Gbit/s，后来查了查才得到一些启发用 string 数组类结构。
+更新思路后速度一下子提到了 10+ Gbit/s。</p>
+<p>然后在正确思路上进行优化，以下是我的几点优化方法：</p>
+<ol>
+<li>queue.pop() 相比 vector.erase(vector.begin()) 可以提升 2 Gbit/s</li>
+<li>用 string + move 可以提升 3 Gbit/s</li>
+<li>用 front_view 相比 string.erase 可以提升 6 Gbit/s</li>
+</ol>
+<p>最终可以达到 32 Gbit/s。</p>
+<h2 id="lab-1-reassembler">Lab 1 Reassembler
+</h2><blockquote>
+<p>被 overlapping 概念坑了，codetime 6 h 才完成。</p>
+</blockquote>
+<p>实现一个 <strong>随机</strong> 流重组器。</p>
+<p>TCP 流一般是提前分割好然后发送的，也就是说 substring index 是不会重叠的。
+但是重组器实现为了 robustness 会实现为重组任何子字符串，也就是强调 <strong>随机</strong> 这一概念。
+这里 lab 也没讲清楚，搞得我以为 overlapping 是指某个包重发导致的。</p>
+<p>做了很多 test fit 后我才发现我混淆了概念，然后真正的 solution 两个钟就写好了&hellip;而且 10 Gbit/s +。</p>
+<p>具体实现就不细讲了，就一个简单的算法。</p>
+<h2 id="lab-2-receiver">Lab 2 Receiver
+</h2><p>第一部分是 ISN wrapper 挺简单的。</p>
+<p>第二部分是 Receiver 也挺简单的。</p>
+<h2 id="lab-3-sender">Lab 3 Sender
+</h2><blockquote>
+<p>算是最难的一部分，讲义里面很多细节没讲到，codetime 13 h 才做完。</p>
+</blockquote>
+<p>建议参照 2020 的讲义来做，里面提到了 test workflow 之类的东西，对 <strong>分析 Sender 的工作流程</strong> 很重要。</p>
+<p>有以下几个概念是讲义里面没具体讲的：</p>
+<ol>
+<li>没讲清为什么要在 window size != 0 时增加累计重发次数并 back off RTO</li>
+<li>原文说在 push 的时候对 window size 0 特殊处理，也没讲清楚，和上一条是关联的</li>
+<li>window size 的概念，没讲为什么每次 receive 就需要执行无条件更新</li>
+</ol>
+<p>我先对上面这些概念进行解释：</p>
+<ol>
+<li>当且仅当网络繁忙时才进行 RTO back off，而 window size = 0 时代表 receiver 忙于处理数据</li>
+<li>当且仅当发送队列没有任何 byte 并且 window size = 0 时才需要假装 window size = 1，旨在发送一条 <strong>不为空</strong> 的消息促使 receiver 回复 ack</li>
+<li>无条件更新 window size 是一个提前设计好的行为，因为课程作者认为 window size 表明的就是 Sender 的发送队列容量，不给你有别的想法</li>
+</ol>
+<p>这个 lab 还有一些过度设计的行为和 test case，下面也讲讲。</p>
+<p>window size 那里我认为 ackno + window size - pushed byte count 可以得到精确值。
+我第一次做的时候是这么写的，但是卡在了 send_extra 一些莫名其妙的测试上。
+继续写的话应该可以过测试，但是代码太丑了就重写了。</p>
+<p>还有就是 tick 那里旨在计时第一个发出的包然后重发。
+其实只要在 tick 时判断一下有没有 outstanding segment 再增加计时，收到 ack new receipt of data 再重置，
+就可以保证计时是精确的。
+事实上我就是这么实现的可以通过 tick 所有测试。</p>
+<p>总而言之，Sender 这块的讲义里面没讲明白原理和细节，只讲流程，莫名其妙，根本没有发挥空间。</p>
+<h2 id="lab-4-network-interface">Lab 4 Network Interface
+</h2><p>实现 ARP 请求和回复、IPv4 包封装和帧交换，简单。</p>
+<p>ARP 的设计那里，我对课程作者的要求写法存疑，代码测试要求每次 ARP Request/Response 都带上自己的 Hardware address / ip address 其实可以没必要。</p>
+<p>有一点坑的是 2023 的讲义里删了很多东西，我是配合 2020 的讲义看的。</p>
+<h2 id="lab-5-router">Lab 5 Router
+</h2><p>实现 Route table 和最长前缀匹配，不涉及路由算法 bellman-ford、BGP、OSPF 之类的，简单。</p>
+<p>课程里没讲要更新 checksum，简直狗屎，就看着它莫名其妙的错误信息发呆。后来我看其他人代码才知道。</p>
+<h2 id="lab-6-all-together">Lab 6 All together
+</h2><p>用课程给的 endtoend 程序启动 server 和 client。</p>
+<p>原理大概类似于 frp 吧，tun 我也不懂。网络栈还是博大精深的，课程的 TCP 只是其中一点点。</p>
+<h1 id="末尾">末尾
+</h1><p>总体上来说，如果能走在正确的路径上，那么课程是比较轻松的，也具有很大的教学意义。
+并没有特别批判的意思，课程就如开头所说 8 / 10 分。</p>
+<p><a class="link" href="https://github.com/iyume/Stanford-CS144"  target="_blank" rel="noopener"
+    >https://github.com/iyume/Stanford-CS144</a>（直接 public，无所谓了）</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #1</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #0</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2024/hackergame-2024/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2024</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/hackergame-2023/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2023</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2021/tzmcm-2021/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">TZMCM 2021 比赛代码</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2025 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

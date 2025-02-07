@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Categories on 黯梦萦辰</title>
+        <link>https://blog.tinyume.com/categories/</link>
+        <description>Recent content in Categories on 黯梦萦辰</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-CN</language>
+        <lastBuildDate>Mon, 20 Jan 2025 15:17:25 +0800</lastBuildDate><atom:link href="https://blog.tinyume.com/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>日常</title>
+        <link>https://blog.tinyume.com/categories/live/</link>
+        <pubDate>Mon, 20 Jan 2025 15:17:25 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/categories/live/</guid>
+        <description>&lt;!-- post markdown meta `categories` relate to this folder&#39;s path --&gt;
+&lt;!-- title here relate to the output categories name --&gt;
+</description>
+        </item>
+        <item>
+        <title>随想</title>
+        <link>https://blog.tinyume.com/categories/thinkings/</link>
+        <pubDate>Mon, 13 Jan 2025 16:05:44 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/categories/thinkings/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>代码</title>
+        <link>https://blog.tinyume.com/categories/code/</link>
+        <pubDate>Sat, 11 Jan 2025 18:21:48 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/categories/code/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>知识</title>
+        <link>https://blog.tinyume.com/categories/knowledge/</link>
+        <pubDate>Sat, 18 Nov 2023 20:10:47 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/categories/knowledge/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>

