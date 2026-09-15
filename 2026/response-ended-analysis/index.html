@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="A production troubleshooting of TCP connection lifecycle.">
+<title>ResponseEnded 排障记录</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2026/response-ended-analysis/'>
+
+<link rel="stylesheet" href="/scss/style.min.b1a5b48e9268da293f0e82d09fd1299e5ecbd5ea47ba1f408b3687d520ce0c2b.css"><meta property='og:title' content="ResponseEnded 排障记录">
+<meta property='og:description' content="A production troubleshooting of TCP connection lifecycle.">
+<meta property='og:url' content='https://blog.tinyume.com/2026/response-ended-analysis/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-09-15T10:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-09-15T10:00:00&#43;08:00'/>
+<meta name="twitter:title" content="ResponseEnded 排障记录">
+<meta name="twitter:description" content="A production troubleshooting of TCP connection lifecycle.">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?s=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#背景">背景</a></li>
+    <li><a href="#排查--修复">排查 &amp; 修复</a>
+      <ol>
+        <li><a href="#dotnet-trace">dotnet-trace</a></li>
+        <li><a href="#tcp-探测脚本">TCP 探测脚本</a></li>
+        <li><a href="#修复">修复</a></li>
+      </ol>
+    </li>
+    <li><a href="#httpclient-底层剖析">HttpClient 底层剖析</a></li>
+    <li><a href="#fin--rst-那些事">FIN &amp; RST 那些事</a></li>
+    <li><a href="#tcpdump">tcpdump</a>
+      <ol>
+        <li><a href="#httpclient-fin">HttpClient FIN</a></li>
+        <li><a href="#peer-fin">Peer FIN</a></li>
+        <li><a href="#两个关闭方向">两个关闭方向</a></li>
+      </ol>
+    </li>
+    <li><a href="#抓鬼环节---envoy">抓鬼环节 - Envoy</a></li>
+    <li><a href="#总结">总结</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/knowledge/" style="background-color: #0177b8; color: #fff;">
+                知识
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2026/response-ended-analysis/">ResponseEnded 排障记录</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            A production troubleshooting of TCP connection lifecycle.
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2026-09-15 10:00</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 11 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>本文记录一个生产环境上偶发的 HTTP 异常排障过程。
+一个看似偶发的 HTTP 接口异常，从 TCP 连接的各个层面进行分析，最终命中对方反向代理服务器源码。</p>
+<h2 id="背景">背景
+</h2><p>在使用 HttpClient 通过 WebProxy 高并发调用某个外部接口时，偶尔会出现网络异常 ResponseEnded。</p>
+<p>异常堆栈：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">System.Net.Http.HttpRequestException: An error occurred while sending the request.
+</span></span><span class="line"><span class="cl"> ---&gt; System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+</span></span><span class="line"><span class="cl">   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+</span></span><span class="line"><span class="cl">   --- End of inner exception stack trace ---
+</span></span><span class="line"><span class="cl">   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+</span></span><span class="line"><span class="cl">   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+</span></span><span class="line"><span class="cl">   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+</span></span><span class="line"><span class="cl">   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+</span></span><span class="line"><span class="cl">   at System.Net.Http.HttpClient.&lt;SendAsync&gt;g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+</span></span><span class="line"><span class="cl">   ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>该异常在日志里面相当醒目，均匀分布在所有时间段，并且不上代理就没这个问题。</p>
+<p>尝试过使用同样的代码，在本地高并发跑脚本，但是无法复现。
+初步认定为 TCP 连接上难以复现的一个并发问题。</p>
+<p>这是连接架构背景：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">HttpClient -&gt; WebProxy (Squid) -&gt; Server
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>代理使用 CONNECT 隧道进行连接，正向代理。</p>
+<h2 id="排查--修复">排查 &amp; 修复
+</h2><h3 id="dotnet-trace">dotnet-trace
+</h3><p><code>dotnet-trace</code> 可以收集 .NET 进程发出的各种事件，这里捞取 <code>System.Net.Http</code> 相关的所有事件，每个请求都有对应的 connectionId，有助于排查底层 TCP 连接相关问题。</p>
+<p>列出 dotnet 进程：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet-trace ps
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Trace:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dotnet-trace collect -p <span class="m">25120</span> --providers System.Net.Http:0xFFFFFFFFFFFFFFFF:5 --duration 00:20:00 -o http.nettrace
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Trace 20min，结果可以根据 host、connectionId 分组，从 <code>RequestFailedDetailed</code> 事件中可以获取异常堆栈，从而过滤 <code>ResponseEnded</code> 异常。</p>
+<blockquote>
+<p>异常事件不含 connectionId，不过异常会跟随一个 close 事件用作关联。</p>
+</blockquote>
+<p>分析所有连接：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>目标 host</th>
+          <th>是否走代理</th>
+          <th>次数</th>
+          <th>断连年龄</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>X</td>
+          <td>是(10.0.0.x)</td>
+          <td>13</td>
+          <td>~60–66s</td>
+      </tr>
+      <tr>
+          <td>example.com</td>
+          <td>是(10.0.0.x)</td>
+          <td>6</td>
+          <td>7.9–40.1s</td>
+      </tr>
+      <tr>
+          <td>example2.com</td>
+          <td>否(直连)</td>
+          <td>8</td>
+          <td>0.6–165.4s</td>
+      </tr>
+      <tr>
+          <td>建连早于抓取窗口(host 未知)</td>
+          <td>—</td>
+          <td>7</td>
+          <td>—</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>看目标 X 可以得知规律就是在 60-66s 发生断连。</p>
+<p>继续分析指定 host 所有连接：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>分母</th>
+          <th>失败率</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>按请求 13 / 44,997</td>
+          <td>≈ 0.029%</td>
+      </tr>
+      <tr>
+          <td>按断连 13 / 558</td>
+          <td>≈ 2.33%</td>
+      </tr>
+      <tr>
+          <td>时间维度</td>
+          <td>13 次 / 20 分钟</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>总之就是长连接无法复用了，大概率是和 keep-alive 相关的问题。</p>
+<p>HttpClient 的 SocketsHttpHandler 提供了两个相关的参数：</p>
+<ul>
+<li>PooledConnectionIdleTimeout 连接空闲多久会自动回收，默认 1min</li>
+<li>PooledConnectionLifetime 连接固定的生命周期，默认不限制</li>
+</ul>
+<p>这几条连接从 trace 可以确保并不空闲，排除第一条。</p>
+<p>第二条列为嫌疑犯，继续探索。</p>
+<h3 id="tcp-探测脚本">TCP 探测脚本
+</h3><p>为了探查事件的全貌，还需要更多的信息。
+于是我想到了一个可以复用 HttpClient 代码来做 TCP 探测脚本的方法。</p>
+<p>探测原理：并发下 HttpClient 的连接复用是黑盒，但是对于串行的请求，必然会选择复用连接。
+如果 HttpConnection 存活，就会复用；如果 HttpConnection 失活，就会建立新连接。</p>
+<p>代码很简单：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="n">Delay</span><span class="p">(</span><span class="m">10</span> <span class="p">*</span> <span class="m">1000</span><span class="p">);</span>  <span class="c1">// 留一点时间去打 trace</span>
+</span></span><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">client</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpClient</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">client</span><span class="p">.</span><span class="n">SendAsync</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>设置四组对照组实验：</p>
+<ul>
+<li>对照组：通过 HKProxy 连接 X 站点（产生 ResponseEnded 的路线）</li>
+<li>实验组 A：通过杭州 Proxy 连接 X 站点</li>
+<li>实验组 B：通过 HKProxy 连接 Y 站点</li>
+<li>实验组 C：直连连接 X 站点</li>
+</ul>
+<p>对照组：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>周期</th>
+          <th>connId</th>
+          <th>目标</th>
+          <th>代理出口</th>
+          <th>建连 → 关闭</th>
+          <th>存活时间</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>第 1 轮</td>
+          <td>4</td>
+          <td>hkproxy 隧道</td>
+          <td>10.0.0.4</td>
+          <td>15:43:40.39 → 15:44:40.65</td>
+          <td>60.27s</td>
+      </tr>
+      <tr>
+          <td>第 1 轮</td>
+          <td>5</td>
+          <td>X</td>
+          <td>10.0.0.4</td>
+          <td>15:43:40.59 → 15:44:40.65</td>
+          <td>60.07s</td>
+      </tr>
+      <tr>
+          <td>第 2 轮</td>
+          <td>6</td>
+          <td>hkproxy 隧道</td>
+          <td>10.0.0.4</td>
+          <td>15:44:40.82 → 15:45:41.41</td>
+          <td>60.59s</td>
+      </tr>
+      <tr>
+          <td>第 2 轮</td>
+          <td>7</td>
+          <td>X</td>
+          <td>10.0.0.4</td>
+          <td>15:44:40.98 → 15:45:41.41</td>
+          <td>60.43s</td>
+      </tr>
+      <tr>
+          <td>第 3 轮</td>
+          <td>8</td>
+          <td>hkproxy 隧道</td>
+          <td>10.0.0.1</td>
+          <td>15:45:41.55 → 15:46:41.76</td>
+          <td>60.21s</td>
+      </tr>
+      <tr>
+          <td>第 3 轮</td>
+          <td>9</td>
+          <td>X</td>
+          <td>10.0.0.1</td>
+          <td>15:45:41.71 → 15:46:41.76</td>
+          <td>60.05s</td>
+      </tr>
+      <tr>
+          <td>第 4 轮</td>
+          <td>10/11</td>
+          <td>X</td>
+          <td>10.0.0.3</td>
+          <td>15:46:41.89 → 抓取结束</td>
+          <td>未关</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>数据和 trace 结果完全一致，就是 X 站点长连接存在 60s 硬中断，继续后面的实验组。</p>
+<p>实验组：</p>
+<ul>
+<li>实验组 A：68.5s 仍活</li>
+<li>实验组 B：&gt;217s 仍活</li>
+<li>实验组 C：&gt;92.8s 仍活</li>
+</ul>
+<p>实验组的测试时间并没有严格要求，只需要测试覆盖到大于 68s 即可。</p>
+<p>结论：可以初步排除 HKProxy 本身问题，因为杭州 Proxy 没问题、其他站点连接没问题。</p>
+<p>初步猜测：通过 HKProxy 可能连接到了智能 DNS 走 X 的 HK 集群，而该集群正好有配置问题。</p>
+<h3 id="修复">修复
+</h3><p>既然下游未知原因 60s 断连，那只要 HttpClient 比下游更早回收连接就可以了。</p>
+<p>改造生产环境代码，分流指定 host 的 HttpClient 构造函数把 PooledConnectionLifetime 设为低于 60s 的值，例如设置 50s，然后对比测试。</p>
+<p>最终异常日志消失！</p>
+<p>排查 &amp; 修复到这里就结束了，但文章并不会到此结束，接下来还要探索一下根因。</p>
+<h2 id="httpclient-底层剖析">HttpClient 底层剖析
+</h2><p>目前已知连接会在 60s 硬中断，尚不清楚哪方发送的 FIN 导致。</p>
+<p>初步怀疑有两种：</p>
+<ul>
+<li>源站或者代理侧发送了 FIN，正好撞上了 request flighting，产生了竞态</li>
+<li>HttpClient 连接复用时，将尚未标记为失活的请求还在拿出来继续写入请求</li>
+</ul>
+<p>因为中间隔了一层代理，使得问题排查难度几何上升。</p>
+<p>首先使用 AI 分析堆栈，拉取 dotnet runtime 源码，找出代码抛异常的位置。</p>
+<p>消息文本精确匹配一个资源 Strings.resx:309-310 中 net_http_invalid_response_premature_eof = &ldquo;The response ended prematurely.&quot;。
+全部抛出点里 HTTP/1.1 只有两处：</p>
+<ul>
+<li>HttpConnection.cs:663（SendAsync 主体内）—— 初始读后 _readBuffer.ActiveLength == 0，注释写明 &ldquo;The server shutdown the connection on their end, likely because of an idle timeout&rdquo;</li>
+<li>HttpConnection.cs:1680（FillAsync）—— 读到响应状态行/头中途 EOF</li>
+</ul>
+<p>通过堆栈分析可以得知是第一处产生的异常，结论：请求已写完、开始读响应时，第一个读操作就返回 0（EOF），即连接在响应任何一个字节到达之前就被关闭了。</p>
+<p><a class="link" href="https://github.com/dotnet/runtime/issues/76644"  target="_blank" rel="noopener"
+    >API Proposal</a> 这里定义了一系列的 HttpRequestError 错误枚举，从 proposal 描述可以看出 <code>ResponseEnded</code> 是较特殊的一类，理应归类为 <code>InvalidResponse</code> / <code>InvalidResponseHeader</code>。</p>
+<p>让我们细看 HttpClient 源码返回 ResponseEnded 的附近：
+<a class="link" href="https://github.com/dotnet/runtime/blob/720ba8ff5980b46e6b6fe5dcdc731299fb6526f1/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/HttpConnection.cs#L606-L664"  target="_blank" rel="noopener"
+    >HttpConnection.cs#L606-L664</a> 报错条件是 <code>_readAheadTask</code> 结束了并且 <code>if (_readBuffer.ActiveLength == 0)</code> 缓冲区还是没数据。</p>
+<p><code>_readAheadTask</code> 就是预读，主要在两处地方调用：从 ConnectionPool 取出连接和读取响应之前。</p>
+<p><a class="link" href="https://github.com/dotnet/runtime/blob/720ba8ff5980b46e6b6fe5dcdc731299fb6526f1/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/HttpConnection.cs#L127"  target="_blank" rel="noopener"
+    >PrepareForReuse</a> 就是从 ConnectionPool 取出连接的时候需要判断的预读，其核心逻辑是：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="cp">#pragma</span> <span class="n">warning</span> <span class="n">disable</span> <span class="n">CA2012</span> <span class="c1">// we&#39;re very careful to ensure the ValueTask is only consumed once, even though it&#39;s stored into a field</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">_readAheadTask</span> <span class="p">=</span> <span class="n">_stream</span><span class="p">.</span><span class="n">ReadAsync</span><span class="p">(</span><span class="n">_readBuffer</span><span class="p">.</span><span class="n">AvailableMemory</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#pragma</span> <span class="n">warning</span> <span class="n">restore</span> <span class="n">CA2012</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                    <span class="c1">// If the read-ahead task already completed, we can&#39;t reuse the connection.</span>
+</span></span><span class="line"><span class="cl">                    <span class="c1">// We&#39;re still responsible for observing potential exceptions thrown by the read-ahead task to avoid leaking unobserved exceptions.</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="p">(</span><span class="n">_readAheadTask</span><span class="p">.</span><span class="n">IsCompleted</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">LogExceptions</span><span class="p">(</span><span class="n">_readAheadTask</span><span class="p">.</span><span class="n">AsTask</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里是异步操作，如果连接已关闭则 <code>_readAheadTask</code> 会立刻返回 ValueTask 结果，否则就当作正常连接交出去。</p>
+<p><a class="link" href="https://github.com/dotnet/runtime/blob/720ba8ff5980b46e6b6fe5dcdc731299fb6526f1/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/HttpConnection.cs#L1649"  target="_blank" rel="noopener"
+    >InitialFillAsync</a> 这里则是读取响应之前需要判断的预读，它的逻辑很简单：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="c1">// Does not throw on EOF. Also assumes there is no buffered data.</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">private</span> <span class="kd">async</span> <span class="n">ValueTask</span> <span class="n">InitialFillAsync</span><span class="p">(</span><span class="kt">bool</span> <span class="kd">async</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Debug</span><span class="p">.</span><span class="n">Assert</span><span class="p">(!</span><span class="n">ReadAheadTaskHasStarted</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Debug</span><span class="p">.</span><span class="n">Assert</span><span class="p">(</span><span class="n">_readBuffer</span><span class="p">.</span><span class="n">AvailableLength</span> <span class="p">==</span> <span class="n">_readBuffer</span><span class="p">.</span><span class="n">Capacity</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Debug</span><span class="p">.</span><span class="n">Assert</span><span class="p">(</span><span class="n">_readBuffer</span><span class="p">.</span><span class="n">AvailableLength</span> <span class="p">&gt;=</span> <span class="n">InitialReadBufferSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="kt">int</span> <span class="n">bytesRead</span> <span class="p">=</span> <span class="kd">async</span> <span class="p">?</span>
+</span></span><span class="line"><span class="cl">                <span class="k">await</span> <span class="n">_stream</span><span class="p">.</span><span class="n">ReadAsync</span><span class="p">(</span><span class="n">_readBuffer</span><span class="p">.</span><span class="n">AvailableMemory</span><span class="p">).</span><span class="n">ConfigureAwait</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span> <span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">_stream</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">_readBuffer</span><span class="p">.</span><span class="n">AvailableSpan</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">_readBuffer</span><span class="p">.</span><span class="n">Commit</span><span class="p">(</span><span class="n">bytesRead</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">NetEventSource</span><span class="p">.</span><span class="n">Log</span><span class="p">.</span><span class="n">IsEnabled</span><span class="p">())</span> <span class="n">Trace</span><span class="p">(</span><span class="s">$&#34;Received {bytesRead} bytes.&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将底层 tcp stream 数据填充到程序的缓冲池里面。
+每次 request 发送完毕之后，<code>await _stream.ReadAsync</code> 操作就会被内核挂起，直到对端返回数据并且内核决定刷新缓冲池，数据就会同步到程序的缓冲池里面。</p>
+<p>之所以说是预读，是因为如果对端发送了 <code>FIN</code>，那么 <code>await _stream.ReadAsync</code> 就会立即返回，并且不带任何数据。
+在应用层来说不必看到 <code>FIN</code> 状态，只需要知道发送了 request，响应立即返回了，但是没有数据 —— 即 ResponseEnded (EOF)。</p>
+<p>另外，HttpClient 有个特殊逻辑，如果预读确实失活了，那么返回给 ConnectionPool 判断是否换连接进行 retry。</p>
+<p>是否 retry 的判断条件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">Content</span> <span class="k">is</span> <span class="kc">null</span> <span class="p">||</span> <span class="n">allowExpect100ToContinue</span> <span class="k">is</span> <span class="n">not</span> <span class="kc">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_canRetry</span> <span class="p">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>而我们这里是 POST 带数据请求，不可能重试。</p>
+<p>这就是 ResponseEnded 整个内部的细节。</p>
+<p>HttpClient 源码分析结论：写入请求之后，预读时等待 Response 遇到了 EOF 抛出异常。</p>
+<h2 id="fin--rst-那些事">FIN &amp; RST 那些事
+</h2><blockquote>
+<p>恶补一下 TCP 优雅关闭、半关闭的相关知识，代理又是如何处理的。</p>
+</blockquote>
+<p>TCP 连接关闭有 FIN 和 RST 两种情况。</p>
+<p>下面是一个 RST 的经典示例，在尝试读取 Response 抛出：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">System.Net.Http.HttpRequestException: An error occurred while sending the request.
+</span></span><span class="line"><span class="cl"> ---&gt; System.IO.IOException: Unable to read data from the transport connection: Connection reset by peer.
+</span></span><span class="line"><span class="cl"> ---&gt; System.Net.Sockets.SocketException (104): Connection reset by peer
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>目前我了解的几种 RST 的情况，有强制关闭主机的时候，还有代理被打爆导致无法建立 TCP 连接也会 RST。</p>
+<p>重点是 FIN。
+FIN 是优雅关闭，某一方主动关闭连接，进入四次挥手。
+主动关闭连接的一方会进入 TCP 半关闭。</p>
+<p>进入 TCP 半关闭状态后，可以接收数据，但无法写入数据。
+并且如果某个响应已经开始写入，关闭是不会中断数据的，而是等数据写入完成再发送 FIN。
+这个原理也能和后续分析证据串起来。</p>
+<p>半关闭状态下，如果 client 还在尝试往 socket 写入数据，这时候对端会依据 RFC 1122 回复 RST，否则就会造成连接永久挂起等问题。
+这也是我遇到这个问题时，最初猜测的高并发竞态问题，不过 ResponseEnded 并不是 RST 引起的，而是 FIN。
+所以我们的目标还是不变的 —— 找出谁发的 FIN。</p>
+<p>代理大体分为两种：</p>
+<ul>
+<li>L4（数据层）：透明代理</li>
+<li>L7（应用层）</li>
+</ul>
+<p>L7 又分为两种：</p>
+<ul>
+<li>正向代理：HTTPS 通过 CONNECT 连接，端到端流量透传，看不到任何 HTTP 语义信息</li>
+<li>反向代理：能看明文，改 XFF，自由控制长连接</li>
+</ul>
+<p>Squid 我们设置为 L7 正向代理，也有空闲连接和生命周期相关的设置，不过我们也和 SRE 确认过并无特殊设置。
+鉴于安全和敏感问题，很难登录代理机器排查。</p>
+<p>根据之前对照实验，这里代理问题概率很小，可以先不看。</p>
+<h2 id="tcpdump">tcpdump
+</h2><p>tcpdump 是 Linux 下的一个强大的抓包工具。</p>
+<p>抓包命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">tcpdump -i any -nn -s <span class="m">256</span> -B <span class="m">4096</span> -w ./hkproxy.pcap <span class="s2">&#34;tcp and port 3128 and net 10.0.0.0/28&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>抓取 30 分钟。
+只抓 packet 前 256 个字节，过滤 tcp:3128 和 <code>10.0.0.0/28</code>，这是代理的内网地址。</p>
+<p>分析原理：tcpdump 的每条连接可以按照五元组 <code>源 IP + 源端口 + 目的 IP + 目的端口 + 传输层协议</code> 来区分。每个 tcp packet 时序是分析的关键。</p>
+<p>直接交给 deepseek-4.1-flash (ds4f) 开搞，方向很明确：</p>
+<ul>
+<li>找出所有连接的年龄</li>
+<li>找出是谁在关闭连接</li>
+</ul>
+<p>经过一番捣鼓，过滤掉空闲连接的干扰，用 matplotlib 输出 svg，结果非常清晰。</p>
+<blockquote>
+<p>服务器一般都会掐掉空闲连接，默认时长为一分钟，一定要过滤掉</p>
+</blockquote>
+<p><img src="/2026/response-ended-analysis/tcpdump_analysis.svg"
+	
+	
+	
+	loading="lazy"
+	
+		alt="分析结果"
+	
+	
+></p>
+<p>如上图所示，结果非常有意思！</p>
+<ul>
+<li>约 90% 连接都是 HttpClient 主动 FIN 的，关闭时间在 60.18-65.28 s 指数分布。</li>
+<li>约 10% 连接是对端主动 FIN 的，关闭时间在 66.17-66.20 s 聚集。</li>
+</ul>
+<p>tcpdump 看不到 HTTP 层语义和 trace 异常，能力有限，不过这个分析报告给了我们极大的启发！</p>
+<p>接下来分两部分解谜：</p>
+<ul>
+<li>HttpClient FIN</li>
+<li>Peer FIN</li>
+</ul>
+<h3 id="httpclient-fin">HttpClient FIN
+</h3><p>在此之前，我们一直误以为 HttpClient 默认只会回收空闲连接，却遗忘了一种情况：对方响应携带了 <code>Connection: Close</code> 响应头。</p>
+<p>该响应头通常用于 <code>Server-side Draining</code> —— 需要优雅回收连接的情况。
+例如服务器进程关闭，阻止新建入站连接，但是还有活跃连接需要回收。
+最经典的就是 Go 服务器的 <code>Graceful shutdown</code>，<code>ctrl+c</code> 不会立即退出进程，而是等待网络请求处理完成，或者连按两次 <code>ctrl+c</code> 强杀。</p>
+<blockquote>
+<p>滚动发布不会排空连接。负载均衡器（L7 反向代理）会首先将机器流量降为 0，但是不会关闭 Client-LB 之间的连接，而是把新请求转发到其他服务器上。所以滚动发布对 Client 是完全无感的。</p>
+</blockquote>
+<p>第一时间想到，这是对方服务器的一种优雅回收连接的策略。
+对方配置了类似 <code>KeepAliveLifetime=60s</code> 的参数，那么到了 60s 之后，响应就会附加 <code>Connection: Close</code> 返回，如果没有请求过来，那么 66s 就直接超时发送 FIN。</p>
+<p>之前我们写了一个 TCP 探测脚本，现在稍微修改一下，让它打印 <code>Connection</code> 响应头。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">OK     176ms HTTP200 sendAt=59.6s  Connection=
+</span></span><span class="line"><span class="cl">OK     199ms HTTP200 sendAt=59.8s  Connection=
+</span></span><span class="line"><span class="cl">OK     185ms HTTP200 sendAt=60.0s  Connection=
+</span></span><span class="line"><span class="cl">OK     202ms HTTP200 sendAt=60.1s  Connection=
+</span></span><span class="line"><span class="cl">OK     178ms HTTP200 sendAt=60.3s  Connection=close
+</span></span><span class="line"><span class="cl">OK     374ms HTTP200 sendAt=60.5s  Connection=
+</span></span><span class="line"><span class="cl">OK     189ms HTTP200 sendAt=60.9s  Connection=
+</span></span><span class="line"><span class="cl">OK     178ms HTTP200 sendAt=61.1s  Connection=
+</span></span><span class="line"><span class="cl">OK     182ms HTTP200 sendAt=61.3s  Connection=
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>果然是对方在 60s 准点响应了 <code>Connection: Close</code>。</p>
+<p>这就是 60s 硬中断的根因，不过和 ResponseEnded 无直接关联，让我们继续分析。</p>
+<h3 id="peer-fin">Peer FIN
+</h3><p>对端为何会在 66s 主动发送 FIN 呢？</p>
+<p><a class="link" href="https://nginx.org/en/docs/http/ngx_http_core_module.html#keepalive_time"  target="_blank" rel="noopener"
+    >Nginx 文档</a> 介绍了 <code>keepalive_time</code> 参数作为连接生命周期。
+从 nginx 源码也发现它并不会主动 draining 连接，而是不管不顾，等 idle 超时后自动回收。</p>
+<p>这里需要进一步分析 dotnet-trace。</p>
+<p>之前打了很多 nettrace 文件，挑一份专看 ResponseEnded 的连接，列一个事件格栅图：</p>
+<p><img src="/2026/response-ended-analysis/respended_raster.svg"
+	
+	
+	
+	loading="lazy"
+	
+		alt="事件格栅图"
+	
+	
+></p>
+<p>图中所示，一共 13 条连接抛 ResponseEnded，每条连接在 0-60s 都是活跃状态，只是请求数多少的区别。
+共同点在于都在 60-65s 空闲，65-66s 最后发出那条请求无一例外都遇上了 ResponseEnded。
+断连时间点位于 65.962 – 66.001 s 之间，极差 39 ms。</p>
+<p>规律非常整齐！完全匹配我之前说的猜测：60s 优雅回收，60-66s 如果没有请求过来，那么 66s 就直接超时发送 FIN。</p>
+<h3 id="两个关闭方向">两个关闭方向
+</h3><p>两个关闭方向：</p>
+<ul>
+<li><code>60s</code> -&gt; <code>Connection: Close</code> -&gt; <code>Client-side FIN</code></li>
+<li><code>60s</code> -&gt; <code>No Request (draining 6s)</code> -&gt; <code>Server-side FIN</code></li>
+</ul>
+<p>第一条路径是 60s 硬中断的根因。
+第二条路径的 <code>Server-side FIN</code> 是 ResponseEnded 的直接原因。</p>
+<h2 id="抓鬼环节---envoy">抓鬼环节 - Envoy
+</h2><p>首先探测对方到底是什么鬼服务器：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">(base) PS C:\Users\user&gt; curl.exe --proxy http://proxy -s -o NUL -D - --max-time 10 https://target
+</span></span><span class="line"><span class="cl">HTTP/1.1 200 Connection established
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">HTTP/1.1 404 Not Found
+</span></span><span class="line"><span class="cl">ag-http-server-time: 817 mcs
+</span></span><span class="line"><span class="cl">ag-service-name: &lt;service-name&gt;
+</span></span><span class="line"><span class="cl">ag-service-version: &lt;x.y.z&gt;
+</span></span><span class="line"><span class="cl">x-server-name: &lt;pod-id&gt;
+</span></span><span class="line"><span class="cl">x-app-version: &lt;x.y.z&gt;
+</span></span><span class="line"><span class="cl">date: Thu, 10 Sep 2026 07:18:54 GMT
+</span></span><span class="line"><span class="cl">content-type: text/plain; charset=UTF-8
+</span></span><span class="line"><span class="cl">content-length: 42
+</span></span><span class="line"><span class="cl">x-envoy-upstream-service-time: 3
+</span></span><span class="line"><span class="cl">x-envoy-upstream-address: &lt;deployment&gt;-&lt;replicaset-hash&gt;-&lt;pod-id&gt;
+</span></span><span class="line"><span class="cl">x-envoy-datacenter: &lt;region&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>运气很好，Header 直接可以看出来是 Envoy 反代。</p>
+<p>Envoy 正好有个 <a class="link" href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-connection-duration"  target="_blank" rel="noopener"
+    >max_connection_duration</a> 参数，并且特意提到了 <code>drain_timeout</code> 的设置。</p>
+<p>接下来看 Envoy 源码，C++ 的代码太复杂了，让 ds4f 直接出结论：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">H1.1 完整时序（每一步的行号都读过）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">T+0     accept，arm timer
+</span></span><span class="line"><span class="cl">        conn_manager_impl.cc:295-300       (max_connection_duration × jitter)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">T+60    onConnectionDurationTimeout()      conn_manager_impl.cc:884-903
+</span></span><span class="line"><span class="cl">          → startDrainSequence()           conn_manager_impl.cc:1802-1808
+</span></span><span class="line"><span class="cl">              drain_state_ = Draining
+</span></span><span class="line"><span class="cl">              codec_-&gt;shutdownNotice()   ← H1 空实现  http1/codec_impl.h:273
+</span></span><span class="line"><span class="cl">              drain_timer(drain_timeout = 5s 默认)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   ├─ A：T+60~65 之间有请求 ────────────────────────────────
+</span></span><span class="line"><span class="cl">   │    响应编码 → encodeHeaders
+</span></span><span class="line"><span class="cl">   │    conn_manager_impl.cc:2114
+</span></span><span class="line"><span class="cl">   │      drain_state_(Draining) != NotDraining   ✓
+</span></span><span class="line"><span class="cl">   │      protocol() &lt; Http2  (H1.1)              ✓
+</span></span><span class="line"><span class="cl">   │      → 2120  headers.setReferenceConnection(ConnectionValues.Close)
+</span></span><span class="line"><span class="cl">   │    → 响应带 Connection: close 发出
+</span></span><span class="line"><span class="cl">   │
+</span></span><span class="line"><span class="cl">   └─ B：T+60~65 之间无请求 ────────────────────────────────
+</span></span><span class="line"><span class="cl">        T+65  drain_timer 到 → onDrainTimeout()   conn_manager_impl.cc:905-910
+</span></span><span class="line"><span class="cl">                codec_-&gt;goAway()      ← H1 空实现  http1/codec_impl.h:271
+</span></span><span class="line"><span class="cl">                drain_state_ = Closing
+</span></span><span class="line"><span class="cl">                checkForDeferredClose(false)      conn_manager_impl.cc:336-347
+</span></span><span class="line"><span class="cl">                  drain_state_ == Closing   ✓
+</span></span><span class="line"><span class="cl">                  streams_.empty()          ✓
+</span></span><span class="line"><span class="cl">                  !codec_-&gt;wantsToWrite()   ✓
+</span></span><span class="line"><span class="cl">                  → doConnectionClose(FlushWriteAndDelay)
+</span></span><span class="line"><span class="cl">                       delayed_close_timeout = 1000ms 默认  (proto:703)
+</span></span><span class="line"><span class="cl">        T+66  → FIN
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个结论也很有意思！回想之前的事件格栅图，最后一个请求是在 <code>65-66s</code> 期间发出的，而对方是在 <code>66s</code> 准点才发出 FIN。
+说明对方不受理 <code>65-66s</code> 期间发出的请求。</p>
+<p>其原因就和 <a class="link" href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-delayed-close-timeout"  target="_blank" rel="noopener"
+    >delayed_close_timeout</a> 参数相关，这个是 TCP 半关闭状态的一个核心参数，官方文档也给了该参数相当多的描述。
+总结下来就是当连接关闭时，不会立即关闭 socket，而是转为只读状态，目的是等待对方先发送 FIN，如果没能等到才会主动发起 FIN，默认超时为 1s。</p>
+<p>时序是这样的：</p>
+<ul>
+<li><code>T</code> 建立了一条新连接，直到 <code>T+60</code> 都是活跃的</li>
+<li><code>T+60</code> Envoy max_connection_duration 触发，尝试附加 <code>Connection: Close</code></li>
+<li><code>T+60~65</code> 无请求</li>
+<li><code>T+65</code> Envoy drain_timeout 触发，立即更改状态机 Closing</li>
+<li><code>T+65~66</code> Client 不知道连接已失活，继续发起一条请求，挂起</li>
+<li><code>T+66</code> Envoy delayed_close_timeout 触发，连接仍未关闭，立即发送 FIN</li>
+<li><code>T+66</code> Client 收到 FIN，认为是 EOF，抛 ResponseEnded 异常</li>
+</ul>
+<p>核心问题就在于 H1.1 协议下，没有 GOAWAY，也没有请求的话，Envoy 无法通知对端连接即将关闭，永远等不到 FIN。
+如果对端正好在 <code>T+65~T+66</code> 窗口发送了请求，Envoy 是不会处理的。</p>
+<p><code>66 = 60(max_connection_duration) + 5(drain_timeout) + 1(delayed_close_timeout)</code> 等式成立，这样全文就串起来了。
+这并不是一个高并发竞态的问题，而是 Envoy 的特殊行为导致的偶发故障，这也解释了为什么高并发脚本无法复现该问题。</p>
+<h2 id="总结">总结
+</h2><p>本文是笔者第一次使用 trace &amp; tcpdump 工具去分析生产问题，过程虽曲折，但从中学习到了很多知识，而不仅仅是解决掉了一个故障。</p>
+<p>对于长连接关闭的偶发性故障，难以使用 curl 等工具简单复现，也难以直观看出规律。
+我的做法是通过 trace &amp; tcpdump 文件分析，一步步地去探查规律。
+这个过程是比较艰难的，因为文件分析需要编写大量的脚本，不过好在有 ds4f 的帮助，几乎两三天就能触及根因。
+不过，这依旧是个很复杂的工作，需要有相当多的 TCP 排障经验才能闭环故障。</p>
+<blockquote>
+<p>此外，本文还深入地探索了很多源码层的细节，这些内容虽然不会对业务有帮助，但阅读 HttpClient 源码还是比较有意思的。</p>
+</blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2026/intro-csharp-interceptors/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">初识 C# Interceptors</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/stable-diffusion-tips/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Stable diffusion 笔记</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2020/bom-introduction/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">BOM、UTF-8 和浏览器编码问题</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2019/modify-json-dom-in-html/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JS 操作 Json DOM</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2026 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

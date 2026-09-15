@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Buffer Pool Manager review">
+<title>CMU 15-445 Project #1</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2025/cmu15445-p1/'>
+
+<link rel="stylesheet" href="/scss/style.min.b1a5b48e9268da293f0e82d09fd1299e5ecbd5ea47ba1f408b3687d520ce0c2b.css"><meta property='og:title' content="CMU 15-445 Project #1">
+<meta property='og:description' content="Buffer Pool Manager review">
+<meta property='og:url' content='https://blog.tinyume.com/2025/cmu15445-p1/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-01-11T18:21:48&#43;08:00'/><meta property='article:modified_time' content='2025-01-11T18:21:48&#43;08:00'/>
+<meta name="twitter:title" content="CMU 15-445 Project #1">
+<meta name="twitter:description" content="Buffer Pool Manager review">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?s=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#project-1-buffer-pool-manager">Project #1 Buffer Pool Manager</a>
+      <ol>
+        <li><a href="#task-1-lru-k-replacement-policy">Task #1 LRU-K Replacement Policy</a></li>
+        <li><a href="#task-2-disk-scheduler">Task #2 Disk Scheduler</a></li>
+        <li><a href="#task-3-buffer-pool-manager">Task #3 Buffer Pool Manager</a></li>
+        <li><a href="#提交">提交</a></li>
+      </ol>
+    </li>
+    <li><a href="#后记">后记</a></li>
+    <li><a href="#其他">其他</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/live/" style="background-color: #2a9d8f; color: #fff;">
+                日常
+            </a>
+        
+            <a href="/categories/code/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2025/cmu15445-p1/">CMU 15-445 Project #1</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Buffer Pool Manager review
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2025-01-11 18:21</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 8 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="project-1-buffer-pool-manager">Project #1 Buffer Pool Manager
+</h2><p>本文记录一下我完成 CMU-15-445 Project #1 的历程，讲讲 what &amp; why，包含了我的思考历程，但不会包含任何具体的实现方法。</p>
+<p>本文出现的所有单词中，heap file 代表数据库文件，储存数个无序的数据库页；
+page 代表数据库页；frame 代表内存中的数据库页；
+bpm 代表 buffer pool manager；</p>
+<p>下面进入正文 ——</p>
+<p>buffer pool manager，即数据库缓冲池，它提供两个功能：</p>
+<ol>
+<li>数据库磁盘 I/O 交互，缓存失效时才进行磁盘读写</li>
+<li>CRUD 数据库页，即 CRUD frame</li>
+</ol>
+<p>bpm 包含 3 个组件：</p>
+<ol>
+<li>replacer 页面置换器</li>
+<li>disk scheduler 磁盘请求队列</li>
+<li>buffer pool manager 缓冲池管理器</li>
+</ol>
+<p>本课程的目标就是实现这 3 个组件，完成一个 thread-safe buffer pool manager。</p>
+<blockquote>
+<p>Edit at 2026-07-23 Writing P2 Review: 最近遇到一些 I/O thrashing 的问题，让我可以更深入地理解这里 disk scheduler 的设计，为什么是队列+异步以及 io_uring 的可能性</p>
+</blockquote>
+<h3 id="task-1-lru-k-replacement-policy">Task #1 LRU-K Replacement Policy
+</h3><p>实现一个基于 LRU-K 算法的 replacer。</p>
+<p>与 LRU 类似，LRU-K 也是用于淘汰掉最不常用的元素（cold data）。</p>
+<p>LRU-K 计算时会遍历所有元素，查找其访问的历史记录，不足 k 次则可以直接淘汰。
+否则找出所有元素的 <strong>前 k 次访问</strong> 与 <strong>当前时间步</strong> 的差值最大值。</p>
+<p>注意，这里使用的概念是 <strong>时间步 (timestep)</strong> 而非讲义里面所说的 <strong>时间戳 (timestamp)</strong> 。</p>
+<p>讲义的原句是 <code>Backward k-distance is computed as the difference in time between the current timestamp and the timestamp of kth previous access.</code>。
+我一开始就误以为 timestamp 是现实世界的时间戳，我想，毫秒级的精度肯定不够吧，于是调查了一番 c++ 时间戳。
+感到不对劲但是又没有其他提示后，便去翻了之前课程的实现，才发现是一个计数&hellip;踩了个坑。</p>
+<p>具体来说，时间步是一个计数概念，从 0 开始，每个访问元素便 +1 即可。</p>
+<p>此外，bpm 还有 evictable（可淘汰）的概念，当 frame 设置为 evictable 时，replacer 才能淘汰它。</p>
+<h3 id="task-2-disk-scheduler">Task #2 Disk Scheduler
+</h3><p>一个磁盘请求调度器。挺简单，10 分钟可以搞定。</p>
+<p><code>DiskScheduler</code> 调用 <code>DiskManager</code> 管理物理磁盘。</p>
+<p><code>DiskManager</code> 中，page id 从 0 开始，长度为 4096，比如 0-4096 比特范围为 page 0 的内容。
+为了减少系统调用，文件会初始化 16 个 page 大小的空间，在需要扩充的时候 x2 。
+<code>IncreaseDiskSpace</code> 虽然命名上看是增加，但实际上是传入总的 page 数量，然后它内部再判断是否需要扩容。
+以及 <code>DiskManager</code> 内部储存了 page 数量，但是实际上没有作用。
+还有 <code>DeletePage</code> 方法也没有实现（虽然也没这个必要），<code>DiskManagerMemory</code> 用了但是用途不一样。这两点稍微有点设计问题和误导性。</p>
+<p>底层的 disk manager 磁盘操作已经预先写好了，需要实现的 disk scheduler 就是管理一个 worker 线程，将读写 page 的请求放入队列，返回 promise。</p>
+<p>这里就不得不提一下 c++ 的 promise / future 协程模型了。</p>
+<ul>
+<li>promise: <code>set_value</code> / <code>set_exception</code> / <code>get_future</code> 用于存放任务的值</li>
+<li>future: <code>get</code> / <code>wait</code> / <code>wait_for</code> 用于等待任务和获取结果</li>
+</ul>
+<p>但是呢，python 的协程模型中，future 用于存放任务的值，task 才是用于管理任务的。
+javascript 和 c# 也类似。</p>
+<p>包括上面的，c++ 这些奇怪的协程接口设计 😅，比如 <code>promise.get_future()</code> 、<code>std::move(promise)</code> 等操作让我写起来感觉非常难受。</p>
+<h3 id="task-3-buffer-pool-manager">Task #3 Buffer Pool Manager
+</h3><p>完成了 LRU-K 替换策略和磁盘调度器后，就可以着手开始解决最复杂的部分 —— Buffer Pool Manager 的实现。</p>
+<p>首先，我觉得最重要的是搞懂这一套流程是怎么工作的、为什么要这么设计。</p>
+<p>这些细节内容是讲义里面没有的，基本上都需要靠自己摸索、碰壁，最终才能理解并实现。
+之前做 CS144 也是类似的感觉，细节的东西都需要靠自己做。
+相比之下，CMU 15-445 提供了基本数据类型定义，至少你知道这个字段是有用的，我没有用到的话那可能是我实现错了。</p>
+<blockquote>
+<p>在做开源软件的时候，我们经常能看到 Tech Specification，一份好的设计文档可以受益整个群体，并且能够跟踪项目的细节变更，比如 <a class="link" href="https://peps.python.org/"  target="_blank" rel="noopener"
+    >Python PEPs</a> 或者 <a class="link" href="https://github.com/ethereum/devp2p/blob/master/rlpx.md"  target="_blank" rel="noopener"
+    >RLPx</a>。</p>
+<p>但是在现实工作中，我们很难见到这样的案例，原因是编写和维护起来非常困难。你说业务发展快，那么就算假设有慢速的业务，会有人去为公司（无论什么行业）写 Spec 吗？我想答案是没有，包括我自己。
+原因是没有意义，不能给你带来绩效，甚至没有认可。
+你走了之后的人受益了，那又与你何关。</p>
+<p>我曾经为此深恶痛绝，如果你做 infrastructure 相关的工作（想想看你做的工具要被公司很多小组用到），那就更为如此。
+这都是公司管理层的偏好问题，你没法控制。</p>
+<p>但至少我们自己要做有意义的事情，将来某天要组建自己的团队时，我们可以用到这些经验。</p>
+</blockquote>
+<p><strong>Page Guard 核心理念</strong></p>
+<p>思考一下面向接口编程，用户接口首先是越简洁越好，符合单一职责，不希望让用户使用锁，更不希望用户知道 buffer pool manager 里面的 frame 机制。</p>
+<p>为了实现这个，当用户申请读写某个页面时，buffer pool manager 返回一个 page guard 对象，这个对象可以理解为 python 里面的上下文管理器、c# 里面的 IDisposable。
+page guard 的具体实现使用了 C++ 的 RAII 机制，利用对象生存周期来管理资源，这是 C++ 中普遍的最佳实践。
+利用 RAII，page guard 创建时可以自动上锁，析构时可以自动释放锁，防止对 frame 的读写产生数据竞争或者脏读。</p>
+<p>这个 frame 锁存在哪里其实不重要，但是在这个项目里面 frame 算是单例对象，所以锁就存在 frame 上即可，写入时独占锁，读取时共享锁。</p>
+<p>frame 的读写锁，具体来说，创建一个 write page guard 时，在堆栈变量的上下文内持有一个独占锁，防止其他线程读取或写入；
+创建一个 read page guard 时，在堆栈变量的上下文内持有一个共享锁，允许多个线程读取，但不允许拥有独占锁。
+这个 rwlock 在 c++ 里面就是 <code>std::shared_mutex</code>，具体用的什么公平策略在这里也不重要。</p>
+<p>再次总结和理解一下 PageGuard 的 RAII 机制和锁：</p>
+<ol>
+<li><code>WritePageGuard</code> 持有时，则无法拥有任何其他 <code>WritePageGuard</code> 和 <code>ReadPageGuard</code> 对象。跨线程锁住此对象，析构时释放锁</li>
+<li>没有 <code>WritePageGuard</code> 持有时，可以拥有多份 <code>ReadPageGuard</code>。有 <code>ReadPageGuard</code> 存在时，则无法创建 <code>WritePageGuard</code></li>
+<li>管理 frame pin count，构造时 +1，析构时 -1，为 0 时设置 frame evictable</li>
+</ol>
+<p>特别要注意的是，C++ 的 RAII 还包含了移动语义，和复制语义类似。
+移动语义首先会为类实例分配一个未定义的内存空间，然后通过右值引用传入的参数和 <code>std::move</code> 来构造该对象，所以需要注意不要引发 UB 和 double free (double move)。
+善用项目里面给的 is_valid 来处理 RAII 语义。</p>
+<p>原文对 pin count 的解释是 <code>The pin count of a frame is the number of threads that have access to the page's data.</code>，这个解释应该是有点毛病的，正确来说是 guard 持有数，因为同一个线程是允许持有两份相同 <code>ReadPageGuard</code> 的。</p>
+<p>我写了个测试，你可以试试：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="n">TEST</span><span class="p">(</span><span class="n">BufferPoolManagerTest</span><span class="p">,</span> <span class="n">MyCustomTest</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">disk_manager</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">DiskManager</span><span class="o">&gt;</span><span class="p">(</span><span class="n">db_fname</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">bpm</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">BufferPoolManager</span><span class="o">&gt;</span><span class="p">(</span><span class="n">FRAMES</span><span class="p">,</span> <span class="n">disk_manager</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">K_DIST</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">pid0</span> <span class="o">=</span> <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">NewPage</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">guard0</span> <span class="o">=</span> <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">WritePage</span><span class="p">(</span><span class="n">pid0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="n">str</span><span class="p">[]</span> <span class="o">=</span> <span class="s">&#34;Hello world!&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="n">guard0</span><span class="p">.</span><span class="n">GetDataMut</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">snprintf</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">str</span><span class="p">),</span> <span class="s">&#34;%s&#34;</span><span class="p">,</span> <span class="n">str</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">pin</span> <span class="o">=</span> <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">GetPinCount</span><span class="p">(</span><span class="n">pid0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ASSERT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">pin</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">guard1</span> <span class="o">=</span> <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">ReadPage</span><span class="p">(</span><span class="n">pid0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">guard2</span> <span class="o">=</span> <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">ReadPage</span><span class="p">(</span><span class="n">pid0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">pin</span> <span class="o">=</span> <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">GetPinCount</span><span class="p">(</span><span class="n">pid0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// This explains that pin count is not just
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// `The pin count of a frame is the number of threads that have access to the page&#39;s data.`
+</span></span></span><span class="line"><span class="cl">    <span class="c1">// said in project #1 instruction.
+</span></span></span><span class="line"><span class="cl">    <span class="n">ASSERT_EQ</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">pin</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Buffer Pool Manager 实现</strong></p>
+<p>我的实现顺序：</p>
+<ol>
+<li>先完成不带锁的 replacer，因为没有测试担心后面出错</li>
+<li>完成 disk scheduler</li>
+<li>理解 bpm 的 page guard，完成不带锁版本并通过测试</li>
+<li>完善代码并通过 bpm 的 basic test，到这里就完成了大部分了，后面都是锁和 debug</li>
+<li>添加 page guard 和 replacer 锁，可以完成本地的所有测试</li>
+<li>添加 bpm 锁，完成 gradescope 所有测试</li>
+</ol>
+<p><strong>死锁</strong></p>
+<p>对于死锁，讲义里面给了提示 <code>holding the buffer pool latch from beginning to end should be enough (except for when you need to release it early to prevent deadlocks)</code></p>
+<p>但是我依旧思考了很久，最终在阅读了 DeadlockTest 这个测试用例后，才恍然大悟。</p>
+<p>死锁的情况是这样的：当主线程持有了 page0 的互斥锁后，子线程尝试获取 page0 的互斥锁时会等待。
+如果子线程里 bpm 的锁未释放，主线程再调用一次 bpm 的带锁函数，就会卡死。</p>
+<p>理解了问题所在之后，就很好解决了，这里就不具体讲了。</p>
+<p><strong>其他并发问题</strong></p>
+<ol>
+<li>在为已缓存的 frame 建立 page guard 之前，注意首先将 frame 设为 non-evictable，否则 page guard 等待锁的时候，其他线程可能会 evict frame</li>
+<li>atomic 如果自增并且需要获取旧值，一定记得用 <code>fetch_add(1)</code> 或者 <code>i++</code></li>
+</ol>
+<p>gradescope 的测试用例并非完美，如果代码中有细微的差错，就会出现一些偶发性问题，比如：</p>
+<p><code>BufferPoolManagerTest.ConcurrentWriterTest (0/5)</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">&gt;</span> <span class="n">GTEST_COLOR</span><span class="o">=</span><span class="n">yes</span> <span class="n">ctest</span> <span class="o">.</span> <span class="o">-</span><span class="n">R</span> <span class="o">^</span><span class="n">BufferPoolManagerTest</span><span class="o">.</span><span class="n">ConcurrentWriterTest</span><span class="o">$</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">tests</span><span class="o">=</span><span class="n">error</span> <span class="o">--</span><span class="n">verbose</span>
+</span></span><span class="line"><span class="cl"><span class="n">UpdateCTestConfiguration</span>  <span class="n">from</span> <span class="p">:</span><span class="o">/</span><span class="n">autograder</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">bustub</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">DartConfiguration</span><span class="o">.</span><span class="n">tcl</span>
+</span></span><span class="line"><span class="cl"><span class="n">UpdateCTestConfiguration</span>  <span class="n">from</span> <span class="p">:</span><span class="o">/</span><span class="n">autograder</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">bustub</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">DartConfiguration</span><span class="o">.</span><span class="n">tcl</span>
+</span></span><span class="line"><span class="cl"><span class="n">Test</span> <span class="n">project</span> <span class="o">/</span><span class="n">autograder</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">bustub</span><span class="o">/</span><span class="n">build</span>
+</span></span><span class="line"><span class="cl"><span class="n">Constructing</span> <span class="n">a</span> <span class="n">list</span> <span class="n">of</span> <span class="n">tests</span>
+</span></span><span class="line"><span class="cl"><span class="n">Done</span> <span class="n">constructing</span> <span class="n">a</span> <span class="n">list</span> <span class="n">of</span> <span class="n">tests</span>
+</span></span><span class="line"><span class="cl"><span class="n">Updating</span> <span class="n">test</span> <span class="n">list</span> <span class="k">for</span> <span class="n">fixtures</span>
+</span></span><span class="line"><span class="cl"><span class="n">Added</span> <span class="mi">0</span> <span class="n">tests</span> <span class="n">to</span> <span class="n">meet</span> <span class="n">fixture</span> <span class="n">requirements</span>
+</span></span><span class="line"><span class="cl"><span class="n">Checking</span> <span class="n">test</span> <span class="n">dependency</span> <span class="n">graph</span><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="n">Checking</span> <span class="n">test</span> <span class="n">dependency</span> <span class="n">graph</span> <span class="n">end</span>
+</span></span><span class="line"><span class="cl"><span class="n">test</span> <span class="mi">18</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Start</span> <span class="mi">18</span><span class="p">:</span> <span class="n">BufferPoolManagerTest</span><span class="o">.</span><span class="n">ConcurrentWriterTest</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="n">Test</span> <span class="n">command</span><span class="p">:</span> <span class="o">/</span><span class="n">autograder</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">bustub</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">test</span><span class="o">/</span><span class="n">grading_buffer_pool_manager_test</span> <span class="s2">&#34;--gtest_filter=BufferPoolManagerTest.ConcurrentWriterTest&#34;</span> <span class="s2">&#34;--gtest_also_run_disabled_tests&#34;</span> <span class="s2">&#34;--gtest_output=xml:/autograder/source/bustub/build/test/grading_buffer_pool_manager_test.xml&#34;</span> <span class="s2">&#34;--gtest_catch_exceptions=0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="n">Test</span> <span class="n">timeout</span> <span class="n">computed</span> <span class="n">to</span> <span class="n">be</span><span class="p">:</span> <span class="mi">120</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="n">Running</span> <span class="n">main</span><span class="p">()</span> <span class="n">from</span> <span class="n">gmock_main</span><span class="o">.</span><span class="n">cc</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="n">Note</span><span class="p">:</span> <span class="n">Google</span> <span class="n">Test</span> <span class="n">filter</span> <span class="o">=</span> <span class="n">BufferPoolManagerTest</span><span class="o">.</span><span class="n">ConcurrentWriterTest</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span><span class="o">==========</span><span class="p">]</span> <span class="n">Running</span> <span class="mi">1</span> <span class="n">test</span> <span class="n">from</span> <span class="mi">1</span> <span class="n">test</span> <span class="n">suite</span><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span><span class="o">----------</span><span class="p">]</span> <span class="n">Global</span> <span class="n">test</span> <span class="n">environment</span> <span class="n">set</span><span class="o">-</span><span class="n">up</span><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span><span class="o">----------</span><span class="p">]</span> <span class="mi">1</span> <span class="n">test</span> <span class="n">from</span> <span class="n">BufferPoolManagerTest</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span> <span class="n">RUN</span>      <span class="p">]</span> <span class="n">BufferPoolManagerTest</span><span class="o">.</span><span class="n">ConcurrentWriterTest</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="o">/</span><span class="n">autograder</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">bustub</span><span class="o">/</span><span class="n">test</span><span class="o">/</span><span class="n">buffer</span><span class="o">/</span><span class="n">grading_buffer_pool_manager_test</span><span class="o">.</span><span class="n">cpp</span><span class="p">:</span><span class="mi">991</span><span class="p">:</span> <span class="n">Failure</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="n">Expected</span> <span class="n">equality</span> <span class="n">of</span> <span class="n">these</span> <span class="n">values</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span>   <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span>   <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">GetPinCount</span><span class="p">(</span><span class="n">page_ids</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span>     <span class="n">Which</span> <span class="n">is</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span>  <span class="n">FAILED</span>  <span class="p">]</span> <span class="n">BufferPoolManagerTest</span><span class="o">.</span><span class="n">ConcurrentWriterTest</span> <span class="p">(</span><span class="mi">1184</span> <span class="n">ms</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span><span class="o">----------</span><span class="p">]</span> <span class="mi">1</span> <span class="n">test</span> <span class="n">from</span> <span class="n">BufferPoolManagerTest</span> <span class="p">(</span><span class="mi">1184</span> <span class="n">ms</span> <span class="n">total</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span><span class="o">----------</span><span class="p">]</span> <span class="n">Global</span> <span class="n">test</span> <span class="n">environment</span> <span class="n">tear</span><span class="o">-</span><span class="n">down</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span><span class="o">==========</span><span class="p">]</span> <span class="mi">1</span> <span class="n">test</span> <span class="n">from</span> <span class="mi">1</span> <span class="n">test</span> <span class="n">suite</span> <span class="n">ran</span><span class="o">.</span> <span class="p">(</span><span class="mi">1184</span> <span class="n">ms</span> <span class="n">total</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span>  <span class="n">PASSED</span>  <span class="p">]</span> <span class="mi">0</span> <span class="n">tests</span><span class="o">.</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span>  <span class="n">FAILED</span>  <span class="p">]</span> <span class="mi">1</span> <span class="n">test</span><span class="p">,</span> <span class="n">listed</span> <span class="n">below</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span> <span class="p">[</span>  <span class="n">FAILED</span>  <span class="p">]</span> <span class="n">BufferPoolManagerTest</span><span class="o">.</span><span class="n">ConcurrentWriterTest</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl"><span class="mi">18</span><span class="p">:</span>  <span class="mi">1</span> <span class="n">FAILED</span> <span class="n">TEST</span>
+</span></span><span class="line"><span class="cl"><span class="mi">1</span><span class="o">/</span><span class="mi">1</span> <span class="n">Test</span> <span class="c1">#18: BufferPoolManagerTest.ConcurrentWriterTest ...***Failed    1.22 sec</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="mi">0</span><span class="o">%</span> <span class="n">tests</span> <span class="n">passed</span><span class="p">,</span> <span class="mi">1</span> <span class="n">tests</span> <span class="n">failed</span> <span class="n">out</span> <span class="n">of</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Total</span> <span class="n">Test</span> <span class="n">time</span> <span class="p">(</span><span class="n">real</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">1.23</span> <span class="n">sec</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">The</span> <span class="n">following</span> <span class="n">tests</span> <span class="n">FAILED</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">	 <span class="mi">18</span> <span class="o">-</span> <span class="n">BufferPoolManagerTest</span><span class="o">.</span><span class="n">ConcurrentWriterTest</span> <span class="p">(</span><span class="n">Failed</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Errors</span> <span class="k">while</span> <span class="n">running</span> <span class="n">CTest</span>
+</span></span><span class="line"><span class="cl"><span class="n">Output</span> <span class="n">from</span> <span class="n">these</span> <span class="n">tests</span> <span class="n">are</span> <span class="ow">in</span><span class="p">:</span> <span class="o">/</span><span class="n">autograder</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">bustub</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">Testing</span><span class="o">/</span><span class="n">Temporary</span><span class="o">/</span><span class="n">LastTest</span><span class="o">.</span><span class="n">log</span>
+</span></span><span class="line"><span class="cl"><span class="n">Use</span> <span class="s2">&#34;--rerun-failed --output-on-failure&#34;</span> <span class="n">to</span> <span class="n">re</span><span class="o">-</span><span class="n">run</span> <span class="n">the</span> <span class="n">failed</span> <span class="n">cases</span> <span class="n">verbosely</span><span class="o">.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Program</span> <span class="n">exited</span> <span class="n">with</span> <span class="mi">8</span> <span class="ow">in</span> <span class="mf">1.238</span><span class="n">s</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后，提交的时候遇到了 clang-format 的错误。</p>
+<p>它原本的代码在我使用 <code>clang-format-18</code> 格式化之后就变了，应该是版本的差异导致的。
+直接在上下文使用 <code>// clang-format off</code> 和 <code>// clang-format on</code> 搞定。</p>
+<h3 id="提交">提交
+</h3><p>没做优化。</p>
+<p>可优化的地方很多，比如 disk manager 就可以实现为并发的多线程版本，这个应该还算容易实现。
+以后可能有空写写。</p>
+<p>Leaderboard QPS Benchmark: 3917.82663</p>
+<p><img src="https://s2.loli.net/2025/01/13/O3Es2ILWfp9Dhk1.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>排名算中游，一共评分的也就 70 多个，外校的学生还是比较少，不过官方的 discord 群挺活跃的。</p>
+<h2 id="后记">后记
+</h2><p>零零散散花了一个月时间，我终于写完了！
+公司的工作虽然枯燥，但胜在事少，可以让我有足够的时间完成这个项目。</p>
+<p>总体来说，Project #1 完成的还算顺利。</p>
+<p>从最初看 bpm 时一头雾水，到迷茫但是决定先写 page guard，到通过了 page guard 测试，到逐步完成 bpm，最终掌握它的实现原理。</p>
+<p>在无数次提交中，终于有一次提交达到满分，还是挺高兴的。</p>
+<p>Project #2 还会更难，但是我并没有觉得任何的痛苦和退缩。</p>
+<p>做这门课的意义是什么？我突然想到这个问题。似乎从 csdiy.wiki 上看到这门课之后，我就直接开始做了，并没有什么特殊的理由。
+单纯的数据库理论知识直接背八股文就行了，但是我不喜欢，做这门课至少能让我觉得有意思。</p>
+<h2 id="其他">其他
+</h2><p>将博客头像旧的 jsdelivr 资源转移到了 sm.ms 图床上，另外还发现 sm.ms 的直链变为了 s2.loli.net。</p>
+<p>将主头像源转移到了 Gravatar 代理镜像。
+原本考虑使用 gravatar.loli.net 镜像，但是 size 参数无效，就放弃了。
+现在用的是 weavatar 速度很棒。</p>
+<p>发现 iyume.live 域名可以注册，<code>$24.10</code> 似乎也还能接受。</p>
+<p>想写个自己的 Astro 博客，现在这个主题用起来问题还是挺多的。
+刚发现的问题是没有按需载入、也没法关掉 photoswipe 功能。
+关心起性能后，才发现好多问题&hellip;😣 希望以后有空可以改进。</p>
+<p>最近想要多写点博文，看看能不能把日本旅行和 2024 年终总结写一写。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2026/cmu15445-p2/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #2</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #0</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2024/hackergame-2024/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2024</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/cs144/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CS 144 TCP</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/hackergame-2023/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2023</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2026 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

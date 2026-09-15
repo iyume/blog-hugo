@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Database Index review">
+<title>CMU 15-445 Project #2</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2026/cmu15445-p2/'>
+
+<link rel="stylesheet" href="/scss/style.min.b1a5b48e9268da293f0e82d09fd1299e5ecbd5ea47ba1f408b3687d520ce0c2b.css"><meta property='og:title' content="CMU 15-445 Project #2">
+<meta property='og:description' content="Database Index review">
+<meta property='og:url' content='https://blog.tinyume.com/2026/cmu15445-p2/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-07-22T15:13:00&#43;08:00'/><meta property='article:modified_time' content='2026-07-22T15:13:00&#43;08:00'/>
+<meta name="twitter:title" content="CMU 15-445 Project #2">
+<meta name="twitter:description" content="Database Index review">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?s=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#project-2-database-index">Project #2 Database Index</a>
+      <ol>
+        <li><a href="#pre-knowledge">Pre-knowledge</a></li>
+        <li><a href="#insert">Insert</a>
+          <ol>
+            <li><a href="#balancedinsert">BalancedInsert</a></li>
+            <li><a href="#insertandsplit">InsertAndSplit</a></li>
+          </ol>
+        </li>
+        <li><a href="#search">Search</a></li>
+        <li><a href="#delete">Delete</a>
+          <ol>
+            <li><a href="#steal">Steal</a></li>
+            <li><a href="#merge">Merge</a></li>
+          </ol>
+        </li>
+        <li><a href="#iterator">Iterator</a></li>
+        <li><a href="#concurrency--tests">Concurrency &amp; Tests</a>
+          <ol>
+            <li><a href="#checkedwritepage-failed-to-bring-in-page-407"><code>CheckedWritePage</code> failed to bring in page 407</a></li>
+            <li><a href="#expected-equality-of-these-values">Expected equality of these values</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#submit">Submit</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/live/" style="background-color: #2a9d8f; color: #fff;">
+                日常
+            </a>
+        
+            <a href="/categories/code/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2026/cmu15445-p2/">CMU 15-445 Project #2</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Database Index review
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2026-07-22 15:13</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 9 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="project-2-database-index">Project #2 Database Index
+</h2><blockquote>
+<p>时间跨度：2025-03-18 ~ 2026-07-21（约 16 个月，实际 coding 分散在若干密集时段）</p>
+<p>总变更：18 个文件，+1875 / -71 行，15 个 commit</p>
+</blockquote>
+<p>这段时间陆陆续续在做这门 2024 年的课程，从 2025-01-11 完成 P1 Buffer Pool Manager 之后便一直没什么闲暇来做，但至今也算是做完了。
+那么按照惯例，本文只作为我思路历程的记录，不涉及代码，只记录我是如何使用递推的思路去实现 B+ Tree，然后提交 Gradescope 一次性通过的。</p>
+<p>这次课程 PDF 的内容也是十分丰富和形象，首先介绍了由哈希冲突衍生的布谷鸟哈希等各种哈希方案，引出 HashTable，然后介绍了各种索引：B+ Tree、LSM-Tree、Skip List、Inverted Index 等等，配合绘图阅读起来还是挺有意思的。</p>
+<p>哈希虽然看起来有一大堆实现，但哈希冲突本质上是无解的，一般像 HashMap 在每个桶里面用链表去解决，根据场景选择速度快、分散均匀的哈希函数即可。
+带哈希索引一般用于 O(1) 的无序高性能场景，例如 Redis、Bloom Filter 等。
+非哈希索引中的 B+ Tree 就是本次课程的核心。</p>
+<p>B+ Tree 是一个平衡树，简单来说，每个内节点和叶子在初始化时设定 max_size 和半满阈值。
+当叶子节点插入后超过 max_size 就会触发向上分裂，如果 root 也分裂了，那么 B+ Tree 树高度 +1。
+当叶子节点删除后低于半满阈值就会触发 steal 先尝试从左右兄弟借一个，借不到就会触发向上合并，如果 root 也合并了，那么 B+ Tree 树高度 -1。</p>
+<p>本次课程就是实现这样一个 B+ Tree，原课程拆分为了 4 个 Task：</p>
+<ul>
+<li>Task #1 - B+Tree Pages</li>
+<li>Task #2 - B+Tree Operations (Insertion, Deletion, and Point Search)</li>
+<li>Task #3 - Index Iterator</li>
+<li>Task #4 - Concurrency Control</li>
+</ul>
+<p>但是这四个 Task 耦合性是非常高的，建议所有 Task 细节看完之后再开始着手实现。</p>
+<p>Project Specification 几个重要概念需要牢记：</p>
+<ul>
+<li>TreePage 是两种 B+ 树节点的基类</li>
+<li>InternalPage 内节点派生类，每个实例包含了数个 direct key 和他们指向的下一级 page id</li>
+<li>LeafPage 叶子节点派生类，每个实例包含了数个实际的 Key-Value</li>
+</ul>
+<p>本文将根据实现顺序 Insert-&gt;Delete-&gt;Iterator 进行讲解，会穿插一些由 AI 转化为 SVG 的个人笔记。
+另外，由于本人是用 <strong>递推</strong> 的方法实现的，也会讲解一下递推过程的状态转移原理，不一定适用所有人。</p>
+<h3 id="pre-knowledge">Pre-knowledge
+</h3><p>在写代码之前，需要熟悉一些 C++ Codebase 相关的内容，比如内存布局、<code>reinterpret_cast</code> 等等。</p>
+<p>在上次的 Buffer Pool Manager 中，每个内存单元 (frame) 大小都是 4KB，映射到 B+ Tree 就是每个 Page 的内存大小都是 4KB。</p>
+<p>Page 头部静态内存布局计算 (0 padding)：</p>
+<ul>
+<li>TreePage: <code>sizeof(page_type_(4B) + size_(4B) + max_size_(4B)) = 12B</code></li>
+<li>InternalPage: <code>sizeof(TreePage) = 12B</code></li>
+<li>LeafPage: <code>sizeof(TreePage + next_page_id_(4B)) = 16B</code> 其中 next_page_id 是实现 iterator 的相关字段</li>
+</ul>
+<p>Page 动态内存布局计算每个节点能容纳多少插槽 (slot_cnt) 的方法就是 <code>(4096B - sizeof(Page)) / sizeof(KeyType + ValueType)</code>。</p>
+<blockquote>
+<p>在没彻底搞懂这个逻辑之前，不要试图在 Page 上面添加任何拓展字段</p>
+</blockquote>
+<p>Frame &lt;&mdash;&gt; Page 是互转的，<code>reinterpret_cast</code> 就是桥梁。
+Frame 是一个 4KB 大小的 <code>char[]</code>，读取到内存之后就是一个可以被 <code>reinterpret_cast</code> 解释成 Page 对象的内存模型。
+把对象操作理解成 memset 就行，期间没有任何的序列化操作或者压缩操作，内存模型就是存储序列。</p>
+<blockquote>
+<p>搜索数据库页相关的定长压缩技术也能看到一些有意思的东西</p>
+</blockquote>
+<p>最后看一眼 B+ Tree 的声明和一个构造示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">KeyType</span><span class="p">,</span> <span class="k">typename</span> <span class="n">ValueType</span><span class="p">,</span> <span class="k">typename</span> <span class="n">KeyComparator</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">BPlusTree</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">InternalPage</span> <span class="o">=</span> <span class="n">BPlusTreeInternalPage</span><span class="o">&lt;</span><span class="n">KeyType</span><span class="p">,</span> <span class="n">page_id_t</span><span class="p">,</span> <span class="n">KeyComparator</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">LeafPage</span> <span class="o">=</span> <span class="n">BPlusTreeLeafPage</span><span class="o">&lt;</span><span class="n">KeyType</span><span class="p">,</span> <span class="n">ValueType</span><span class="p">,</span> <span class="n">KeyComparator</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="n">BPlusTree</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">,</span> <span class="n">page_id_t</span> <span class="n">header_page_id</span><span class="p">,</span> <span class="n">BufferPoolManager</span> <span class="o">*</span><span class="n">buffer_pool_manager</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                     <span class="k">const</span> <span class="n">KeyComparator</span> <span class="o">&amp;</span><span class="n">comparator</span><span class="p">,</span> <span class="kt">int</span> <span class="n">leaf_max_size</span> <span class="o">=</span> <span class="n">LEAF_PAGE_SLOT_CNT</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                     <span class="kt">int</span> <span class="n">internal_max_size</span> <span class="o">=</span> <span class="n">INTERNAL_PAGE_SLOT_CNT</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Returns true if this B+ tree has no keys and values.
+</span></span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">IsEmpty</span><span class="p">()</span> <span class="k">const</span> <span class="o">-&gt;</span> <span class="kt">bool</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Insert a key-value pair into this B+ tree.
+</span></span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">Insert</span><span class="p">(</span><span class="k">const</span> <span class="n">KeyType</span> <span class="o">&amp;</span><span class="n">key</span><span class="p">,</span> <span class="k">const</span> <span class="n">ValueType</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">bool</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Remove a key and its value from this B+ tree.
+</span></span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">Remove</span><span class="p">(</span><span class="k">const</span> <span class="n">KeyType</span> <span class="o">&amp;</span><span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Return the value associated with a given key
+</span></span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">GetValue</span><span class="p">(</span><span class="k">const</span> <span class="n">KeyType</span> <span class="o">&amp;</span><span class="n">key</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ValueType</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">result</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">bool</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Return the page id of the root node
+</span></span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">GetRootPageId</span><span class="p">()</span> <span class="k">const</span> <span class="o">-&gt;</span> <span class="n">page_id_t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Index iterator
+</span></span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">Begin</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">INDEXITERATOR_TYPE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">End</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">INDEXITERATOR_TYPE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">Begin</span><span class="p">(</span><span class="k">const</span> <span class="n">KeyType</span> <span class="o">&amp;</span><span class="n">key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">INDEXITERATOR_TYPE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// create b+ tree
+</span></span></span><span class="line"><span class="cl"><span class="n">BPlusTree</span><span class="o">&lt;</span><span class="n">GenericKey</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">RID</span><span class="p">,</span> <span class="n">GenericComparator</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;&gt;</span> <span class="n">tree</span><span class="p">(</span><span class="s">&#34;foo_pk&#34;</span><span class="p">,</span> <span class="n">page_id</span><span class="p">,</span> <span class="n">bpm</span><span class="p">,</span> <span class="n">comparator</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意 InternalPage 的 ValueType 不是泛型而是 page_id_t，因为内节点仅指向下一个节点。
+而 LeafPage 的 ValueType 就是 RID (Record ID) 一个指针指向真实的 Database Row 的储存位置，这个也是我们常说的数据库隐藏的 rowid 字段。
+GenericKey 就是一个抽象的 key 实现，可以兼容长度 8B 的各种数据类型，例如 int64 和 string。</p>
+<h3 id="insert">Insert
+</h3><p>Insert 主要是实现叶子节点和内节点的插入与分裂（就不展示具体函数签名了）：</p>
+<ul>
+<li><code>LeafPage::BalancedInsert</code> &amp; <code>InternalPage::BalancedInsert</code></li>
+<li><code>LeafPage::InsertAndSplit</code> &amp; <code>InternalPage::InsertAndSplit</code></li>
+</ul>
+<blockquote>
+<p>latch crabbing 并不算复杂，按螃蟹锁逻辑将 PageGuard 推入课程提供的 <code>write_set_</code> 队列就行。
+大部分锁都封装在 PageGuard RAII 模式里面了，具体会在最后章节介绍，我这里实现的是普通版本，不是课程优化建议的乐观锁，感兴趣的也可以实现乐观锁。</p>
+<p>实现的过程中可以自由写测试，参考其他测试案例即可，记得最后 <code>delete bpm;</code> 否则会报内存泄漏。</p>
+</blockquote>
+<h4 id="balancedinsert">BalancedInsert
+</h4><p>刚开始写可以先尝试实现 <code>BPlusTree::Insert</code> 简单插入不分裂。
+在内节点和叶子节点定义一个 <code>BalancedInsert</code> 实现二分查找快速插入即可，处理 root 作为 LeafPage 的一些边界情况，保持有序即可。</p>
+<p>注意 <code>BalancedInsert</code> 都是在节点内操作的，不涉及外部节点，也不用更新 direct key，不影响 B+ Tree 的不变性。</p>
+<h4 id="insertandsplit">InsertAndSplit
+</h4><blockquote>
+<p>建议先不要用 zero-copy 实现，边界情况比较麻烦</p>
+</blockquote>
+<p>接下来介绍如何使用递推思路去实现插入和向上分裂。</p>
+<p>举个例子，这是一个满叶子节点的树，这里展示的数值都是 key 值：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">            6 (page3)
+</span></span><span class="line"><span class="cl">1 2 3 4 (page1) | 6 7 8 9 (page2)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>插入 5 之后：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">                    3 | 6 (page3)
+</span></span><span class="line"><span class="cl">1 2 0 0 (page1) | 3 4 5 0 (page4) | 6 7 8 9 (page2)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发生了三个步骤：</p>
+<ol>
+<li>叶子节点 page1 拆成了 page1 + page4</li>
+<li>叶子节点 page4 first key 上升作为内节点的 new direct key</li>
+<li>内节点 page3 更新指向新的 page4，每棵树理应符合各自 key range，保持树的不变性</li>
+</ol>
+<p>分裂时程序需要遵循一个约定，左子树永远是旧子树，右子树永远是新的子树，这样父节点才能正确处理。</p>
+<blockquote>
+<p>BPlusTreePage::GetMinSize 可以自由定义，但是一定要保证分裂后 MinSize &lt;= size &lt;= MaxSize，保持树的不变性</p>
+</blockquote>
+<p>由此可以推导状态 <code>opt=(direct_key, left_page_id, right_page_id)</code>：</p>
+<p><img src="/2026/cmu15445-p2/insert_opt_state_machine.svg"
+	
+	
+	
+	loading="lazy"
+	
+		alt="分裂状态转换图示"
+	
+	
+></p>
+<p>这里是我写的一个测试，可以帮助理解这个过程：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span><span class="lnt">95
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">TEST</span><span class="p">(</span><span class="n">BPlusTreeTests</span><span class="p">,</span> <span class="n">My_TreeInsert_Basic_Test</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// create KeyComparator and index schema
+</span></span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">key_schema</span> <span class="o">=</span> <span class="n">ParseCreateStatement</span><span class="p">(</span><span class="s">&#34;a bigint&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">GenericComparator</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;</span> <span class="n">comparator</span><span class="p">(</span><span class="n">key_schema</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">disk_manager</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_unique</span><span class="o">&lt;</span><span class="n">DiskManagerUnlimitedMemory</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="o">*</span><span class="n">bpm</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BufferPoolManager</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">disk_manager</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// allocate header_page
+</span></span></span><span class="line"><span class="cl">  <span class="n">page_id_t</span> <span class="n">page_id</span> <span class="o">=</span> <span class="n">bpm</span><span class="o">-&gt;</span><span class="n">NewPage</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// create b+ tree
+</span></span></span><span class="line"><span class="cl">  <span class="n">BPlusTree</span><span class="o">&lt;</span><span class="n">GenericKey</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">RID</span><span class="p">,</span> <span class="n">GenericComparator</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;&gt;</span> <span class="n">tree</span><span class="p">(</span><span class="s">&#34;foo_pk&#34;</span><span class="p">,</span> <span class="n">page_id</span><span class="p">,</span> <span class="n">bpm</span><span class="p">,</span> <span class="n">comparator</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">GenericKey</span><span class="o">&lt;</span><span class="mi">8</span><span class="o">&gt;</span> <span class="n">index_key</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">RID</span> <span class="n">rid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">do_insert</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="kt">int64_t</span> <span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int64_t</span> <span class="n">value</span> <span class="o">=</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rid</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int32_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">index_key</span><span class="p">.</span><span class="n">SetFromInteger</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tree</span><span class="p">.</span><span class="n">Insert</span><span class="p">(</span><span class="n">index_key</span><span class="p">,</span> <span class="n">rid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">do_delete</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="kt">int64_t</span> <span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int64_t</span> <span class="n">value</span> <span class="o">=</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">rid</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int32_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">index_key</span><span class="p">.</span><span class="n">SetFromInteger</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tree</span><span class="p">.</span><span class="n">Remove</span><span class="p">(</span><span class="n">index_key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Insert 5 items to reach leaf max size
+</span></span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">int64_t</span> <span class="n">key</span> <span class="o">=</span> <span class="mi">40</span><span class="p">;</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="mi">45</span><span class="p">;</span> <span class="n">key</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">do_insert</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;========================</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tree</span><span class="p">.</span><span class="n">Print</span><span class="p">(</span><span class="n">bpm</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 1    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 40, 41, 42, 43, 44
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">do_delete</span><span class="p">(</span><span class="mi">33</span><span class="p">);</span>  <span class="c1">// delete key not exists
+</span></span></span><span class="line"><span class="cl">  <span class="n">do_delete</span><span class="p">(</span><span class="mi">44</span><span class="p">);</span>  <span class="c1">// delete right side
+</span></span></span><span class="line"><span class="cl">  <span class="n">do_insert</span><span class="p">(</span><span class="mi">44</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">do_delete</span><span class="p">(</span><span class="mi">40</span><span class="p">);</span>  <span class="c1">// delete left side
+</span></span></span><span class="line"><span class="cl">  <span class="c1">// tree.Print(bpm);
+</span></span></span><span class="line"><span class="cl">  <span class="n">do_insert</span><span class="p">(</span><span class="mi">40</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Make root leaf split
+</span></span></span><span class="line"><span class="cl">  <span class="n">do_insert</span><span class="p">(</span><span class="mi">45</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;========================</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tree</span><span class="p">.</span><span class="n">Print</span><span class="p">(</span><span class="n">bpm</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Internal Page: 3
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 1, 43: 2
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 1    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 40, 41, 42
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 2    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 43, 44, 45
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">do_insert</span><span class="p">(</span><span class="mi">46</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">do_insert</span><span class="p">(</span><span class="mi">47</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;========================</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tree</span><span class="p">.</span><span class="n">Print</span><span class="p">(</span><span class="n">bpm</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Internal Page: 3
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 1, 43: 2
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 1    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 40, 41, 42
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 2    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 43, 44, 45, 46, 47
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">do_insert</span><span class="p">(</span><span class="mi">48</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;========================</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tree</span><span class="p">.</span><span class="n">Print</span><span class="p">(</span><span class="n">bpm</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Internal Page: 3
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 1, 43: 2, 46: 4
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 1    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 40, 41, 42
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 2    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 43, 44, 45
+</span></span></span><span class="line"><span class="cl"><span class="cm">
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Leaf Page: 4    Next: -1
+</span></span></span><span class="line"><span class="cl"><span class="cm">  Contents: 46, 47, 48
+</span></span></span><span class="line"><span class="cl"><span class="cm">  */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="search">Search
+</h3><p>实现简单 Insert 对项目有了大概的了解之后，就可以写 Search 了。</p>
+<p>Search 是最简单的函数，实现 B+ Tree Point Search 就行，拿到 ReadGuard 释放父节点，一路往下找到叶子节点就行。</p>
+<h3 id="delete">Delete
+</h3><p>Delete 是本课程最复杂的操作，虽然看起来和 Insert 差不多，但是 Insert 只需要处理目标叶子节点和上级 +N 内节点就可以了，而 Delete 需要 Steal、Merge 还需要涉及两个兄弟节点的读取和操作。
+由于过于复杂，不建议封装函数，直接在 BPlusTree 类里面操作节点就行。</p>
+<p>内节点操作关联节点图示：</p>
+<p><img src="/2026/cmu15445-p2/bplus_tree_internal_node.svg"
+	
+	
+	
+	loading="lazy"
+	
+		alt="内节点图示"
+	
+	
+></p>
+<p>BalancedDelete 不再赘述，需要注意的是我们删除的是 key 和其对应的右子树。
+如果删除后 size &lt; MinSize，就将当前叶子节点设为 &ldquo;under-filled&rdquo; 状态，然后进入递推流程开始 Steal 判定 sibling，如果无法 Steal 则进行 Merge。</p>
+<p>Delete 状态图示：</p>
+<p><img src="/2026/cmu15445-p2/bplus_tree_delete_full_flow.svg"
+	
+	
+	
+	loading="lazy"
+	
+		alt="删除全流程图示"
+	
+	
+></p>
+<h4 id="steal">Steal
+</h4><p>进入 Steal 首先获取当前 &ldquo;under-filled&rdquo; 节点，搜索其左右子兄弟，有左兄弟就用左边，没有就选择右边。</p>
+<blockquote>
+<p>左右子兄弟还有个方案是根据是否 half-full 去选择，不过略复杂而且不一定有意义</p>
+</blockquote>
+<p>如果可以 Steal，进行两个相邻节点的 Rebalancing，将右子树第一个值移到左子树最后，或者将左子树最后一个值移到右子树开头。</p>
+<ul>
+<li>叶子节点 Rebalancing 完成，更新 parent direct key 即可</li>
+<li>内节点 Rebalancing 一定要和 parent key <strong>旋转</strong>，这是整个 P2 最精髓的部分</li>
+</ul>
+<p>内节点旋转示例，按照我的笔记原样粘贴更形象：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">          40 (parent key)   -&gt;           30 (parent key)
+</span></span><span class="line"><span class="cl">0 10 20 30 0 | 0 50 60 0 0  -&gt;  0 10 20 0 0 | 0 40 50 60 0
+</span></span><span class="line"><span class="cl">v  v  v  x 0 | v  v  v 0 0  -&gt;  v  v  v 0 0 | x  v  v  v 0
+</span></span><span class="line"><span class="cl">         ↑ 30的右子树[30,40)
+</span></span><span class="line"><span class="cl">                                              ↑ [30,40)范围不能变，要和parent key旋转
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里的操作就是将 direct key 30 和它的右子树从左节点移到右节点，首先我们知道一个 direct key 两个子树分别只能得出 <code>(-oo,30)</code> <code>[30,+oo)</code> 这两个区间范围，结合 30 和 parent direct key 40 才能得出 30 的右子树最终的范围是 <code>[30,40)</code>。</p>
+<p>为了在移动过程中，保持 B+ Tree 的不变性，这里需要用到一个 <strong>旋转</strong> 特性，把 parent key 置换下来，保证每颗子树区间不变。</p>
+<p>最后如果无法 Steal，进入下一步 Merge。</p>
+<h4 id="merge">Merge
+</h4><p>Merge 是删除流程递推的最后一步。</p>
+<p>对于叶子节点：</p>
+<ol>
+<li>把右子树 KV 搬到左子树后面</li>
+<li>删掉上一级内节点的 direct key</li>
+</ol>
+<p>对于内节点：</p>
+<ol>
+<li>把右子树 KV 搬到左子树后面</li>
+<li>搬完会发现少了一个 key，需要把 parent direct key 拉下来放中间</li>
+<li>删掉上一级内节点的 direct key</li>
+<li>回收右子树，一定要 Drop 之后再 DeletePage</li>
+</ol>
+<blockquote>
+<p>DeletePage 对于 pin_count &gt; 0 会静默返回的，建议改成直接抛异常，更好排查问题</p>
+</blockquote>
+<p>到这里基本上就可以完成所有 remove tests 了，后续再讲 concurrent 相关的问题。</p>
+<h3 id="iterator">Iterator
+</h3><p>首先科普一下原生的 C++ Iterator 协议，Iterator 可以让一个类实现鸭子类型（duck typing）接口，从而让 for-loop 可以直接迭代这个类的实例。
+类似 Python 等各个语言的迭代器协议，C++ 主要实现 <code>begin()</code> 和 <code>end()</code>，大多数情况都会实现一个迭代器类去承接迭代过程中的状态变化（很少会直接返回 this）。</p>
+<p>本次课程的 B+ Tree Iterator 也是参考原生协议做的：</p>
+<ul>
+<li><code>Begin()</code>: 往下搜索最左边的叶子，创建迭代器</li>
+<li><code>End()</code>: 无效迭代器，用于终止迭代（这个和标准协议一致，比如我们常用的 <code>it != x.end()</code>）</li>
+<li><code>INDEXITERATOR_TYPE</code>: 迭代器类，需要持有 ReadGuard，同时维护当前迭代中叶子节点对应的索引位置，迭代完当前叶子就找下一个叶子</li>
+</ul>
+<p>叶子节点链表在 Insert &amp; Remove 中维护就可以，其实做起来没有想象中复杂，就是在触发分裂、合并的时候，处理相邻节点关联就行。</p>
+<h3 id="concurrency--tests">Concurrency &amp; Tests
+</h3><p>写完 B+ Tree 所有操作之后，理论上除了 <code>MixTest</code> 其他 tests 都可以通过了。</p>
+<p>接下来就是逐个分析 <code>MixTest</code> 出现的并发问题：</p>
+<h4 id="checkedwritepage-failed-to-bring-in-page-407"><code>CheckedWritePage</code> failed to bring in page 407
+</h4><p>排查思路：没法获取 PageGuard -&gt; replacer 无法淘汰 frame -&gt; SetEvictable 有并发问题。</p>
+<p>最后确实发现了我的 BPM 写法存在的问题，主要在 PageGuard Drop 回收的时候要用 <code>pin_count_.fetch_sub(1)</code> 去减少引用计数，如果计数归 0 要上锁进行 double-check <code>SetEvictable</code>，避免另一个线程创建了新的 PageGuard。（课程注释写了两个 VERY careful 警告是有道理的）</p>
+<h4 id="expected-equality-of-these-values">Expected equality of these values
+</h4><p>MixTest 出现了断言错误，很明显数据脏了，锁有问题。</p>
+<p>这个地方出动了 DeepSeek 找到了问题所在，在 <code>GetValue</code> 中 <code>GetRootPageId</code> 是我单独写的方法，方法返回后 header page ReadGuard 已经被释放了，再去获取 root 对应 ReadGuard 有个时差，导致了这个 TOCTOU（time-of-check-time-of-use）竞态。</p>
+<p>算是一个小失误吧，警告我们不要提前封装代码。</p>
+<p>其他地方的并发大多数都没什么问题，因为 B+ Tree 本身的设计就足够简洁，管理好了父节点的写锁基本上就没什么问题。</p>
+<h2 id="submit">Submit
+</h2><p>Submit 的时候遇到一个究极无语的大坑，来说结论：gradescope sign 的时候 <code>Affiliation (School/Company): none</code> 这样填会导致 Gradescope 超时。</p>
+<p>本以为超时是代码问题，卡了足足两天在尝试修复。
+后来查了 <a class="link" href="https://github.com/cmu-db/bustub/issues/52"  target="_blank" rel="noopener"
+    >相关 Issue</a> 里面提到可以提交 Original file 验证一下，于是我试了下还是超时&hellip;
+很明显就是 sign 有问题了，把 <code>Affiliation (School/Company): none</code> 的 none 改成其他字符就可以了 😡</p>
+<p>最后美美提交，一次性 AC：</p>
+<p><img src="https://blog-r2.tinyume.com/2026/cmu15445-p2/Snipaste_2026-07-22_15-11-58.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="My Benchmark"
+	
+	
+></p>
+<p>这个比分在中游水准吧，不过我已经很满足了。</p>
+<p>这个时间点去做 2024 年的课程，gradescope 剩余的提交时间只有 5 个月了，剩下的 P3 <code>Query Execution</code> 和 P4 <code>Concurrency Control</code> 说实话都挺有意思的。
+但是我太懒了，随缘做吧。</p>
+<p>之前发布 P1 的博文之后，陆陆续续收到了好几个人的来信，希望这篇文章也能帮助到更多的人吧！</p>
+<blockquote>
+<p>最近察觉到了一个事情，就是性能优化是一个非常广泛的领域，仅盯指标是很难去想象卡点在哪里的。</p>
+<p>更好的方向，或许是学习更多不同的基建原理，各种 IO、memory、disk 相关的优化，各种背压机制，将各种系统性原理转化为对性能分析的观察力。</p>
+</blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #1</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #0</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2024/hackergame-2024/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2024</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/cs144/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CS 144 TCP</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/hackergame-2023/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2023</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2026 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

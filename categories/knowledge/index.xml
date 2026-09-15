@@ -1,0 +1,1410 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>知识 on 黯梦萦辰</title>
+        <link>https://blog.tinyume.com/categories/knowledge/</link>
+        <description>Recent content in 知识 on 黯梦萦辰</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-CN</language>
+        <lastBuildDate>Tue, 15 Sep 2026 10:00:00 +0800</lastBuildDate><atom:link href="https://blog.tinyume.com/categories/knowledge/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>ResponseEnded 排障记录</title>
+        <link>https://blog.tinyume.com/2026/response-ended-analysis/</link>
+        <pubDate>Tue, 15 Sep 2026 10:00:00 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2026/response-ended-analysis/</guid>
+        <description>&lt;p&gt;本文记录一个生产环境上偶发的 HTTP 异常排障过程。
+一个看似偶发的 HTTP 接口异常，从 TCP 连接的各个层面进行分析，最终命中对方反向代理服务器源码。&lt;/p&gt;
+&lt;h2 id=&#34;背景&#34;&gt;背景
+&lt;/h2&gt;&lt;p&gt;在使用 HttpClient 通过 WebProxy 高并发调用某个外部接口时，偶尔会出现网络异常 ResponseEnded。&lt;/p&gt;
+&lt;p&gt;异常堆栈：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;System.Net.Http.HttpRequestException: An error occurred while sending the request.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ---&amp;gt; System.Net.Http.HttpIOException: The response ended prematurely. (ResponseEnded)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   --- End of inner exception stack trace ---
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   at System.Net.Http.HttpConnection.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   at System.Net.Http.HttpClient.&amp;lt;SendAsync&amp;gt;g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;该异常在日志里面相当醒目，均匀分布在所有时间段，并且不上代理就没这个问题。&lt;/p&gt;
+&lt;p&gt;尝试过使用同样的代码，在本地高并发跑脚本，但是无法复现。
+初步认定为 TCP 连接上难以复现的一个并发问题。&lt;/p&gt;
+&lt;p&gt;这是连接架构背景：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;HttpClient -&amp;gt; WebProxy (Squid) -&amp;gt; Server
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;代理使用 CONNECT 隧道进行连接，正向代理。&lt;/p&gt;
+&lt;h2 id=&#34;排查--修复&#34;&gt;排查 &amp;amp; 修复
+&lt;/h2&gt;&lt;h3 id=&#34;dotnet-trace&#34;&gt;dotnet-trace
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;dotnet-trace&lt;/code&gt; 可以收集 .NET 进程发出的各种事件，这里捞取 &lt;code&gt;System.Net.Http&lt;/code&gt; 相关的所有事件，每个请求都有对应的 connectionId，有助于排查底层 TCP 连接相关问题。&lt;/p&gt;
+&lt;p&gt;列出 dotnet 进程：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;dotnet-trace ps
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Trace:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;dotnet-trace collect -p &lt;span class=&#34;m&#34;&gt;25120&lt;/span&gt; --providers System.Net.Http:0xFFFFFFFFFFFFFFFF:5 --duration 00:20:00 -o http.nettrace
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Trace 20min，结果可以根据 host、connectionId 分组，从 &lt;code&gt;RequestFailedDetailed&lt;/code&gt; 事件中可以获取异常堆栈，从而过滤 &lt;code&gt;ResponseEnded&lt;/code&gt; 异常。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;异常事件不含 connectionId，不过异常会跟随一个 close 事件用作关联。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;分析所有连接：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;目标 host&lt;/th&gt;
+          &lt;th&gt;是否走代理&lt;/th&gt;
+          &lt;th&gt;次数&lt;/th&gt;
+          &lt;th&gt;断连年龄&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;X&lt;/td&gt;
+          &lt;td&gt;是(10.0.0.x)&lt;/td&gt;
+          &lt;td&gt;13&lt;/td&gt;
+          &lt;td&gt;~60–66s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;example.com&lt;/td&gt;
+          &lt;td&gt;是(10.0.0.x)&lt;/td&gt;
+          &lt;td&gt;6&lt;/td&gt;
+          &lt;td&gt;7.9–40.1s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;example2.com&lt;/td&gt;
+          &lt;td&gt;否(直连)&lt;/td&gt;
+          &lt;td&gt;8&lt;/td&gt;
+          &lt;td&gt;0.6–165.4s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;建连早于抓取窗口(host 未知)&lt;/td&gt;
+          &lt;td&gt;—&lt;/td&gt;
+          &lt;td&gt;7&lt;/td&gt;
+          &lt;td&gt;—&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;看目标 X 可以得知规律就是在 60-66s 发生断连。&lt;/p&gt;
+&lt;p&gt;继续分析指定 host 所有连接：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;分母&lt;/th&gt;
+          &lt;th&gt;失败率&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;按请求 13 / 44,997&lt;/td&gt;
+          &lt;td&gt;≈ 0.029%&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;按断连 13 / 558&lt;/td&gt;
+          &lt;td&gt;≈ 2.33%&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;时间维度&lt;/td&gt;
+          &lt;td&gt;13 次 / 20 分钟&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;总之就是长连接无法复用了，大概率是和 keep-alive 相关的问题。&lt;/p&gt;
+&lt;p&gt;HttpClient 的 SocketsHttpHandler 提供了两个相关的参数：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PooledConnectionIdleTimeout 连接空闲多久会自动回收，默认 1min&lt;/li&gt;
+&lt;li&gt;PooledConnectionLifetime 连接固定的生命周期，默认不限制&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这几条连接从 trace 可以确保并不空闲，排除第一条。&lt;/p&gt;
+&lt;p&gt;第二条列为嫌疑犯，继续探索。&lt;/p&gt;
+&lt;h3 id=&#34;tcp-探测脚本&#34;&gt;TCP 探测脚本
+&lt;/h3&gt;&lt;p&gt;为了探查事件的全貌，还需要更多的信息。
+于是我想到了一个可以复用 HttpClient 代码来做 TCP 探测脚本的方法。&lt;/p&gt;
+&lt;p&gt;探测原理：并发下 HttpClient 的连接复用是黑盒，但是对于串行的请求，必然会选择复用连接。
+如果 HttpConnection 存活，就会复用；如果 HttpConnection 失活，就会建立新连接。&lt;/p&gt;
+&lt;p&gt;代码很简单：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Task&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Delay&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;10&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;1000&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 留一点时间去打 trace&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;client&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;HttpClient&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;client&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;SendAsync&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;req&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;设置四组对照组实验：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对照组：通过 HKProxy 连接 X 站点（产生 ResponseEnded 的路线）&lt;/li&gt;
+&lt;li&gt;实验组 A：通过杭州 Proxy 连接 X 站点&lt;/li&gt;
+&lt;li&gt;实验组 B：通过 HKProxy 连接 Y 站点&lt;/li&gt;
+&lt;li&gt;实验组 C：直连连接 X 站点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;对照组：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;周期&lt;/th&gt;
+          &lt;th&gt;connId&lt;/th&gt;
+          &lt;th&gt;目标&lt;/th&gt;
+          &lt;th&gt;代理出口&lt;/th&gt;
+          &lt;th&gt;建连 → 关闭&lt;/th&gt;
+          &lt;th&gt;存活时间&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;第 1 轮&lt;/td&gt;
+          &lt;td&gt;4&lt;/td&gt;
+          &lt;td&gt;hkproxy 隧道&lt;/td&gt;
+          &lt;td&gt;10.0.0.4&lt;/td&gt;
+          &lt;td&gt;15:43:40.39 → 15:44:40.65&lt;/td&gt;
+          &lt;td&gt;60.27s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;第 1 轮&lt;/td&gt;
+          &lt;td&gt;5&lt;/td&gt;
+          &lt;td&gt;X&lt;/td&gt;
+          &lt;td&gt;10.0.0.4&lt;/td&gt;
+          &lt;td&gt;15:43:40.59 → 15:44:40.65&lt;/td&gt;
+          &lt;td&gt;60.07s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;第 2 轮&lt;/td&gt;
+          &lt;td&gt;6&lt;/td&gt;
+          &lt;td&gt;hkproxy 隧道&lt;/td&gt;
+          &lt;td&gt;10.0.0.4&lt;/td&gt;
+          &lt;td&gt;15:44:40.82 → 15:45:41.41&lt;/td&gt;
+          &lt;td&gt;60.59s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;第 2 轮&lt;/td&gt;
+          &lt;td&gt;7&lt;/td&gt;
+          &lt;td&gt;X&lt;/td&gt;
+          &lt;td&gt;10.0.0.4&lt;/td&gt;
+          &lt;td&gt;15:44:40.98 → 15:45:41.41&lt;/td&gt;
+          &lt;td&gt;60.43s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;第 3 轮&lt;/td&gt;
+          &lt;td&gt;8&lt;/td&gt;
+          &lt;td&gt;hkproxy 隧道&lt;/td&gt;
+          &lt;td&gt;10.0.0.1&lt;/td&gt;
+          &lt;td&gt;15:45:41.55 → 15:46:41.76&lt;/td&gt;
+          &lt;td&gt;60.21s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;第 3 轮&lt;/td&gt;
+          &lt;td&gt;9&lt;/td&gt;
+          &lt;td&gt;X&lt;/td&gt;
+          &lt;td&gt;10.0.0.1&lt;/td&gt;
+          &lt;td&gt;15:45:41.71 → 15:46:41.76&lt;/td&gt;
+          &lt;td&gt;60.05s&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;第 4 轮&lt;/td&gt;
+          &lt;td&gt;10/11&lt;/td&gt;
+          &lt;td&gt;X&lt;/td&gt;
+          &lt;td&gt;10.0.0.3&lt;/td&gt;
+          &lt;td&gt;15:46:41.89 → 抓取结束&lt;/td&gt;
+          &lt;td&gt;未关&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;数据和 trace 结果完全一致，就是 X 站点长连接存在 60s 硬中断，继续后面的实验组。&lt;/p&gt;
+&lt;p&gt;实验组：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;实验组 A：68.5s 仍活&lt;/li&gt;
+&lt;li&gt;实验组 B：&amp;gt;217s 仍活&lt;/li&gt;
+&lt;li&gt;实验组 C：&amp;gt;92.8s 仍活&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;实验组的测试时间并没有严格要求，只需要测试覆盖到大于 68s 即可。&lt;/p&gt;
+&lt;p&gt;结论：可以初步排除 HKProxy 本身问题，因为杭州 Proxy 没问题、其他站点连接没问题。&lt;/p&gt;
+&lt;p&gt;初步猜测：通过 HKProxy 可能连接到了智能 DNS 走 X 的 HK 集群，而该集群正好有配置问题。&lt;/p&gt;
+&lt;h3 id=&#34;修复&#34;&gt;修复
+&lt;/h3&gt;&lt;p&gt;既然下游未知原因 60s 断连，那只要 HttpClient 比下游更早回收连接就可以了。&lt;/p&gt;
+&lt;p&gt;改造生产环境代码，分流指定 host 的 HttpClient 构造函数把 PooledConnectionLifetime 设为低于 60s 的值，例如设置 50s，然后对比测试。&lt;/p&gt;
+&lt;p&gt;最终异常日志消失！&lt;/p&gt;
+&lt;p&gt;排查 &amp;amp; 修复到这里就结束了，但文章并不会到此结束，接下来还要探索一下根因。&lt;/p&gt;
+&lt;h2 id=&#34;httpclient-底层剖析&#34;&gt;HttpClient 底层剖析
+&lt;/h2&gt;&lt;p&gt;目前已知连接会在 60s 硬中断，尚不清楚哪方发送的 FIN 导致。&lt;/p&gt;
+&lt;p&gt;初步怀疑有两种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;源站或者代理侧发送了 FIN，正好撞上了 request flighting，产生了竞态&lt;/li&gt;
+&lt;li&gt;HttpClient 连接复用时，将尚未标记为失活的请求还在拿出来继续写入请求&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因为中间隔了一层代理，使得问题排查难度几何上升。&lt;/p&gt;
+&lt;p&gt;首先使用 AI 分析堆栈，拉取 dotnet runtime 源码，找出代码抛异常的位置。&lt;/p&gt;
+&lt;p&gt;消息文本精确匹配一个资源 Strings.resx:309-310 中 net_http_invalid_response_premature_eof = &amp;ldquo;The response ended prematurely.&amp;quot;。
+全部抛出点里 HTTP/1.1 只有两处：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HttpConnection.cs:663（SendAsync 主体内）—— 初始读后 _readBuffer.ActiveLength == 0，注释写明 &amp;ldquo;The server shutdown the connection on their end, likely because of an idle timeout&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;HttpConnection.cs:1680（FillAsync）—— 读到响应状态行/头中途 EOF&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;通过堆栈分析可以得知是第一处产生的异常，结论：请求已写完、开始读响应时，第一个读操作就返回 0（EOF），即连接在响应任何一个字节到达之前就被关闭了。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/dotnet/runtime/issues/76644&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;API Proposal&lt;/a&gt; 这里定义了一系列的 HttpRequestError 错误枚举，从 proposal 描述可以看出 &lt;code&gt;ResponseEnded&lt;/code&gt; 是较特殊的一类，理应归类为 &lt;code&gt;InvalidResponse&lt;/code&gt; / &lt;code&gt;InvalidResponseHeader&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;让我们细看 HttpClient 源码返回 ResponseEnded 的附近：
+&lt;a class=&#34;link&#34; href=&#34;https://github.com/dotnet/runtime/blob/720ba8ff5980b46e6b6fe5dcdc731299fb6526f1/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/HttpConnection.cs#L606-L664&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;HttpConnection.cs#L606-L664&lt;/a&gt; 报错条件是 &lt;code&gt;_readAheadTask&lt;/code&gt; 结束了并且 &lt;code&gt;if (_readBuffer.ActiveLength == 0)&lt;/code&gt; 缓冲区还是没数据。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;_readAheadTask&lt;/code&gt; 就是预读，主要在两处地方调用：从 ConnectionPool 取出连接和读取响应之前。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/dotnet/runtime/blob/720ba8ff5980b46e6b6fe5dcdc731299fb6526f1/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/HttpConnection.cs#L127&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PrepareForReuse&lt;/a&gt; 就是从 ConnectionPool 取出连接的时候需要判断的预读，其核心逻辑是：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#pragma&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;warning&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;disable&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CA2012&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// we&amp;#39;re very careful to ensure the ValueTask is only consumed once, even though it&amp;#39;s stored into a field&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                    &lt;span class=&#34;n&#34;&gt;_readAheadTask&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_stream&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ReadAsync&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_readBuffer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AvailableMemory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#pragma&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;warning&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;restore&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CA2012&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                    &lt;span class=&#34;c1&#34;&gt;// If the read-ahead task already completed, we can&amp;#39;t reuse the connection.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                    &lt;span class=&#34;c1&#34;&gt;// We&amp;#39;re still responsible for observing potential exceptions thrown by the read-ahead task to avoid leaking unobserved exceptions.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_readAheadTask&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;IsCompleted&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                        &lt;span class=&#34;n&#34;&gt;LogExceptions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_readAheadTask&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AsTask&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;());&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这里是异步操作，如果连接已关闭则 &lt;code&gt;_readAheadTask&lt;/code&gt; 会立刻返回 ValueTask 结果，否则就当作正常连接交出去。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/dotnet/runtime/blob/720ba8ff5980b46e6b6fe5dcdc731299fb6526f1/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/HttpConnection.cs#L1649&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;InitialFillAsync&lt;/a&gt; 这里则是读取响应之前需要判断的预读，它的逻辑很简单：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// Does not throw on EOF. Also assumes there is no buffered data.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;kd&#34;&gt;private&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ValueTask&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;InitialFillAsync&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;async&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;Debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Assert&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ReadAheadTaskHasStarted&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;Debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Assert&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_readBuffer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AvailableLength&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_readBuffer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Capacity&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;Debug&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Assert&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_readBuffer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AvailableLength&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;InitialReadBufferSize&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;bytesRead&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;async&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;?&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;k&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;_stream&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ReadAsync&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_readBuffer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AvailableMemory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;).&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ConfigureAwait&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;n&#34;&gt;_stream&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;_readBuffer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AvailableSpan&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;_readBuffer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Commit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;bytesRead&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;NetEventSource&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;IsEnabled&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Trace&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;$&amp;#34;Received {bytesRead} bytes.&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;将底层 tcp stream 数据填充到程序的缓冲池里面。
+每次 request 发送完毕之后，&lt;code&gt;await _stream.ReadAsync&lt;/code&gt; 操作就会被内核挂起，直到对端返回数据并且内核决定刷新缓冲池，数据就会同步到程序的缓冲池里面。&lt;/p&gt;
+&lt;p&gt;之所以说是预读，是因为如果对端发送了 &lt;code&gt;FIN&lt;/code&gt;，那么 &lt;code&gt;await _stream.ReadAsync&lt;/code&gt; 就会立即返回，并且不带任何数据。
+在应用层来说不必看到 &lt;code&gt;FIN&lt;/code&gt; 状态，只需要知道发送了 request，响应立即返回了，但是没有数据 —— 即 ResponseEnded (EOF)。&lt;/p&gt;
+&lt;p&gt;另外，HttpClient 有个特殊逻辑，如果预读确实失活了，那么返回给 ConnectionPool 判断是否换连接进行 retry。&lt;/p&gt;
+&lt;p&gt;是否 retry 的判断条件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Content&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;is&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;allowExpect100ToContinue&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;is&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;null&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;_canRetry&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;而我们这里是 POST 带数据请求，不可能重试。&lt;/p&gt;
+&lt;p&gt;这就是 ResponseEnded 整个内部的细节。&lt;/p&gt;
+&lt;p&gt;HttpClient 源码分析结论：写入请求之后，预读时等待 Response 遇到了 EOF 抛出异常。&lt;/p&gt;
+&lt;h2 id=&#34;fin--rst-那些事&#34;&gt;FIN &amp;amp; RST 那些事
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;恶补一下 TCP 优雅关闭、半关闭的相关知识，代理又是如何处理的。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;TCP 连接关闭有 FIN 和 RST 两种情况。&lt;/p&gt;
+&lt;p&gt;下面是一个 RST 的经典示例，在尝试读取 Response 抛出：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;System.Net.Http.HttpRequestException: An error occurred while sending the request.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ---&amp;gt; System.IO.IOException: Unable to read data from the transport connection: Connection reset by peer.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ---&amp;gt; System.Net.Sockets.SocketException (104): Connection reset by peer
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;目前我了解的几种 RST 的情况，有强制关闭主机的时候，还有代理被打爆导致无法建立 TCP 连接也会 RST。&lt;/p&gt;
+&lt;p&gt;重点是 FIN。
+FIN 是优雅关闭，某一方主动关闭连接，进入四次挥手。
+主动关闭连接的一方会进入 TCP 半关闭。&lt;/p&gt;
+&lt;p&gt;进入 TCP 半关闭状态后，可以接收数据，但无法写入数据。
+并且如果某个响应已经开始写入，关闭是不会中断数据的，而是等数据写入完成再发送 FIN。
+这个原理也能和后续分析证据串起来。&lt;/p&gt;
+&lt;p&gt;半关闭状态下，如果 client 还在尝试往 socket 写入数据，这时候对端会依据 RFC 1122 回复 RST，否则就会造成连接永久挂起等问题。
+这也是我遇到这个问题时，最初猜测的高并发竞态问题，不过 ResponseEnded 并不是 RST 引起的，而是 FIN。
+所以我们的目标还是不变的 —— 找出谁发的 FIN。&lt;/p&gt;
+&lt;p&gt;代理大体分为两种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;L4（数据层）：透明代理&lt;/li&gt;
+&lt;li&gt;L7（应用层）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;L7 又分为两种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;正向代理：HTTPS 通过 CONNECT 连接，端到端流量透传，看不到任何 HTTP 语义信息&lt;/li&gt;
+&lt;li&gt;反向代理：能看明文，改 XFF，自由控制长连接&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Squid 我们设置为 L7 正向代理，也有空闲连接和生命周期相关的设置，不过我们也和 SRE 确认过并无特殊设置。
+鉴于安全和敏感问题，很难登录代理机器排查。&lt;/p&gt;
+&lt;p&gt;根据之前对照实验，这里代理问题概率很小，可以先不看。&lt;/p&gt;
+&lt;h2 id=&#34;tcpdump&#34;&gt;tcpdump
+&lt;/h2&gt;&lt;p&gt;tcpdump 是 Linux 下的一个强大的抓包工具。&lt;/p&gt;
+&lt;p&gt;抓包命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tcpdump -i any -nn -s &lt;span class=&#34;m&#34;&gt;256&lt;/span&gt; -B &lt;span class=&#34;m&#34;&gt;4096&lt;/span&gt; -w ./hkproxy.pcap &lt;span class=&#34;s2&#34;&gt;&amp;#34;tcp and port 3128 and net 10.0.0.0/28&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;抓取 30 分钟。
+只抓 packet 前 256 个字节，过滤 tcp:3128 和 &lt;code&gt;10.0.0.0/28&lt;/code&gt;，这是代理的内网地址。&lt;/p&gt;
+&lt;p&gt;分析原理：tcpdump 的每条连接可以按照五元组 &lt;code&gt;源 IP + 源端口 + 目的 IP + 目的端口 + 传输层协议&lt;/code&gt; 来区分。每个 tcp packet 时序是分析的关键。&lt;/p&gt;
+&lt;p&gt;直接交给 deepseek-4.1-flash (ds4f) 开搞，方向很明确：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;找出所有连接的年龄&lt;/li&gt;
+&lt;li&gt;找出是谁在关闭连接&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;经过一番捣鼓，过滤掉空闲连接的干扰，用 matplotlib 输出 svg，结果非常清晰。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;服务器一般都会掐掉空闲连接，默认时长为一分钟，一定要过滤掉&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://blog.tinyume.com/2026/response-ended-analysis/tcpdump_analysis.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;分析结果&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如上图所示，结果非常有意思！&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;约 90% 连接都是 HttpClient 主动 FIN 的，关闭时间在 60.18-65.28 s 指数分布。&lt;/li&gt;
+&lt;li&gt;约 10% 连接是对端主动 FIN 的，关闭时间在 66.17-66.20 s 聚集。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;tcpdump 看不到 HTTP 层语义和 trace 异常，能力有限，不过这个分析报告给了我们极大的启发！&lt;/p&gt;
+&lt;p&gt;接下来分两部分解谜：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HttpClient FIN&lt;/li&gt;
+&lt;li&gt;Peer FIN&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;httpclient-fin&#34;&gt;HttpClient FIN
+&lt;/h3&gt;&lt;p&gt;在此之前，我们一直误以为 HttpClient 默认只会回收空闲连接，却遗忘了一种情况：对方响应携带了 &lt;code&gt;Connection: Close&lt;/code&gt; 响应头。&lt;/p&gt;
+&lt;p&gt;该响应头通常用于 &lt;code&gt;Server-side Draining&lt;/code&gt; —— 需要优雅回收连接的情况。
+例如服务器进程关闭，阻止新建入站连接，但是还有活跃连接需要回收。
+最经典的就是 Go 服务器的 &lt;code&gt;Graceful shutdown&lt;/code&gt;，&lt;code&gt;ctrl+c&lt;/code&gt; 不会立即退出进程，而是等待网络请求处理完成，或者连按两次 &lt;code&gt;ctrl+c&lt;/code&gt; 强杀。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;滚动发布不会排空连接。负载均衡器（L7 反向代理）会首先将机器流量降为 0，但是不会关闭 Client-LB 之间的连接，而是把新请求转发到其他服务器上。所以滚动发布对 Client 是完全无感的。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;第一时间想到，这是对方服务器的一种优雅回收连接的策略。
+对方配置了类似 &lt;code&gt;KeepAliveLifetime=60s&lt;/code&gt; 的参数，那么到了 60s 之后，响应就会附加 &lt;code&gt;Connection: Close&lt;/code&gt; 返回，如果没有请求过来，那么 66s 就直接超时发送 FIN。&lt;/p&gt;
+&lt;p&gt;之前我们写了一个 TCP 探测脚本，现在稍微修改一下，让它打印 &lt;code&gt;Connection&lt;/code&gt; 响应头。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     176ms HTTP200 sendAt=59.6s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     199ms HTTP200 sendAt=59.8s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     185ms HTTP200 sendAt=60.0s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     202ms HTTP200 sendAt=60.1s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     178ms HTTP200 sendAt=60.3s  Connection=close
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     374ms HTTP200 sendAt=60.5s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     189ms HTTP200 sendAt=60.9s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     178ms HTTP200 sendAt=61.1s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK     182ms HTTP200 sendAt=61.3s  Connection=
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;果然是对方在 60s 准点响应了 &lt;code&gt;Connection: Close&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;这就是 60s 硬中断的根因，不过和 ResponseEnded 无直接关联，让我们继续分析。&lt;/p&gt;
+&lt;h3 id=&#34;peer-fin&#34;&gt;Peer FIN
+&lt;/h3&gt;&lt;p&gt;对端为何会在 66s 主动发送 FIN 呢？&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://nginx.org/en/docs/http/ngx_http_core_module.html#keepalive_time&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Nginx 文档&lt;/a&gt; 介绍了 &lt;code&gt;keepalive_time&lt;/code&gt; 参数作为连接生命周期。
+从 nginx 源码也发现它并不会主动 draining 连接，而是不管不顾，等 idle 超时后自动回收。&lt;/p&gt;
+&lt;p&gt;这里需要进一步分析 dotnet-trace。&lt;/p&gt;
+&lt;p&gt;之前打了很多 nettrace 文件，挑一份专看 ResponseEnded 的连接，列一个事件格栅图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://blog.tinyume.com/2026/response-ended-analysis/respended_raster.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;事件格栅图&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;图中所示，一共 13 条连接抛 ResponseEnded，每条连接在 0-60s 都是活跃状态，只是请求数多少的区别。
+共同点在于都在 60-65s 空闲，65-66s 最后发出那条请求无一例外都遇上了 ResponseEnded。
+断连时间点位于 65.962 – 66.001 s 之间，极差 39 ms。&lt;/p&gt;
+&lt;p&gt;规律非常整齐！完全匹配我之前说的猜测：60s 优雅回收，60-66s 如果没有请求过来，那么 66s 就直接超时发送 FIN。&lt;/p&gt;
+&lt;h3 id=&#34;两个关闭方向&#34;&gt;两个关闭方向
+&lt;/h3&gt;&lt;p&gt;两个关闭方向：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;60s&lt;/code&gt; -&amp;gt; &lt;code&gt;Connection: Close&lt;/code&gt; -&amp;gt; &lt;code&gt;Client-side FIN&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;60s&lt;/code&gt; -&amp;gt; &lt;code&gt;No Request (draining 6s)&lt;/code&gt; -&amp;gt; &lt;code&gt;Server-side FIN&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;第一条路径是 60s 硬中断的根因。
+第二条路径的 &lt;code&gt;Server-side FIN&lt;/code&gt; 是 ResponseEnded 的直接原因。&lt;/p&gt;
+&lt;h2 id=&#34;抓鬼环节---envoy&#34;&gt;抓鬼环节 - Envoy
+&lt;/h2&gt;&lt;p&gt;首先探测对方到底是什么鬼服务器：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(base) PS C:\Users\user&amp;gt; curl.exe --proxy http://proxy -s -o NUL -D - --max-time 10 https://target
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;HTTP/1.1 200 Connection established
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;HTTP/1.1 404 Not Found
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ag-http-server-time: 817 mcs
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ag-service-name: &amp;lt;service-name&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ag-service-version: &amp;lt;x.y.z&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;x-server-name: &amp;lt;pod-id&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;x-app-version: &amp;lt;x.y.z&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;date: Thu, 10 Sep 2026 07:18:54 GMT
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;content-type: text/plain; charset=UTF-8
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;content-length: 42
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;x-envoy-upstream-service-time: 3
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;x-envoy-upstream-address: &amp;lt;deployment&amp;gt;-&amp;lt;replicaset-hash&amp;gt;-&amp;lt;pod-id&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;x-envoy-datacenter: &amp;lt;region&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;运气很好，Header 直接可以看出来是 Envoy 反代。&lt;/p&gt;
+&lt;p&gt;Envoy 正好有个 &lt;a class=&#34;link&#34; href=&#34;https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-connection-duration&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;max_connection_duration&lt;/a&gt; 参数，并且特意提到了 &lt;code&gt;drain_timeout&lt;/code&gt; 的设置。&lt;/p&gt;
+&lt;p&gt;接下来看 Envoy 源码，C++ 的代码太复杂了，让 ds4f 直接出结论：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;H1.1 完整时序（每一步的行号都读过）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;T+0     accept，arm timer
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        conn_manager_impl.cc:295-300       (max_connection_duration × jitter)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;T+60    onConnectionDurationTimeout()      conn_manager_impl.cc:884-903
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          → startDrainSequence()           conn_manager_impl.cc:1802-1808
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              drain_state_ = Draining
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              codec_-&amp;gt;shutdownNotice()   ← H1 空实现  http1/codec_impl.h:273
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;              drain_timer(drain_timeout = 5s 默认)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   ├─ A：T+60~65 之间有请求 ────────────────────────────────
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   │    响应编码 → encodeHeaders
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   │    conn_manager_impl.cc:2114
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   │      drain_state_(Draining) != NotDraining   ✓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   │      protocol() &amp;lt; Http2  (H1.1)              ✓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   │      → 2120  headers.setReferenceConnection(ConnectionValues.Close)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   │    → 响应带 Connection: close 发出
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   │
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   └─ B：T+60~65 之间无请求 ────────────────────────────────
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        T+65  drain_timer 到 → onDrainTimeout()   conn_manager_impl.cc:905-910
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                codec_-&amp;gt;goAway()      ← H1 空实现  http1/codec_impl.h:271
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                drain_state_ = Closing
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                checkForDeferredClose(false)      conn_manager_impl.cc:336-347
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                  drain_state_ == Closing   ✓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                  streams_.empty()          ✓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                  !codec_-&amp;gt;wantsToWrite()   ✓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                  → doConnectionClose(FlushWriteAndDelay)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                       delayed_close_timeout = 1000ms 默认  (proto:703)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        T+66  → FIN
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这个结论也很有意思！回想之前的事件格栅图，最后一个请求是在 &lt;code&gt;65-66s&lt;/code&gt; 期间发出的，而对方是在 &lt;code&gt;66s&lt;/code&gt; 准点才发出 FIN。
+说明对方不受理 &lt;code&gt;65-66s&lt;/code&gt; 期间发出的请求。&lt;/p&gt;
+&lt;p&gt;其原因就和 &lt;a class=&#34;link&#34; href=&#34;https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-delayed-close-timeout&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;delayed_close_timeout&lt;/a&gt; 参数相关，这个是 TCP 半关闭状态的一个核心参数，官方文档也给了该参数相当多的描述。
+总结下来就是当连接关闭时，不会立即关闭 socket，而是转为只读状态，目的是等待对方先发送 FIN，如果没能等到才会主动发起 FIN，默认超时为 1s。&lt;/p&gt;
+&lt;p&gt;时序是这样的：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;T&lt;/code&gt; 建立了一条新连接，直到 &lt;code&gt;T+60&lt;/code&gt; 都是活跃的&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;T+60&lt;/code&gt; Envoy max_connection_duration 触发，尝试附加 &lt;code&gt;Connection: Close&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;T+60~65&lt;/code&gt; 无请求&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;T+65&lt;/code&gt; Envoy drain_timeout 触发，立即更改状态机 Closing&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;T+65~66&lt;/code&gt; Client 不知道连接已失活，继续发起一条请求，挂起&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;T+66&lt;/code&gt; Envoy delayed_close_timeout 触发，连接仍未关闭，立即发送 FIN&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;T+66&lt;/code&gt; Client 收到 FIN，认为是 EOF，抛 ResponseEnded 异常&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;核心问题就在于 H1.1 协议下，没有 GOAWAY，也没有请求的话，Envoy 无法通知对端连接即将关闭，永远等不到 FIN。
+如果对端正好在 &lt;code&gt;T+65~T+66&lt;/code&gt; 窗口发送了请求，Envoy 是不会处理的。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;66 = 60(max_connection_duration) + 5(drain_timeout) + 1(delayed_close_timeout)&lt;/code&gt; 等式成立，这样全文就串起来了。
+这并不是一个高并发竞态的问题，而是 Envoy 的特殊行为导致的偶发故障，这也解释了为什么高并发脚本无法复现该问题。&lt;/p&gt;
+&lt;h2 id=&#34;总结&#34;&gt;总结
+&lt;/h2&gt;&lt;p&gt;本文是笔者第一次使用 trace &amp;amp; tcpdump 工具去分析生产问题，过程虽曲折，但从中学习到了很多知识，而不仅仅是解决掉了一个故障。&lt;/p&gt;
+&lt;p&gt;对于长连接关闭的偶发性故障，难以使用 curl 等工具简单复现，也难以直观看出规律。
+我的做法是通过 trace &amp;amp; tcpdump 文件分析，一步步地去探查规律。
+这个过程是比较艰难的，因为文件分析需要编写大量的脚本，不过好在有 ds4f 的帮助，几乎两三天就能触及根因。
+不过，这依旧是个很复杂的工作，需要有相当多的 TCP 排障经验才能闭环故障。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;此外，本文还深入地探索了很多源码层的细节，这些内容虽然不会对业务有帮助，但阅读 HttpClient 源码还是比较有意思的。&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        </item>
+        <item>
+        <title>初识 C# Interceptors</title>
+        <link>https://blog.tinyume.com/2026/intro-csharp-interceptors/</link>
+        <pubDate>Fri, 17 Jul 2026 17:00:00 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2026/intro-csharp-interceptors/</guid>
+        <description>&lt;p&gt;2026 年来讲这个特性可能有点火星了，不过 C# Interceptors 确实给了我一些惊喜，故想写篇文章介绍一下。&lt;/p&gt;
+&lt;p&gt;Interceptors 在 &lt;code&gt;.NET 8&lt;/code&gt; 上面是实验性功能，&lt;code&gt;.NET 9.0.2xx&lt;/code&gt; 之后成为稳定性功能。
+在 &lt;code&gt;.NET 10&lt;/code&gt; LTS 之后的版本开始流行使用这个特性。
+一上来就看 Interceptors 是比较难以理解的，它通过 Analyzer hook 进编译管线，这里就先从 Analyzer 讲起。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;为什么要用它？&lt;/p&gt;
+&lt;p&gt;我们使用编译器魔法，本质上就是元编程，可以将反射开销全部优化掉，速度变快，也能 AOT (Ahead of time) 友好，AOT 是近年 C# 快速发展的一个特性。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;roslyn-analyzer&#34;&gt;Roslyn Analyzer
+&lt;/h2&gt;&lt;p&gt;理解 C# 编译器管线之前，需要知道 Roslyn 起到一个什么样的作用。&lt;/p&gt;
+&lt;p&gt;类似于 Python ast，它们起到的作用都是 &lt;strong&gt;解析 (Parse)&lt;/strong&gt; 和 &lt;strong&gt;分析 (Analysis)&lt;/strong&gt; 语法树。
+Parse 的部分大差不差，在分析部分 Python ast 仅仅提供了一个简易的 NodeVisitor，而 Roslyn 提供了一整套的 Semantic Model，无需像 Python 那样写复杂的代码分析。&lt;/p&gt;
+&lt;p&gt;Semantic Model 就是一个获取类型推断信息的语义模型，最直观的就是 IDE 的 &lt;code&gt;Go to Definition&lt;/code&gt;。
+Python 写 Semantic Model 的痛苦程度看看 mypy 就知道了（以及我写的 &lt;code&gt;nb-autodoc&lt;/code&gt;）。
+Roslyn 相当于是微软提供的轮椅，它包含了一整套分析静态代码产生完整类型推断的工具链，这些信息都是和 Ast 相关联的，Linter 可以从中拿到类型推断，产生分析结果，最终反馈在源码的具体每个字符上。&lt;/p&gt;
+&lt;p&gt;现代，将各种编译器诊断接入到 IDE 用 LSP (Language Server Protocol) 已然是标准做法，而各种不同编程语言如何编写 Linter 则产生了非常多的方法。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Go (gopls)、C++ (clangd) 等用的是官方编译器 API。&lt;/li&gt;
+&lt;li&gt;Python (pyright) 则比较别具一格地用 Typescript 来解析 Python 的源码。&lt;/li&gt;
+&lt;li&gt;TypeScript (tsc/eslint) 则是类型检查 -&amp;gt; 类型擦除 -&amp;gt; JS Linter。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;C# 是其中最灵活的一种插件式系统，它定义了一种叫做 Analyzer 的项目类型，通过将 Analyzer 定义在待分析项目依赖里面，编译器进程去读取并加载，无需用户去引入第三方工具、兼容 IDE 什么的。&lt;/p&gt;
+&lt;p&gt;从 IDE 的角度来看执行流程：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;IDE
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Microsoft.CodeAnalysis.LanguageServer.dll
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Project Analyzers (.csproj)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Diagnostics
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;需要注意的是 Roslyn 和 Analyzer 本身都是一个包，它们的宿主是编译器。
+为了兼容各个版本 dotnet SDK 或者甚至不同编译器的 TargetFrameworks 支持列表，Analyzer 项目版本必须要和各种编译器进程兼容，即公认 &lt;code&gt;netstandard2.0&lt;/code&gt;。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Roslyn Analyzer 相当于是一个用 C# 实现的 C# 分析器罢了，本质上也可以用其他语言来实现，例如 F#，前提是兼容 &lt;code&gt;netstandard2.0&lt;/code&gt; 标准的 dll 程序集。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;回顾一下 C# 进行一次编译的时候，输入是多个源代码文件 + &lt;code&gt;.csproj&lt;/code&gt; package reference + project reference + OutputType 等多个编译选项，输出就是 &lt;code&gt;&amp;lt;assemblyName&amp;gt;.dll&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;加入代码诊断 Diagnostics Analyzer 的编译流程大概上就是这样：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;AST → Semantic Model → Analyzer -&amp;gt; Diagnostics
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Compile (Symbols + Definitions)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Lowering + Optimization
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Assembly (.dll)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;source-generator&#34;&gt;Source Generator
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Source Generator (SG) 大约在 2020 年推出，一种在不修改源码基础上新增代码的方式，在最终编译的时候才将这些新文件一起编译进去。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;SG 一般会配合 attribute / partial 这两个 C# 特性一起用，例如先用声明式写一段代码：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;partial&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Foo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;    [Name(&amp;#34;Guru&amp;#34;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;    [Say(&amp;#34;Hello!&amp;#34;)]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;partial&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Bar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;通过在项目定义一个 SG Analyzer（这个具体怎么写就不展开了）并开启 &lt;code&gt;&amp;lt;EmitCompilerGeneratedFiles&amp;gt;true&amp;lt;/EmitCompilerGeneratedFiles&amp;gt;&lt;/code&gt; 调试选项，就会在 &lt;code&gt;obj/Debug/net10.0/generated&lt;/code&gt; 下面看到一个新文件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// Same namespace&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;partial&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Foo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kd&#34;&gt;partial&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Bar&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// behind implementation&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;kt&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;Guru&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;kt&#34;&gt;var&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;saying&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;Hello!&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;System&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Console&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;WriteLine&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;$&amp;#34;{name} says {saying}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;SG 的特点是在完全不改变用户代码语义（包括类型检查）的情况下，用 partial / extension method 等方法去拓展源码。&lt;/p&gt;
+&lt;p&gt;SG 也是 Analyzer，上面说的诊断 Analyzer 继承 &lt;code&gt;DiagnosticAnalyzer&lt;/code&gt; 基类，而 SG 基于 &lt;code&gt;IIncrementalGenerator&lt;/code&gt; 接口实现。&lt;/p&gt;
+&lt;p&gt;加入了 Source Generator 的编译流程是这样的：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;AST → Semantic Model → Analyzer (Source Generator) -&amp;gt; New Files
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Compile (Symbols + Definitions + New Files)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Lowering + Optimization
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Assembly (.dll)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;interceptors&#34;&gt;Interceptors
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Interceptors 大约在 2025 年底成为稳定特性，可以拦截函数调用并替换为另一个调用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;理解了 Analyzer 之后，再来阅读 &lt;a class=&#34;link&#34; href=&#34;https://github.com/dotnet/roslyn/blob/main/docs/features/interceptors.md&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Interceptors 官方文档&lt;/a&gt; 就很清晰易懂了。
+Interceptors 本质和 SG 一样，都是基于 &lt;code&gt;IIncrementalGenerator&lt;/code&gt; 接口实现，都是 Generate New Files。&lt;/p&gt;
+&lt;p&gt;Interceptors 特性就是不需要通过魔改代码，实现拦截并替换项目内任何地方的 Invocation（函数调用）。&lt;/p&gt;
+&lt;p&gt;原理：Interceptors 和 SG 同样是产生新文件，区别在于 Interceptors 扫描代码时可以根据 Invocation 创建一个拦截点，将其重定向到新文件里的新函数，交给 Compiler 去处理拦截点。&lt;/p&gt;
+&lt;p&gt;编译流程在 Compile 之后多了一个 Interceptors Replace 的步骤，指导 Compiler 去接管 &lt;strong&gt;指定位置&lt;/strong&gt; 代码的函数调用：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;AST → Semantic Model → Analyzer (Source Generator) -&amp;gt; New Files
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Compile (Symbols + Definitions + New Files)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Interceptors Replace
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Lowering + Optimization
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Assembly (.dll)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;文档介绍的 &lt;code&gt;GetInterceptableLocation(this SemanticModel, InvocationExpressionSyntax, CancellationToken)&lt;/code&gt; 便是用于生成位置编码的函数。&lt;/p&gt;
+&lt;p&gt;整体看下来还是比较简单的，做 ast 本身就有很多 polyfill 这里就不讲了，实现的时候就知道了。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/iyume/Iyume.JsonPath&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Iyume.JsonPath&lt;/a&gt; 是我根据 Interceptors 特性 vibe coding 出来的，可以在编译时就确定 JsonPath 的路径生成静态代码，感兴趣的也可以看看。
+（有些细节还没空去调整，比如生成的 Location 与函数如何复用）&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Stable diffusion 笔记</title>
+        <link>https://blog.tinyume.com/2023/stable-diffusion-tips/</link>
+        <pubDate>Sat, 18 Nov 2023 20:10:47 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2023/stable-diffusion-tips/</guid>
+        <description>&lt;h2 id=&#34;preface&#34;&gt;Preface
+&lt;/h2&gt;&lt;p&gt;新笔记本暗影精灵 9 锐龙版自从 6 月多到手后，换了两次系统 —— 换到 win10 发现驱动没有 win10 支持所以又换了回去 win11。
+到了 9 月多时，想着拿这 8g 显卡跑点啥，正好又对 Stable diffusion 感兴趣，于是研究了几天源码，跑了几天训练效果对比。
+最终结果还是不尽人意，数据集不全是一方面的问题，还有我的 8g 显卡不支持我对模型继续深入研究了。&lt;/p&gt;
+&lt;p&gt;原本 9 月底炼的差不多时就想着写一篇文章介绍一下 Stable diffusion，但是不知道为什么忘了（转头像转的）。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;此文章旨在用阐述我对 Stable diffusion 源码和架构的一些理解，以及对于 “为什么我炼不出波奇酱？” 这个问题的解答。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;脚本&#34;&gt;脚本
+&lt;/h2&gt;&lt;p&gt;文章用的是 diffusers 提供的示例脚本:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/huggingface/diffusers/tree/main/examples&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/huggingface/diffusers/tree/main/examples&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;对于略微有点 neural network 知识的人都可以上手。
+此外还有面向新手的 &lt;a class=&#34;link&#34; href=&#34;https://github.com/7eu7d7/HCP-Diffusion&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;HCP-Diffusion&lt;/a&gt; 值得推荐，照着它给的 example yaml 改改就能跑。
+相对于 diffusers 和 hcpdiff，&lt;a class=&#34;link&#34; href=&#34;https://github.com/kohya-ss/sd-scripts&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;sd-scripts&lt;/a&gt; 是对 diffusers 的脚本进行的拓展，但是提供的脚本复杂难以配置，不建议使用。不过 &lt;a class=&#34;link&#34; href=&#34;https://github.com/bmaltais/kohya_ss&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;基于 sd-scripts 的 GUI&lt;/a&gt; 可以考虑使用。&lt;/p&gt;
+&lt;h2 id=&#34;sd-模型结构&#34;&gt;SD 模型结构
+&lt;/h2&gt;&lt;p&gt;一个 SD 模型组成:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;FeatureExtractor (safety checker 专用)&lt;/li&gt;
+&lt;li&gt;Tokenizer, TextEncoder (text)&lt;/li&gt;
+&lt;li&gt;Scheduler (add noise)&lt;/li&gt;
+&lt;li&gt;UNet (denoise)&lt;/li&gt;
+&lt;li&gt;VAE (Variant Auto Encoder)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;上面的部件中除了 UNet，其余都是预训练的。
+FeatureExtractor, TextEncoder 这些是通用型权重，就和从 resnet 独立出 feature extractor 一个道理。&lt;/p&gt;
+&lt;p&gt;VAE 也是预训练的，但是有很多人会误解它的方法和作用。
+网上查不到具体训练方法，论文里讲的也不多，在 G. Details on Autoencoder Models 那一部分。
+我的猜测是和 AE 差不多，img -&amp;gt; latents -&amp;gt; img 的自监督训练。其中的 latents 和 embeddings 有异曲同工之处，区别在于 latents 作为模型输入，有具体形状，embeddings 作为上下文嵌入，一般是 linear features。
+VAE 的 encoder 可以实现 img2img 的效果，下面会具体讲讲。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;VAE 细节：源码里的 VAE encoder 输出是 8 维的，会使用一个叫做 &lt;code&gt;DiagonalGaussianDistribution&lt;/code&gt; 的模型进行变分处理（大概是为了增强重建能力），同时这个变分模型也提供了合并方法输出 4 维，再输入到 UNet。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这里是我根据 diffusers 文档实现的完整 pipeline: &lt;a class=&#34;link&#34; href=&#34;https://github.com/iyume/diffusers-test/blob/main/tours/diffusers_tour_pipeline_depart.py&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/iyume/diffusers-test/blob/main/tours/diffusers_tour_pipeline_depart.py&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;text-to-image&#34;&gt;text-to-image
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;tokenize prompt&lt;/li&gt;
+&lt;li&gt;根据 tokens 和 textual inversion weights 进行 token -&amp;gt; vectors 映射&lt;/li&gt;
+&lt;li&gt;创建一个长度相同的 uncond_embeddings 并 concat 进去（N+1），旨在使用 CFG Scale (guidance_scale) 控制结果与 prompt 的贴合程度&lt;/li&gt;
+&lt;li&gt;创建噪声图，scheduler 循环 timestep 调用 UNet 降噪，embedding 在 UNet 内部处理&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;UNet 有个 time embedding 我没看懂，不知道为什么要将 text embedding 转换为 time embedding。参照 &lt;a class=&#34;link&#34; href=&#34;https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/unet_2d_condition.py#L925&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;1&lt;/a&gt; &lt;a class=&#34;link&#34; href=&#34;https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/embeddings.py#L238&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;2&lt;/a&gt; &lt;a class=&#34;link&#34; href=&#34;https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/embeddings.py#L190&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;3&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;image-to-image&#34;&gt;image-to-image
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;利用 VAE encoder 将图像编码为 latents&lt;/li&gt;
+&lt;li&gt;根据 step 和 strength 调用 scheduler 对 latents 增加噪声&lt;/li&gt;
+&lt;li&gt;scheduler 循环 timestep 调用 UNet 降噪，有 prompt 的话就载入 text embedding&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;context-embeddings&#34;&gt;Context Embeddings
+&lt;/h3&gt;&lt;p&gt;Context Embeddings 是 Stable diffusion 模型里面一个非常重要的设计，用于接受各种各样的输入，如文本、图像、音乐、语音。
+embeddings 并不是多模态，它们有着重要的区别：Stable diffusion 只能接受单一种类的 embedding，除非使用 adapter 模型对各种潜在空间进行相互转换。&lt;/p&gt;
+&lt;p&gt;具体的嵌入方法就是 Attention 注意力机制。
+Attention 是一个单独的层，大部分有着独立的权重，用于改变输出，一般不影响输出的尺寸。&lt;/p&gt;
+&lt;p&gt;就我个人经验而言，在传统的 CNN 领域里，Attention 一般分为 Channel Attention 和 Spatial Attention，根据维度的不同，计算方差或者其他类似的值，加到结果内。&lt;/p&gt;
+&lt;p&gt;在 Stable diffusion 则是一个叫做 &lt;a class=&#34;link&#34; href=&#34;https://github.com/huggingface/diffusers/blob/4e54dfe985293df9e6e86828d7a2763d076879f5/src/diffusers/models/transformer_2d.py#L45&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Transformer2DModel&lt;/a&gt; 的模型，比较复杂没细看。&lt;/p&gt;
+&lt;h2 id=&#34;训练方法&#34;&gt;训练方法
+&lt;/h2&gt;&lt;p&gt;基于 RTX 4060 Laptop 8G 测试，只跑得动 textual inversion 和 lora，所以只对这两个训练方法做介绍。&lt;/p&gt;
+&lt;p&gt;训练图片采用的是 16 张从 TV 截图的波奇酱的图片，每两张在 anythingv5 模型上做了 img2img 风格化处理（对于 lora 似乎影响不大），所以眼睛会略微偏蓝。&lt;/p&gt;
+&lt;h3 id=&#34;textual-inversion&#34;&gt;Textual Inversion
+&lt;/h3&gt;&lt;p&gt;文本反转，即不是通过改变权重来改变模型效果，而是通过改变输入来改变输出。&lt;/p&gt;
+&lt;p&gt;训练 textual inversion 时，通过创建一个 tokenizer 不认识的 token，映射至对应的向量，这个向量长度可以由 num_vectors 控制。
+向量长度越大，输出的权重文件也就越大，一般 32 vectors 对应 97 kb。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在 tokenizer 中，一个 word 是有可能对应多个 token 的，比如 girls 会被拆分为 girl, s&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;**结果评价：**训练时间 1 小时。97 KB (32 vectors)。
+完全无法训练姿态，只会扭曲模型效果（姿态有关的都只能采用 ControlNet 和 openpose）。动漫人物的发饰、呆毛、眼球等细节完全无法还原，容易产生撕裂现象，还有模糊不清。大概只能训练结合模型已有的物品。非常容易破坏模型风格。&lt;/p&gt;
+&lt;p&gt;综上，Textual Inversion 是一个很黑盒很 DNN 的操作，大炼丹师或许可以得到非常小的权重和非常完美的结果，或者是大魔法师配合优秀的 prompt 也能得到不错的结果，但是不建议使用这个训练方法。&lt;/p&gt;
+&lt;p&gt;下图是使用单 keyword (gotou_hitori) 不搭配任何 prompt 生成的图像：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_ti_single_word.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;下图是使用 keyword 搭配 prompt 生成的图像：&lt;/p&gt;
+&lt;p&gt;使用了类似 &lt;code&gt;[[gotou_hitori:0.2]::0.8]&lt;/code&gt; 的 prompt 魔法。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_ti_prompted.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;text-to-image-1&#34;&gt;text-to-image
+&lt;/h3&gt;&lt;p&gt;最原始的方法，旨在训练整个 UNet。&lt;/p&gt;
+&lt;p&gt;对降噪误差做 backward，比如 DDIM 有 50 timestep，对 20 至 21 的降噪步骤相减并 backward。&lt;/p&gt;
+&lt;p&gt;我这里只用了 text-to-image lora 脚本，没有记录训练时间，但是我记得和 textual inversion 的训练时长差不多，且模型效果比 textual inversion 还差，大概率是因为数据集不完善。diffusers 的官方脚本没更新，只能用它老一套的 datasets 载入，比较麻烦。&lt;/p&gt;
+&lt;p&gt;评价为不好用，要求数据集完善，可以被 dreambooth 完美取代。&lt;/p&gt;
+&lt;h3 id=&#34;dreambooth&#34;&gt;Dreambooth
+&lt;/h3&gt;&lt;p&gt;参照官方的 &lt;a class=&#34;link&#34; href=&#34;https://dreambooth.github.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dreambooth 讲解&lt;/a&gt;。
+Dreambooth 也是训练整个 UNet 的方法，但是速度快，要求数据集小。&lt;/p&gt;
+&lt;p&gt;我这里只训练了 dreambooth lora 脚本。训练的关键参数是 rank，类似于 textual inversion 中的 num_vectors。
+rank 越高表示控制的维度越深，同时权重文件也会越大，也更容易过拟合。&lt;/p&gt;
+&lt;p&gt;防止过拟合的方法最简单的就是用 tensorboard 看看每一百步生成的测试图像。&lt;/p&gt;
+&lt;p&gt;**结果评价：**训练时间 10 分钟，可以关掉 validation。3 MB (rank 1)。
+对动漫人物的学习（建议 rank&amp;gt;10）可以达到略胜于 Textual Inversion 的效果，主要是不容易影响模型自带的风格，模型兼容性也比 TI 更好。但对于波奇酱的方块发饰则很难达到好的效果，生成出来要么是圆的，要么一大一小，只有极小概率会生成出不错的发饰。&lt;/p&gt;
+&lt;p&gt;参考生成图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_dreambooth_lora.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Dreambooth lora test&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;第一张的效果最佳，不过呆毛偏上了点。相比于 TI 来说，lora 不需要搭配太多 prompt，只要 &lt;code&gt;&amp;lt;lora:gotou_hitori&amp;gt;&lt;/code&gt; 载入 lora 即可达到不错的效果。&lt;/p&gt;
+&lt;h2 id=&#34;高清生成&#34;&gt;高清生成
+&lt;/h2&gt;&lt;p&gt;最后放一张使用 anime6k 配合 prompt 咒语生成的高清图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/iyume/diffusers-test/output_highres_hitori_balloon.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;波奇酱高清&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;里面应该是包含了 generation data 的。话说现在居然还没有一个便利的查看/修改 generation data 的工具，打算自己写一个了。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;笔记&#34;&gt;笔记
+&lt;/h2&gt;&lt;p&gt;随手记的一个笔记&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-txt&#34; data-lang=&#34;txt&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CFG Scale(classifier-free guidance): 提示词和生成图像的贴合程度
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Outpainting: 向外延展画布
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Inpainting: 修复图像内部空缺
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Color Sketch: 为素描画填充颜色
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Prompt Matrix: 提示词矩阵，用 | 分割提示词的排列组合进行扩散
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Pormpt S/R: 提示词 Search/Replace，搜索替换并矩阵扩散
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Prompt Editing: [from:to:when] 控制每次 inference step 的 prompt
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(()) 给予更多权重，(word:1.111) 权重分配
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;X/Y/Z plot: 同 X/Y plot，根据不同输入参数（提示词，CFG scale，step 等）创建输出矩阵
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Textual Inversion: 将特定提示词和相关图像嵌入模型进行训练
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Tiling: 将图像周期平铺放大分辨率，比如把花的数量增加
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Styles: 保存常用提示词
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Variations: 图像微调，与 img2img 不同在于，微调的提示词是可选的，构图通常有很大变化
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;High-res fix: 防止生成高分辨率（大于 512x512）时出现图像扭曲，在生成 512x512 时设置 upscale 参数 1.5 则输出 768x768，step 设置为 0 时会使用 sampling step 的值
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Upscaling: 将图像进行放大
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Alternating Words: 交叉使用不同的 prompt，是 Prompt Editing 的自动版
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tcmalloc: 对显存分配提升巨大，见 https://github.com/AUTOMATIC1111/stable-diffusion-webui/discussions/6722
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;将 generation data 粘贴到 prompt 然后点击 &amp;#34;Generate&amp;#34; 下方第一个蓝色按钮即可自动应用参数
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;https://www.youtube.com/watch?v=dVjMiJsuR5o
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Dreambooth: 训练整个模型最有效的方法，也只能训练整个模型，占用空间大
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Textual Inversion: 在 text encoder 进行训练，对某种特定的单词创建特定的 embeddings (vector) 再输入模型，只改变描述，不改变模型效果
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;LoRA: 在模型中插入低秩权重，对这个权重进行训练，同时会减慢生成速度，数个 LoRA 可以同时使用，但很容易过拟合（容易记住数据集）
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Tricks:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(1) num_train_epochs = max_steps * batch_size / len(train_dataloader)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;max_steps = num_train_epochs * len(train_dataloader) / batch_size
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;假如有 14 张训练图片，此时 len(train_dataloader)=1400，则 epochs = max_steps * 4 / 1400，max_steps=1050 时 epochs=3，max_steps=1051 时 epochs=4
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(2) Inpainting Mask blur 是进行高斯模糊的参数，0 代表完全改变，越高代表越少的改变
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(3) [[gotou_hitori:0.2]::0.8] add gotou_hitori from 0.2 to 0.8
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;后记&#34;&gt;后记
+&lt;/h2&gt;&lt;p&gt;Stable diffusion 太强了，生成美少女也很好玩，源码太复杂没能全部读完，将来要是有兴趣了再读吧。&lt;/p&gt;
+&lt;p&gt;虽然我对 AI 感兴趣，从最开始的 CS231n 到后面发论文，期间读了很多 segmentation(deeplabv3,bisenetv2,unet)、fusion(多尺度、曝光、聚焦等各种融合) 等领域的优秀论文，也从中学了很多。
+但我毕竟是个末流一本，也不是搞算法和数学原理的，对我而言沉没成本很大。
+AI 我是打算只当作兴趣学学的。Web3 也差不多，后面可能会写一篇介绍 go-ethereum 的文章。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;之前居然还有一个人开了 issue 和我讨论，挺惊讶的：https://github.com/iyume/image-fusion/issues/2&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;文章花了一整天的时间来写，太久没写文章感觉很生疏。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>BOM、UTF-8 和浏览器编码问题</title>
+        <link>https://blog.tinyume.com/2020/bom-introduction/</link>
+        <pubDate>Tue, 08 Dec 2020 15:52:00 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2020/bom-introduction/</guid>
+        <description>&lt;p&gt;原本只是无意间发现 &lt;a class=&#34;link&#34; href=&#34;https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/luhuisicnu/The-Flask-Mega-Tutorial-zh&lt;/a&gt; 这个项目，想拷到本地查看（毕竟 Gitbook 的速度也是挺不理想）&lt;/p&gt;
+&lt;p&gt;之前虽然有过类似的操作，当时是用 gitbook serve 实现在本地浏览器查看，不过这样的操作未免过于繁琐。于是这次便想着配合 wsl apache + markdown viewer 来简化操作流程&lt;/p&gt;
+&lt;p&gt;当我部署完成访问&lt;code&gt;SUMMARY.md&lt;/code&gt;时，却出现了中文乱码，再点开浏览器编码，发现浏览器自动使用了西文编码而不是&lt;code&gt;UTF-8&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;想到我之前参赛中遇到的一些小问题，结合起来写出了这篇关于 Unicode 各种文件头中的介绍文章，以及一些个人的猜测&lt;/p&gt;
+&lt;h2 id=&#34;先讲讲utf-8和utf-8-with-bom&#34;&gt;先讲讲&lt;code&gt;utf-8&lt;/code&gt;和&lt;code&gt;utf-8 with bom&lt;/code&gt;
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;BOM（Byte Order Mark），字节顺序标记，出现在文本文件头部，Unicode编码标准中用于标识文件是采用哪种格式的编码。&lt;/p&gt;
+&lt;p&gt;&amp;mdash;-百度百科&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;建立 abc.txt 用&lt;code&gt;utf-8&lt;/code&gt;保存
+建立 abd.txt 用&lt;code&gt;utf-8 with bom&lt;/code&gt;保存&lt;/p&gt;
+&lt;p&gt;如果你有 VSCode，那么打开文件在右下角便可以看见一个&lt;code&gt;UTF-8&lt;/code&gt;标识，点开再通过编码保存就行了&lt;/p&gt;
+&lt;p&gt;并给两个文件写入相同内容&lt;/p&gt;
+&lt;p&gt;再使用 010 Editor 分别打开两个文件&lt;/p&gt;
+&lt;p&gt;我们知道&lt;code&gt;utf-8&lt;/code&gt;是无字节序的，没有所谓文件头
+而 UTF-8 with BOM 文件头多出来了&lt;code&gt;EF BB BF&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;相关网站：&lt;a class=&#34;link&#34; href=&#34;https://developer.ibm.com/zh/articles/unicode-programming-language/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://developer.ibm.com/zh/articles/unicode-programming-language/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;可以得知虽然 BOM 的意思是字节顺序标记，但在 UTF-8 编码格式的文本中，如果添加了 BOM，则标示该文本是由 UTF-8 编码方式编码的，而不用来说明字节序&lt;/p&gt;
+&lt;h2 id=&#34;python-处理utf-8-with-bom&#34;&gt;Python 处理&lt;code&gt;utf-8 with bom&lt;/code&gt;
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;之前在比赛中使用&lt;code&gt;burp&lt;/code&gt;爆破时，总会发现字典的第一个密码在&lt;code&gt;burp&lt;/code&gt;中会显示成乱码&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;先试着打开一下第一行会乱码的那个文件&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;./password.txt&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;r&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;split&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;第一行是&lt;code&gt;\ufeffadmin&lt;/code&gt;，多了个奇怪的东西&lt;code&gt;\ufeff&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;并且这个东西可以通过如下语句去掉，只是换了个编码方式&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;./password.txt&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;r&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;encoding&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8-sig&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;split&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\n&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;我们知道&lt;code&gt;\u&lt;/code&gt;就是表示&lt;code&gt;unicode&lt;/code&gt;，那么&lt;code&gt;\ufeff&lt;/code&gt;是什么呢？&lt;/p&gt;
+&lt;p&gt;尝试以下代码&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;i like milk&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8-sig&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# output: b&amp;#39;\xef\xbb\xbfi like milk&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;i like milk&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8-sig&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# output: &amp;#39;\ufeffi like milk&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;第一行中出现了&lt;code&gt;\xef\xbb\xbf&lt;/code&gt;，&lt;code&gt;\x&lt;/code&gt;是表示十六进制的，并且&lt;code&gt;EF BB BF&lt;/code&gt;正好就是 UTF-8 with bom 的文件头部&lt;/p&gt;
+&lt;p&gt;在第二行中使用&lt;code&gt;utf-8-sig&lt;/code&gt;编码再使用&lt;code&gt;utf-8&lt;/code&gt;解码便出现了&lt;code&gt;\ufeff&lt;/code&gt;这个玩意&lt;/p&gt;
+&lt;p&gt;可以推测&lt;code&gt;\ufeff&lt;/code&gt;就是之前提到的多出的三个十六进制符&lt;code&gt;EF BB BF&lt;/code&gt;在&lt;code&gt;decode(&#39;utf-8&#39;)&lt;/code&gt;时被错误识别而编码出来的部分&lt;/p&gt;
+&lt;p&gt;并且通过查阅资料，可以发现&lt;code&gt;FE FF&lt;/code&gt;是 UTF-16-BE 的 BOM&lt;/p&gt;
+&lt;p&gt;但是也有许多讲不通的地方，于是去查了谷歌发现这样一句话&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Our friend FEFF means different things, but it&amp;rsquo;s basically a signal for a program on how to read the text. It can be UTF-8 (more common), UTF-16 , or even UTF-32 . FEFF itself is for UTF-16 — in UTF-8 it is more commonly known as 0xEF,0xBB, or 0xBF&lt;/p&gt;
+&lt;p&gt;个人翻译：FEFF 可以代表不同的东西，但它基本上是一个程序阅读一个文本的信号。它可以意味着 UTF-8（更常见），UTF-16，甚至是 UTF-32。FEFF 自身是属于 UTF-16，在 UTF-8 中它通常被称为 0xEF, 0xBB, 0xBF&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;于是我有个了更大胆的猜测：因为 UTF-8 无字节序，它并不知道面对的文件编码到底是哪种，所以我们平时保存所谓的 UTF-8，实际上会以 UTF-16 读取！&lt;/p&gt;
+&lt;p&gt;说那么多，不如来动手试试！&lt;/p&gt;
+&lt;p&gt;先把&lt;code&gt;abc.txt&lt;/code&gt;用 UTF-16-BE 储存&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;./abc.txt&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;r&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;encoding&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16-be&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# output: &amp;#39;\ufeffadddd这是中文\n\nand this is milk.\n&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;出现了熟悉的&lt;code&gt;\ufeff&lt;/code&gt;！&lt;/p&gt;
+&lt;p&gt;与 UTF-8 相同的是，UTF-16-BE 和 UTF-16-LE 也可以不需要 BOM（也许都不需要，但若是如此则需要自己判断类型）&lt;/p&gt;
+&lt;p&gt;并且还发现了一个出乎意料并且有意思的东西&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;abc&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# output: b&amp;#39;\xff\xfea\x00b\x00c\x00&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;abc&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16-le&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# output: &amp;#39;\ufeffabc&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;abc&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16-be&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# output: &amp;#39;\ufffe愀戀挀&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;以上代码使用&lt;code&gt;utf-16&lt;/code&gt;编码出来的头为&lt;code&gt;\xff\xfe&lt;/code&gt;，而在使用&lt;code&gt;utf-16-le&lt;/code&gt;解码却出现了&lt;code&gt;\ufeff&lt;/code&gt;，可能的推测就是&lt;code&gt;utf-16-le&lt;/code&gt;对&lt;code&gt;utf-16&lt;/code&gt;编码的字符的处理相对于&lt;code&gt;utf-16-be&lt;/code&gt;是对每两个十六进制数交换了一下位置&lt;/p&gt;
+&lt;p&gt;还有处地方很神奇了，此前我一直以为 UTF-16 decode 和 UTF-16-LE decode 是一样的效果，在这里居然多了个&lt;code&gt;\ufeff&lt;/code&gt;，略微试试才发现&lt;code&gt;utf-16 encode&lt;/code&gt;和&lt;code&gt;utf-16-le encode&lt;/code&gt;是不一样的，&lt;strong&gt;并且&lt;code&gt;utf-16-le decode&lt;/code&gt;不会处理&lt;code&gt;\xff\xfe&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;但是以下代码却出乎我的意料&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\xef\xbb\xbf&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-16&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;output&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;ï»¿&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;很多人可能不知道&lt;code&gt;ï»¿&lt;/code&gt;是什么符号，但我曾经在&lt;code&gt;burp&lt;/code&gt;见过&lt;/p&gt;
+&lt;p&gt;它就是在某些软件中载入&lt;code&gt;utf-8 with bom&lt;/code&gt;文件时，首行被错误识别的字符！&lt;/p&gt;
+&lt;p&gt;再尝试&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\xef\xbb\xbf&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;ï»¿&amp;#39;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;它们的输出都是&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;sa&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span class=&#34;se&#34;&gt;\xc3\xaf\xc2\xbb\xc2\xbf&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;ï»¿&lt;/code&gt;的十进制为 239 187 191，它实际上就对应&lt;code&gt;EF BB BF&lt;/code&gt;，只不过 UTF-8 错误地将它当成字符解释了出来&lt;/p&gt;
+&lt;h2 id=&#34;综上我们可以得出以下三点结论&#34;&gt;综上我们可以得出以下三点结论
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;UTF-8 的 BOM 会被识别它自身识别成&lt;code&gt;ï»¿&lt;/code&gt;（这并不是乱码）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对&lt;code&gt;EF BB BF&lt;/code&gt;的编码有如下特征&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;直接使用 UTF-8 decode，它会变成&lt;code&gt;\ufeff&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;先执行 UTF-8 encode，再执行 UTF-8 decode，它会变成&lt;code&gt;ï»¿&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;先执行 UTF-16 encode，再执行 UTF-16 decode，它会变成&lt;code&gt;ï»¿&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;先执行 UTF-16 encode，再执行 UTF-16-LE decode，他会变成&lt;code&gt;\ufeffï»¿&lt;/code&gt;（最奇怪的地方）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;\ufeff&lt;/code&gt;会在以下情况出现&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;b&#39;\xef\xbb\xbf&#39;.decode(&#39;utf-8&#39;)&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;&#39;&#39;.encode(&#39;utf-8-sig&#39;).decode(&#39;utf-8&#39;)&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;&#39;&#39;.encode(&#39;utf-16&#39;).decode(&#39;utf-16-le&#39;)&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;注意点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;utf-16 encode&lt;/code&gt;会给加上头部&lt;code&gt;\xff\xfe&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;而&lt;code&gt;utf-16-le encode&lt;/code&gt;和&lt;code&gt;utf-16-be encode&lt;/code&gt;并不会&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;并且&lt;code&gt;utf-16-le decode&lt;/code&gt;和&lt;code&gt;utf-16-be decode&lt;/code&gt;不会处理来自&lt;code&gt;utf-16 encode&lt;/code&gt;加上的文件头&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;我对此的猜测&#34;&gt;我对此的猜测
+&lt;/h2&gt;&lt;p&gt;回归原题目：&lt;strong&gt;为什么读取 utf-8 with bom 的文件首行会出现&lt;code&gt;\ufeff&lt;/code&gt;？并且某些软件会出现&lt;code&gt;ï»¿&lt;/code&gt;？&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;第一种&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;可能是编程软件中的&lt;code&gt;utf-8&lt;/code&gt;处理带 BOM 编码文件时，有一种特殊的兼容性处理方式，就是在 BOM 之后的每一位十六进制符往后填充&lt;code&gt;\x00&lt;/code&gt;，首部填充了&lt;code&gt;\xff\xfe&lt;/code&gt;，将其转换为标准&lt;code&gt;utf-16&lt;/code&gt;编码，再使用&lt;code&gt;utf-16-le decode&lt;/code&gt;，而 BOM 的&lt;code&gt;EF BB BF&lt;/code&gt;由于仅代表 Zero Width No-Break Space，可能存在某种特殊机制使其在&lt;code&gt;utf-16 encode&lt;/code&gt;之前就变成了空字符，而&lt;code&gt;utf-16 encode&lt;/code&gt;所加上的文件头&lt;code&gt;\xff\xfe&lt;/code&gt;在&lt;code&gt;utf-16-le decode&lt;/code&gt;后就变成了&lt;code&gt;\xfe\xff&lt;/code&gt;，但这种可能也无法解释为什么&lt;code&gt;utf-8 without bom&lt;/code&gt;编码文件在解码时不会被加上&lt;code&gt;\ufeff&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;可能&lt;code&gt;\xef\xbb\xbf&lt;/code&gt;执行&lt;code&gt;utf-8 decode&lt;/code&gt;就是&lt;code&gt;\ufeff&lt;/code&gt;，但会有很多地方解释不清&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第二种&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可能是某些软件读取文件时，直接对十六进制内容进行&lt;code&gt;utf-8 decode&lt;/code&gt;（或是&lt;code&gt;utf-16 decode&lt;/code&gt;），导致 BOM 被当作文件一部分解释了出来，进而出现了&lt;code&gt;ï»¿&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;注意&#34;&gt;注意
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;我本人不是很熟悉编码方面的原理，一切仅是推理&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;本文章也算是一个抛砖引玉吧，毕竟这一块找了挺多资料都没有很详细的记载&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;说了那么多额外话题，最初的浏览器中文乱码问题的解决方法其实就是在&lt;code&gt;markdown viewer&lt;/code&gt;设置中添加一项&lt;code&gt;http://localhost&lt;/code&gt; match all 并且开启 encoding utf-8 就行了&lt;/p&gt;
+&lt;p&gt;限于时间，我没空再进行别的实验了，比如说添加响应头来看看浏览器会不会识别，实际上写这一篇文章已经耗了一个晚上&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;小结一下就是：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;编程语言及各类常用应用中，使用 UTF-8 编码的文件可以被正常读取，而浏览器不行&lt;/p&gt;
+&lt;p&gt;使用 UTF-8 with BOM 可以正常被浏览器读取，而在大多数编程语言中需要进行额外处理，并且有一小部分软件无法识别 BOM（比如&lt;code&gt;burp&lt;/code&gt;）&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>JS 操作 Json DOM</title>
+        <link>https://blog.tinyume.com/2019/modify-json-dom-in-html/</link>
+        <pubDate>Thu, 31 Oct 2019 00:27:08 +0800</pubDate>
+        
+        <guid>https://blog.tinyume.com/2019/modify-json-dom-in-html/</guid>
+        <description>&lt;h2 id=&#34;起因&#34;&gt;起因
+&lt;/h2&gt;&lt;p&gt;在修复结构化数据时，尝试使用原生 JS 去操作含在 html 标签内的 Json&lt;/p&gt;
+&lt;h2 id=&#34;简易实现方法&#34;&gt;简易实现方法
+&lt;/h2&gt;&lt;h3 id=&#34;json-example&#34;&gt;Json Example
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;myjsonid&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;application/ld+json&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;s2&#34;&gt;&amp;#34;headline&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;s2&#34;&gt;&amp;#34;datePublished&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;s2&#34;&gt;&amp;#34;dateModified&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;s2&#34;&gt;&amp;#34;image&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// 不能添逗号否则 parse 报错
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;第一种方法&#34;&gt;第一种方法
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;script&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;document&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getElementById&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;myjsonid&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;firstChild&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;nodeValue&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;{&amp;#34;headline&amp;#34;: &amp;#34;myheadline&amp;#34;, &amp;#34;datePublished&amp;#34;: &amp;#34;1024-1024-1024&amp;#34;, &amp;#34;dateModified&amp;#34;: &amp;#34;1024-1024-1024&amp;#34;, &amp;#34;image&amp;#34;: &amp;#34;https://i.loli.net/2019/10/31/9kjzeQfiy43HK2B.jpg&amp;#34;}&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// Completely replace it
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;第二种方法&#34;&gt;第二种方法
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;script&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;document&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getElementById&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;myjsonid&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;textContent&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;{&amp;#34;headline&amp;#34;: &amp;#34;myheadline&amp;#34;, &amp;#34;datePublished&amp;#34;: &amp;#34;1024-1024-1024&amp;#34;, &amp;#34;dateModified&amp;#34;: &amp;#34;1024-1024-1024&amp;#34;, &amp;#34;image&amp;#34;: &amp;#34;https://i.loli.net/2019/10/31/9kjzeQfiy43HK2B.jpg&amp;#34;}&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// Completely replace it
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;output&#34;&gt;Output
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;id&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;myjsonid&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;application/ld+json&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;{&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;headline&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;myheadline&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;datePublished&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;1024-1024-1024&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;dateModified&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;1024-1024-1024&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;image&amp;#34;&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;https://i.loli.net/2019/10/31/9kjzeQfiy43HK2B.jpg&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这样毫无疑问很麻烦，如果只想要改一对键值的话，全部替换岂不要命？&lt;/p&gt;
+&lt;p&gt;上面方法只是操作了 Json 字符串，但是 JS 娘还有各种操作 Json 对象的方法，那么可以将其转化为对象然后再偷梁换柱一波&lt;/p&gt;
+&lt;h2 id=&#34;最终实现&#34;&gt;最终实现
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;script&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;document&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getElementById&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;myjsonid&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;obj&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;JSON&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;firstChild&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;nodeValue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;headline&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;myheadline&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;datePublished&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;1024-1024-1024&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;dateModified&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;1024-1024-1024&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;image&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;https://i.loli.net/2019/10/31/9kjzeQfiy43HK2B.jpg&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;firstChild&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;nodeValue&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;JSON&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;stringify&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;obj&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// Also use script.textContent
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        </item>
+        
+    </channel>
+</rss>
