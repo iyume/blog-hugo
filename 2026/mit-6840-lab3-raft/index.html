@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="MapReduce, KV Server, Raft">
+<title>6.5840 Lab 1-3 Raft</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2026/mit-6840-lab3-raft/'>
+
+<link rel="stylesheet" href="/scss/style.min.b1a5b48e9268da293f0e82d09fd1299e5ecbd5ea47ba1f408b3687d520ce0c2b.css"><meta property='og:title' content="6.5840 Lab 1-3 Raft">
+<meta property='og:description' content="MapReduce, KV Server, Raft">
+<meta property='og:url' content='https://blog.tinyume.com/2026/mit-6840-lab3-raft/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-09-16T10:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-09-16T10:00:00&#43;08:00'/>
+<meta name="twitter:title" content="6.5840 Lab 1-3 Raft">
+<meta name="twitter:description" content="MapReduce, KV Server, Raft">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?s=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#lab-1---mapreduce">Lab 1 - MapReduce</a></li>
+    <li><a href="#lab-2---keyvalue-server">Lab 2 - Key/Value Server</a></li>
+    <li><a href="#lab-3---raft">Lab 3 - Raft</a>
+      <ol>
+        <li><a href="#leader-election">Leader election</a></li>
+        <li><a href="#log">Log</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/live/" style="background-color: #2a9d8f; color: #fff;">
+                日常
+            </a>
+        
+            <a href="/categories/code/" style="background-color: #df7988; color: #fff;">
+                代码
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2026/mit-6840-lab3-raft/">6.5840 Lab 1-3 Raft</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            MapReduce, KV Server, Raft
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2026-09-16 10:00</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>前两个 lab 比较简单，和 lab 3 放在一起写一篇博文。</p>
+<blockquote>
+<p>原本打算 Lab3 写完发出来的，然而一不小心手滑去掉 draft 然后发布了&hellip;</p>
+</blockquote>
+<h2 id="lab-1---mapreduce">Lab 1 - MapReduce
+</h2><p>MapReduce 其实就是一套分布式的思想，可以最大限度地利用 CPU、带宽等资源去完成计算。
+其思想的核心就是对一个庞大的任务进行哈希分桶，分而治之，最后归并。
+分桶的依据就是给任务结果定义一个可哈希的 <code>Key</code>，例如在 word count 里面 <code>Key</code> 就是每个单词。</p>
+<p>MapReduce 里，Coordinator 作为单一协调器管理和分发任务给数个 Worker。
+而 Worker 有可能挂掉，需要对作业的完整性加以保障。</p>
+<p>任务保障机制的核心几点：</p>
+<ul>
+<li>每个任务输出为文件形式，用 <code>os.Rename</code> 等机制完成原子性的替换</li>
+<li>任务超时没完成，重新派发给其他 Worker</li>
+</ul>
+<p>MapReduce 分为 Map、Reduce 两阶段。</p>
+<p>Map Phase:</p>
+<ul>
+<li>Coordinator 将 N 个 Input file 包装为 N 个 MapTask，进行分发</li>
+<li>Worker 收到 MapTask 处理完成，将结果进行哈希分桶至 M 个桶，最终结果为 <code>mr-N-M</code>，输出文件数量为 <code>N*M</code> 个</li>
+</ul>
+<p>Reduce Phase:</p>
+<ul>
+<li>Coordinator 等待所有 MapTask 完成后，根据哈希桶的数量创建 M 个 ReduceTask 分发给 Worker</li>
+<li>Worker 收到第 M 个 ReduceTask 时，便将 <code>mr-*-M</code> 的结果提取出来进行归并，最终输出结果为 <code>mr-out-M</code>，输出文件数量为 <code>M</code> 个</li>
+</ul>
+<h2 id="lab-2---keyvalue-server">Lab 2 - Key/Value Server
+</h2><p>实现一个简易的分布式 KV Store，核心是利用 Version 字段 + 重试实现 <code>at-most-once</code> 机制，确保在弱网环境也可以正常运行。
+RPC 都定义好了，我认为是相当 easy 的。</p>
+<p>不过这个 <code>rpc.ErrMaybe</code> 设计上还是比较有意思的。
+抛开 Version，<code>rpc.ErrMaybe</code> 的含义是 Client 在重试时，并不知道第一次的请求是否成功，有可能成功了但是 ack 被丢弃了。
+这个时候 Client 就会将 <code>rpc.ErrMaybe</code> 返回给应用层去处理。</p>
+<p>lock 就是基于 KV Store 之上的应用层的作业，实现分布式锁。
+核心就是要妥善处理 <code>rpc.ErrMaybe</code>，二次检查 KV Store 里面是否存在锁并且 clientId 一致。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 举例，Release 重试判断是否成功</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">if</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">ErrVersion</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">maybe</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nb">panic</span><span class="p">(</span><span class="s">&#34;unexpected error&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>Version 在 DB 也是相当常用的字段，如今我们处理 HTTP 网络异常，都是直接利用幂等和 retry 直接无脑重试接口。
+我相信 99% 的应用都没有处理 “DB 成功，Response 出现网络异常”，利用查询接口去二次确认更新是否成功，只会返回给用户看 “这个更新提示失败了”，但是用户刷新了一遍页面，已经是新的值了。</p>
+<p>而 <code>rpc.ErrMaybe</code> 将网络异常封装了一层重试接口，交由应用层的重试逻辑去查询一次状态来判断是否成功，是一个成功的案例。</p>
+</blockquote>
+<h2 id="lab-3---raft">Lab 3 - Raft
+</h2><p>课程按顺序依次讲了 GFS、Paxos、Raft，这三者是分布式系统发展中比较重要的几个里程碑。</p>
+<p>GFS (Google File System) 是早期实现 primary 主从复制的容错文件系统，采用较原始的 lease 租约等方式在多副本中选定 primary 节点。
+Paxos 是最早的一套理论化的共识算法，利用多数派和投票机制确保集群高效且不会发生脑裂。
+Raft 则是 Paxos 工程化的最佳实践，也是本次 Lab 3 的实现目标。</p>
+<p>Lab 3 分为四个阶段：</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> Part 3A: leader election (moderate)</li>
+<li><input checked="" disabled="" type="checkbox"> Part 3B: log (hard)</li>
+<li><input disabled="" type="checkbox"> Part 3C: persistence (hard)</li>
+<li><input disabled="" type="checkbox"> Part 3D: log compaction (hard)</li>
+</ul>
+<p>Raft guarantees:</p>
+<ul>
+<li><code>Election Safety</code>: at most one leader can be elected in a given term. §5.2</li>
+<li><code>Leader Append-Only</code>: a leader never overwrites or deletes entries in its log; it only appends new entries. §5.3</li>
+<li><code>Log Matching</code>: if two logs contain an entry with the same index and term, then the logs are identical in all entries up through the given index. §5.3</li>
+<li><code>Leader Completeness</code>: if a log entry is committed in a given term, then that entry will be present in the logs of the leaders for all higher-numbered terms. §5.4</li>
+<li><code>State Machine Safety</code>: if a server has applied a log entry at a given index to its state machine, no other server will ever apply a different log entry for the same index. §5.4.3</li>
+</ul>
+<p>Raft 会保证上面 5 个特征始终成立，与论文环环相扣，需要牢记于心。</p>
+<h3 id="leader-election">Leader election
+</h3><p>Raft 选举的核心思想是每次选举必须达到多数派才会通过，不会产生脑裂，选举失败就会进行下一次的选举。
+剩下的内容无非就是处理网络分区、性能和调参。</p>
+<p>网络分区就是某个时间点下，一个或多个节点突然与集群网络分区了，无法互相访问，即 network unreachable，而不是前几次课程处理的网络异常。
+网络分区也是本次课程主要的容错目标和测试目标。</p>
+<p>代码实现上并不是完全自主设计，而是参照课程给的 extended Raft paper 去实现。
+Paper 里面已经详细介绍了字段和状态转换规则，所以实际难度会低很多。</p>
+<p>相关术语：</p>
+<ul>
+<li>term: 每次选举的自增编号，是选举算法迭代的核心机制</li>
+<li>ticker: 课程内定义的一个循环计时器，用于判断选举超时、Leader 失活</li>
+</ul>
+<p>Raft 三种状态：</p>
+<ul>
+<li>Follower: 跟随其 leader，并且随时检查心跳包</li>
+<li>Candidate: leader 失活之后，重新发起投票的人</li>
+<li>Leader: 领导者，必须保证一个 term 只能有一个 leader</li>
+</ul>
+<p>Raft 三种状态转换：</p>
+<ul>
+<li>
+<p>Follower → Candidate</p>
+<ul>
+<li>收不到心跳包 -&gt; ticker 超时 (丢失 leader) -&gt; 成为 Candidate 并发起投票</li>
+</ul>
+</li>
+<li>
+<p>Candidate → Leader</p>
+<ul>
+<li>投票得到多数派支持 -&gt; 成为新的 leader -&gt; 定期给其他 peer 发送心跳包</li>
+</ul>
+</li>
+<li>
+<p>Candidate → Follower</p>
+<ul>
+<li>收到 &gt;= currentTerm 的心跳包请求 -&gt; 新的 leader 已经选好了 -&gt; 成为 follower</li>
+</ul>
+</li>
+<li>
+<p>Leader → Follower</p>
+<ul>
+<li>收到 &gt; currentTerm 的心跳包请求 -&gt; 有了新 leader 成为 follower</li>
+<li>收到 &gt; currentTerm 的心跳包响应 -&gt; 有了新 leader 成为 follower</li>
+<li>收到 = currentTerm 的心跳包请求 -&gt; 不可能脑裂，panic！这是我自己设定的规则</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Paper: Raft ensures that there is at most one leader in a given term.</p>
+</blockquote>
+<p>Leader → Follower 发生在 Leader 被网络分区的情况下，那么它恢复的时候，就会收到新 Leader 的心跳包。
+或者它向其他 peer 发送心跳包的时候，得到响应 term 更高（告诉它我有新的 Leader 了！）。
+理解这两点至关重要，缺一不可，否则老 Leader 就很难判断自身所处状态。</p>
+<p>上面的两种情况还可以延伸解释一下，为什么心跳包响应 term？
+假设 LeaderA 恢复分区的时候，正好原集群的 Leader 失活了，LeaderA 不知道它自己已经没有权力了，心跳包响应也不带 term，这时候只能等其他节点 electionTimeout 发起投票才能转为 Follower（携带了更高的 term）。
+实际上这里等 electionTimeout 兜底也没问题，所以我并没有处理心跳包响应 term，并不影响测试。
+这玩意或许在后续 log 才有真正意义。</p>
+<p>Paper 提供的每个字段都是有意义的，可以处理各种网络分区的情况，这里就不继续细讲了。</p>
+<p>选举的核心流程：</p>
+<p><img src="/2026/mit-6840-lab3-raft/election-flow.svg"
+	
+	
+	
+	loading="lazy"
+	
+		alt="execution flow"
+	
+	
+></p>
+<p>最初状态 <code>currentTerm=0, state=Follower</code> 是不用特殊处理的，等待其中一个节点随机超时之后，开始选举 Leader 即可。</p>
+<h3 id="log">Log
+</h3><p>Log replication，即主从复制。
+Leader 收到 command 后包装为 LogEntry，广播给 Follower 保存。
+当日志在多数派中保存下来时，记作 commit 保存到状态机和持久化。</p>
+<p>在选举阶段，我们已经理解了 <code>Election Safety</code> 特性，即 one term, at most one leader。
+在 log replication 阶段，我们需要理解剩下的特性，如下图表格所示。</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>性质</th>
+          <th>由什么保证</th>
+          <th>Task</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Election Safety（一个任期最多一个 leader）</td>
+          <td>多数派 + 每个任期只投一票</td>
+          <td>3A</td>
+      </tr>
+      <tr>
+          <td>Leader Append-Only（leader 只追加，不覆盖/删除）</td>
+          <td>结构性的：Start 只 append，leader 从不截断自己的日志</td>
+          <td>3B</td>
+      </tr>
+      <tr>
+          <td>Log Matching（同 index 同 term ⇒ 之前全部相同）</td>
+          <td>PrevLogIndex/PrevLogTerm 一致性检查 + 遇冲突才截断</td>
+          <td>3B</td>
+      </tr>
+      <tr>
+          <td>Leader Completeness（已提交的条目一定在后续所有 leader 的日志里）</td>
+          <td>选举限制（LastLogTerm/LastLogIndex 比较）+ §5.4.2 只提交本任期条目</td>
+          <td>3B</td>
+      </tr>
+      <tr>
+          <td>State Machine Safety（同一 index 不会被两台机器 apply 成不同值）</td>
+          <td>由上两条推出，加上“只按 commitIndex 递增顺序 apply”</td>
+          <td>3B</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>其实关键字段就这些，按重要程度、实现顺序排序：</p>
+<ul>
+<li>nextIndex: 新 Leader 需要乐观假设所有 peer 都跟上了进度，发送 0 长度的日志，冲突时回退进度</li>
+<li>matchIndex: peer 的实际进度跟踪，在响应了 AppendEntries Success 之后更新记录</li>
+<li>commitIndex: peer 内部的提交索引，已提交的索引的日志具有多数派和不变性</li>
+<li>lastApplied: commitIndex 提交至 applyCh 用到的索引跟踪</li>
+</ul>
+<p>我的实现过程：</p>
+<ul>
+<li>将 heartbeat 改造成 per-peer goroutine，因为每个 peer 状态不一样，也能隔离故障</li>
+<li>把 AppendEntriesArgs 的 PrevLogIndex、PrevLogTerm、Entries 三个参数实现</li>
+<li>理解 nextIndex / matchIndex 作用，实现日志切片和回退逻辑</li>
+<li>peer 收到 AppendEntries，根据 <code>Log Matching</code> 原则确认日志不会发生错乱后，将自身日志截断，拼接上 Leader 给的日志（就是完全复制 Leader 日志）</li>
+<li>commitIndex / applyCh 实现</li>
+</ul>
+<p>commitIndex 更新：</p>
+<ul>
+<li>Leader: 只需要在 matchIndex 更新的时候随之更新即可，本质上还是数票</li>
+<li>Follower: 在收到 AppendEntries 并确认后，利用参数传来的 LeaderCommit 更新自身的提交进度</li>
+</ul>
+<p>实现到这一步，3B 的前三个测试应该都能完成了。
+接下来完成 election restriction 就可以完成所有的测试。</p>
+<p>election restriction 是为了确保不会有老节点突然冒出来充当了 Leader，结果覆盖掉多数派已提交的日志。
+论文对这一章节讲得很具体了，在 RequestVoteArgs 加上 Candidate 最后一条日志的索引和 term，再进行校验，确保 Candidate 日志是最新的。
+至于这块能不能用 commitIndex 之类的实现更高效率选举，还有待思考。</p>
+<blockquote>
+<p>Paper: If desired, the protocol can be optimized to reduce the number of rejected AppendEntries RPCs</p>
+</blockquote>
+<p>原论文的单步回退策略直觉上不太合理，于是我采用了 backoff 实现，也就是 nextIndex 会减半回退。
+举例，新 Leader 第一次总会发出一个长度 0 的 AppendEntries 请求，peer 拒绝后，下一次就直接发送后半部分的日志，peer 确认后就可以直接截断拼接。</p>
+<blockquote>
+<p>除了回退策略，在 3A 的时候我没有校验 sendAppendEntries 响应 Term 校验逻辑，而在 3B 是需要的，但实现的更简单，不需要回退为 Follower 的逻辑，等待心跳包即可</p>
+</blockquote>
+<p>测试结果太长就不贴了，结论来说，比较课程基准合计 time ↓10s、RPC ↓600。
+Lab 3A 选举的测试结果也大概是这样，虽然测试结果可能受硬件影响，但至少 RPC 数显而易见地降了，说明实现还是比较优秀的。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2026/cmu15445-p2/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #2</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #1</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/cmu15445-p0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CMU 15-445 Project #0</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2024/hackergame-2024/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Hackergame 2024</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/cs144/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CS 144 TCP</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2026 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

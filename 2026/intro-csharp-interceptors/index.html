@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Roslyn analyzer, interceptors, and compile-time jsonpath interpreter">
+<title>初识 C# Interceptors</title>
+
+<link rel='canonical' href='https://blog.tinyume.com/2026/intro-csharp-interceptors/'>
+
+<link rel="stylesheet" href="/scss/style.min.b1a5b48e9268da293f0e82d09fd1299e5ecbd5ea47ba1f408b3687d520ce0c2b.css"><meta property='og:title' content="初识 C# Interceptors">
+<meta property='og:description' content="Roslyn analyzer, interceptors, and compile-time jsonpath interpreter">
+<meta property='og:url' content='https://blog.tinyume.com/2026/intro-csharp-interceptors/'>
+<meta property='og:site_name' content='黯梦萦辰'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2026-07-17T17:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-07-17T17:00:00&#43;08:00'/>
+<meta name="twitter:title" content="初识 C# Interceptors">
+<meta name="twitter:description" content="Roslyn analyzer, interceptors, and compile-time jsonpath interpreter">
+    <link rel="shortcut icon" href="https://s2.loli.net/2025/01/11/oE6LCK18VcgRutx.png" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            localStorage.setItem(colorSchemeKey, "auto");
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    <img src="https://weavatar.com/avatar/1f332bb36f390f81d4d3287440e56842?s=256" width="300" height="300" class="site-logo" loading="lazy" alt="Avatar">
+                
+                </a>
+                
+                    <span class="emoji">💤</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">黯梦萦辰</a></h1>
+            <h2 class="site-description">Stay cool. Stay pythonic.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/iyume'
+                        target="_blank"
+                        title="Github"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%8F%8B%E9%93%BE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>友链</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#roslyn-analyzer">Roslyn Analyzer</a></li>
+    <li><a href="#source-generator">Source Generator</a></li>
+    <li><a href="#interceptors">Interceptors</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/knowledge/" style="background-color: #0177b8; color: #fff;">
+                知识
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2026/intro-csharp-interceptors/">初识 C# Interceptors</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Roslyn analyzer, interceptors, and compile-time jsonpath interpreter
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2026-07-17 17:00</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>2026 年来讲这个特性可能有点火星了，不过 C# Interceptors 确实给了我一些惊喜，故想写篇文章介绍一下。</p>
+<p>Interceptors 在 <code>.NET 8</code> 上面是实验性功能，<code>.NET 9.0.2xx</code> 之后成为稳定性功能。
+在 <code>.NET 10</code> LTS 之后的版本开始流行使用这个特性。
+一上来就看 Interceptors 是比较难以理解的，它通过 Analyzer hook 进编译管线，这里就先从 Analyzer 讲起。</p>
+<blockquote>
+<p>为什么要用它？</p>
+<p>我们使用编译器魔法，本质上就是元编程，可以将反射开销全部优化掉，速度变快，也能 AOT (Ahead of time) 友好，AOT 是近年 C# 快速发展的一个特性。</p>
+</blockquote>
+<h2 id="roslyn-analyzer">Roslyn Analyzer
+</h2><p>理解 C# 编译器管线之前，需要知道 Roslyn 起到一个什么样的作用。</p>
+<p>类似于 Python ast，它们起到的作用都是 <strong>解析 (Parse)</strong> 和 <strong>分析 (Analysis)</strong> 语法树。
+Parse 的部分大差不差，在分析部分 Python ast 仅仅提供了一个简易的 NodeVisitor，而 Roslyn 提供了一整套的 Semantic Model，无需像 Python 那样写复杂的代码分析。</p>
+<p>Semantic Model 就是一个获取类型推断信息的语义模型，最直观的就是 IDE 的 <code>Go to Definition</code>。
+Python 写 Semantic Model 的痛苦程度看看 mypy 就知道了（以及我写的 <code>nb-autodoc</code>）。
+Roslyn 相当于是微软提供的轮椅，它包含了一整套分析静态代码产生完整类型推断的工具链，这些信息都是和 Ast 相关联的，Linter 可以从中拿到类型推断，产生分析结果，最终反馈在源码的具体每个字符上。</p>
+<p>现代，将各种编译器诊断接入到 IDE 用 LSP (Language Server Protocol) 已然是标准做法，而各种不同编程语言如何编写 Linter 则产生了非常多的方法。</p>
+<ul>
+<li>Go (gopls)、C++ (clangd) 等用的是官方编译器 API。</li>
+<li>Python (pyright) 则比较别具一格地用 Typescript 来解析 Python 的源码。</li>
+<li>TypeScript (tsc/eslint) 则是类型检查 -&gt; 类型擦除 -&gt; JS Linter。</li>
+</ul>
+<p>C# 是其中最灵活的一种插件式系统，它定义了一种叫做 Analyzer 的项目类型，通过将 Analyzer 定义在待分析项目依赖里面，编译器进程去读取并加载，无需用户去引入第三方工具、兼容 IDE 什么的。</p>
+<p>从 IDE 的角度来看执行流程：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">IDE
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Microsoft.CodeAnalysis.LanguageServer.dll
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Project Analyzers (.csproj)
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Diagnostics
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要注意的是 Roslyn 和 Analyzer 本身都是一个包，它们的宿主是编译器。
+为了兼容各个版本 dotnet SDK 或者甚至不同编译器的 TargetFrameworks 支持列表，Analyzer 项目版本必须要和各种编译器进程兼容，即公认 <code>netstandard2.0</code>。</p>
+<blockquote>
+<p>Roslyn Analyzer 相当于是一个用 C# 实现的 C# 分析器罢了，本质上也可以用其他语言来实现，例如 F#，前提是兼容 <code>netstandard2.0</code> 标准的 dll 程序集。</p>
+</blockquote>
+<p>回顾一下 C# 进行一次编译的时候，输入是多个源代码文件 + <code>.csproj</code> package reference + project reference + OutputType 等多个编译选项，输出就是 <code>&lt;assemblyName&gt;.dll</code>。</p>
+<p>加入代码诊断 Diagnostics Analyzer 的编译流程大概上就是这样：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">AST → Semantic Model → Analyzer -&gt; Diagnostics
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Compile (Symbols + Definitions)
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Lowering + Optimization
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Assembly (.dll)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="source-generator">Source Generator
+</h2><blockquote>
+<p>Source Generator (SG) 大约在 2020 年推出，一种在不修改源码基础上新增代码的方式，在最终编译的时候才将这些新文件一起编译进去。</p>
+</blockquote>
+<p>SG 一般会配合 attribute / partial 这两个 C# 特性一起用，例如先用声明式写一段代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">partial</span> <span class="k">class</span> <span class="nc">Foo</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="na">    [Name(&#34;Guru&#34;)]</span>
+</span></span><span class="line"><span class="cl"><span class="na">    [Say(&#34;Hello!&#34;)]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">partial</span> <span class="k">void</span> <span class="n">Bar</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>通过在项目定义一个 SG Analyzer（这个具体怎么写就不展开了）并开启 <code>&lt;EmitCompilerGeneratedFiles&gt;true&lt;/EmitCompilerGeneratedFiles&gt;</code> 调试选项，就会在 <code>obj/Debug/net10.0/generated</code> 下面看到一个新文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="c1">// Same namespace</span>
+</span></span><span class="line"><span class="cl"><span class="kd">partial</span> <span class="k">class</span> <span class="nc">Foo</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">partial</span> <span class="k">void</span> <span class="n">Bar</span><span class="p">()</span>  <span class="c1">// behind implementation</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">name</span> <span class="p">=</span> <span class="s">&#34;Guru&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">saying</span> <span class="p">=</span> <span class="s">&#34;Hello!&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">$&#34;{name} says {saying}&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>SG 的特点是在完全不改变用户代码语义（包括类型检查）的情况下，用 partial / extension method 等方法去拓展源码。</p>
+<p>SG 也是 Analyzer，上面说的诊断 Analyzer 继承 <code>DiagnosticAnalyzer</code> 基类，而 SG 基于 <code>IIncrementalGenerator</code> 接口实现。</p>
+<p>加入了 Source Generator 的编译流程是这样的：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">AST → Semantic Model → Analyzer (Source Generator) -&gt; New Files
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Compile (Symbols + Definitions + New Files)
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Lowering + Optimization
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Assembly (.dll)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="interceptors">Interceptors
+</h2><blockquote>
+<p>Interceptors 大约在 2025 年底成为稳定特性，可以拦截函数调用并替换为另一个调用。</p>
+</blockquote>
+<p>理解了 Analyzer 之后，再来阅读 <a class="link" href="https://github.com/dotnet/roslyn/blob/main/docs/features/interceptors.md"  target="_blank" rel="noopener"
+    >Interceptors 官方文档</a> 就很清晰易懂了。
+Interceptors 本质和 SG 一样，都是基于 <code>IIncrementalGenerator</code> 接口实现，都是 Generate New Files。</p>
+<p>Interceptors 特性就是不需要通过魔改代码，实现拦截并替换项目内任何地方的 Invocation（函数调用）。</p>
+<p>原理：Interceptors 和 SG 同样是产生新文件，区别在于 Interceptors 扫描代码时可以根据 Invocation 创建一个拦截点，将其重定向到新文件里的新函数，交给 Compiler 去处理拦截点。</p>
+<p>编译流程在 Compile 之后多了一个 Interceptors Replace 的步骤，指导 Compiler 去接管 <strong>指定位置</strong> 代码的函数调用：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">AST → Semantic Model → Analyzer (Source Generator) -&gt; New Files
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Compile (Symbols + Definitions + New Files)
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Interceptors Replace
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Lowering + Optimization
+</span></span><span class="line"><span class="cl"> ↓
+</span></span><span class="line"><span class="cl">Assembly (.dll)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>文档介绍的 <code>GetInterceptableLocation(this SemanticModel, InvocationExpressionSyntax, CancellationToken)</code> 便是用于生成位置编码的函数。</p>
+<p>整体看下来还是比较简单的，做 ast 本身就有很多 polyfill 这里就不讲了，实现的时候就知道了。</p>
+<p><a class="link" href="https://github.com/iyume/Iyume.JsonPath"  target="_blank" rel="noopener"
+    >Iyume.JsonPath</a> 是我根据 Interceptors 特性 vibe coding 出来的，可以在编译时就确定 JsonPath 的路径生成静态代码，感兴趣的也可以看看。
+（有些细节还没空去调整，比如生成的 Location 与函数如何复用）</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>CC BY-NC-SA 4.0 License</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2026/response-ended-analysis/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ResponseEnded 排障记录</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2023/stable-diffusion-tips/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Stable diffusion 笔记</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2020/bom-introduction/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">BOM、UTF-8 和浏览器编码问题</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2019/modify-json-dom-in-html/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JS 操作 Json DOM</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2021 - 
+        
+        2026 黯梦萦辰
+    </section>
+    
+    <section class="powerby">
+        
+            <a href="https://github.com/iyume/blog-hugo/">Github</a> & <a href="https://www.jsdelivr.com/">jsDelivr</a> & <a href="https://www.cloudflare.com/">Cloudflare</a><br><a href="http://beian.miit.gov.cn/">粤ICP备2020138189号</a> <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
